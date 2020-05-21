@@ -1,0 +1,125 @@
+﻿@page "/"
+
+@using Shopping.Shared
+@inject HttpClient Http
+
+<div class="row">
+    <div class="col-sm-4">
+        <h3>Einkaufsliste @shoppingList.Date.ToString("dd.MM.yy")</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label>Produkt</label>
+    </div>
+    <div class="col">
+        <label>Anzahl</label>
+    </div>
+    <div class="col">
+        Einheit
+    </div>
+    <div class="col">
+
+    </div>
+</div>
+<EditForm EditContext="@editContext" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="row">
+        <div class="col">
+            <InputText @bind-Value="newItem.Name" class="form-control" />
+        </div>
+        <div class="col">
+            <InputText @bind-Value="newItem.Amount" class="form-control" />
+        </div>
+        <div class="col">
+            <InputSelect @bind-Value="newItem.AmountType" class="form-control">
+                @foreach(AmountType val in Enum.GetValues(typeof(AmountType)))
+                {
+                    <option value="@val">@val.GetDescription()</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="col">
+            <button type="submit" disabled="@formInvalid" class="btn btn-primary">
+                <span class="oi oi-plus" aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
+</EditForm>
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th>Produkt</th>
+            <th>Menge</th>
+            <th>Einheit</th>
+            <th>Gekauft?</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (shoppingList.Items.Count == 0)
+        {
+            <tr>
+                <td colspan="5" align="center">Keine Daten ...</td>
+            </tr>
+        }
+        else
+        {
+            foreach (var item in shoppingList.Items)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Amount</td>
+                    <td>@(((AmountType)item.AmountType).GetDescription())</td>
+                    <td>
+                        <input type="checkbox" @bind-value="@item.Done" />
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="@(e=>Remove(item.Id))">
+                            <span class="oi oi-x" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    private ShoppingList shoppingList = new ShoppingList();
+    private bool formInvalid = true;
+    private EditContext editContext;
+    private ShoppingItem newItem = new ShoppingItem();
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(newItem);
+        editContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        formInvalid = !editContext.Validate();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        editContext.OnFieldChanged -= HandleFieldChanged;
+    }
+    public void Remove(string id)
+    {
+        shoppingList.RemoveEntry(id);
+    }
+    private void HandleValidSubmit()
+    {
+        if (!shoppingList.Contains(newItem))
+        {
+            var copy = new ShoppingItem(newItem);
+            shoppingList.AddEntry(copy);
+        }
+    }
+
+}
