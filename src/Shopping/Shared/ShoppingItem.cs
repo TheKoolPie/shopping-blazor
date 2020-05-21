@@ -24,6 +24,7 @@ namespace Shopping.Shared
 
         [DisplayName("Gekauft")]
         public bool Done { get; set; }
+        public string DoneCssClassName { get; set; }
 
         public ShoppingItem() { }
         public ShoppingItem(ShoppingItem item)

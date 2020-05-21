@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
 namespace Shopping.Shared
@@ -14,6 +15,9 @@ namespace Shopping.Shared
         [DisplayName("Datum")]
         public DateTime Date { get; set; }
 
+        private string DoneCssClassName => "done";
+
+
         public ShoppingList()
         {
             Date = DateTime.Now;
@@ -25,6 +29,15 @@ namespace Shopping.Shared
             if (item != null)
             {
                 Items.Remove(item);
+            }
+        }
+        public void ToggleDoneState(string id)
+        {
+            var item = Items.FirstOrDefault(i => i.Id.Equals(id));
+            if (item != null)
+            {
+                item.Done = !item.Done;
+                item.DoneCssClassName = item.Done ? DoneCssClassName : null;
             }
         }
         public bool Contains(ShoppingItem item)

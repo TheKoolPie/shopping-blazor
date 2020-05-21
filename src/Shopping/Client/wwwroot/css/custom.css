@@ -1,0 +1,7 @@
+﻿.product-card {
+    margin: 10px;
+}
+
+    .product-card.done {
+        background-color:#99e699;
+    }

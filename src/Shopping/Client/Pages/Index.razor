@@ -4,88 +4,84 @@
 @inject HttpClient Http
 
 <div class="row">
-    <div class="col-sm-4">
+    <div class="col-md-4">
         <h3>Einkaufsliste @shoppingList.Date.ToString("dd.MM.yy")</h3>
     </div>
 </div>
-<div class="row">
-    <div class="col">
-        <label>Produkt</label>
-    </div>
-    <div class="col">
-        <label>Anzahl</label>
-    </div>
-    <div class="col">
-        Einheit
-    </div>
-    <div class="col">
 
-    </div>
-</div>
 <EditForm EditContext="@editContext" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="row">
         <div class="col">
-            <InputText @bind-Value="newItem.Name" class="form-control" />
+            <label>
+                Produkt
+                <InputText @bind-Value="newItem.Name" class="form-control" />
+            </label>
         </div>
+    </div>
+    <div class="row">
         <div class="col">
-            <InputText @bind-Value="newItem.Amount" class="form-control" />
+            <label>
+                Anzahl
+                <InputText @bind-Value="newItem.Amount" class="form-control" />
+            </label>
         </div>
+    </div>
+    <div class="row">
         <div class="col">
-            <InputSelect @bind-Value="newItem.AmountType" class="form-control">
-                @foreach(AmountType val in Enum.GetValues(typeof(AmountType)))
-                {
-                    <option value="@val">@val.GetDescription()</option>
-                }
-            </InputSelect>
+            <label>
+                Einheit
+                <InputSelect @bind-Value="newItem.AmountType" class="form-control">
+                    @foreach (AmountType val in Enum.GetValues(typeof(AmountType)))
+                    {
+                        <option value="@val">@val.GetDescription()</option>
+                    }
+                </InputSelect>
+            </label>
         </div>
+    </div>
+    <div class="row">
         <div class="col">
             <button type="submit" disabled="@formInvalid" class="btn btn-primary">
                 <span class="oi oi-plus" aria-hidden="true"></span>
+                Hinzufügen
             </button>
         </div>
     </div>
 </EditForm>
 <hr />
-<table class="table">
-    <thead>
-        <tr>
-            <th>Produkt</th>
-            <th>Menge</th>
-            <th>Einheit</th>
-            <th>Gekauft?</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="container">
+    <div class="row">
         @if (shoppingList.Items.Count == 0)
         {
-            <tr>
-                <td colspan="5" align="center">Keine Daten ...</td>
-            </tr>
+            <div class="col">
+                Keine Daten gefunden....
+            </div>
         }
         else
         {
             foreach (var item in shoppingList.Items)
             {
-                <tr>
-                    <td>@item.Name</td>
-                    <td>@item.Amount</td>
-                    <td>@(((AmountType)item.AmountType).GetDescription())</td>
-                    <td>
-                        <input type="checkbox" @bind-value="@item.Done" />
-                    </td>
-                    <td>
-                        <button class="btn btn-danger" @onclick="@(e=>Remove(item.Id))">
-                            <span class="oi oi-x" aria-hidden="true"></span>
-                        </button>
-                    </td>
-                </tr>
+                <div class="col">
+                    <div class="card product-card @item.DoneCssClassName" style="width:16rem;"
+                         @onclick="@(e=>CheckItem(item.Id))">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Name</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@item.Amount @(((AmountType)item.AmountType).GetDescription())</h6>
+                            @*<button class="btn btn-dark" @onclick="@(e=>CheckItem(item.Id))">
+                                <span class="oi oi-check" /> Erledigt
+                            </button>*@
+                            <button class="btn btn-light" @onclick="@(e=>Remove(item.Id))">
+                                <span class="oi oi-x" /> Löschen
+                            </button>
+                        </div>
+                    </div>
+                </div>
             }
         }
-    </tbody>
-</table>
+    </div>
+</div>
 
 @code {
     private ShoppingList shoppingList = new ShoppingList();
@@ -112,6 +108,10 @@
     public void Remove(string id)
     {
         shoppingList.RemoveEntry(id);
+    }
+    public void CheckItem(string id)
+    {
+        shoppingList.ToggleDoneState(id);
     }
     private void HandleValidSubmit()
     {
