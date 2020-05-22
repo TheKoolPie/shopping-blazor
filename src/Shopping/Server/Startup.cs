@@ -27,7 +27,7 @@ namespace Shopping.Server
             var connData = new CosmosDbConnStringData(connString);
             services.AddControllersWithViews();
             services.AddRazorPages();
-            //services.AddDbContext<ShoppingDbContext>(o => o.UseCosmos(connData.Endpoint, connData.Key, "shopping-list"));
+            services.AddDbContext<ShoppingDbContext>(o => o.UseCosmos(connData.Endpoint, connData.Key, "shopping-list"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

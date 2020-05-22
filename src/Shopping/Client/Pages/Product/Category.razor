@@ -1,0 +1,31 @@
+﻿@page "/product/category"
+@using Shopping.Shared.Data
+@inject HttpClient Http
+
+<h3>Produkt Kategorien</h3>
+
+<button class="btn btn-primary" @onclick="SaveCategory">Add</button>
+<label>@msg</label>
+@code {
+    private string msg;
+
+    private async void SaveCategory()
+    {
+        var category = new ProductCategory
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fleisch",
+            ColorCode = "#c827ce"
+        };
+
+        var result = await Http.PostAsJsonAsync<ProductCategory>("api/ProductCategory",category);
+        if (result.IsSuccessStatusCode)
+        {
+            msg = "Saved successfully";
+        }
+        else
+        {
+            msg = "Error";
+        }
+    }
+}

@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Linq;
 
-namespace Shopping.Shared
+namespace Shopping.Shared.Enums
 {
     public static class EnumExtensionMethods
     {
