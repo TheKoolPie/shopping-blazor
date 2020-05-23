@@ -21,6 +21,13 @@ namespace Shopping.Server.Controllers
             
         }
 
+        [HttpGet]
+        public async Task<ActionResult<List<ProductCategory>>> GetProductCategories()
+        {
+            var categories = await _context.Categories.ToListAsync();
+            return categories;
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductCategory>> GetProductCategory(string name)
         {
@@ -51,7 +58,22 @@ namespace Shopping.Server.Controllers
                     throw;
                 }
             }
-            return CreatedAtAction("GetProductCategory", new { name = category.Name }, category);
+            return Ok(category);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ProductCategory>> DeleteProductCategory(string id)
+        {
+            var categories = await _context.Categories.ToListAsync();
+            var category = categories.FirstOrDefault(c => c.Id.ToString().Equals(id));
+            if (category == null)
+            {
+                return NotFound();
+            }
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+
+            return category;
         }
 
         private bool CategoryExists(string name) 

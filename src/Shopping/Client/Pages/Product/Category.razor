@@ -1,31 +1,247 @@
 ﻿@page "/product/category"
 @using Shopping.Shared.Data
+@using Shopping.Shared.Enums
+@using Shopping.Shared.Model
+@using System.Linq
 @inject HttpClient Http
+@inject ILogger<Category> Logger
 
 <h3>Produkt Kategorien</h3>
 
-<button class="btn btn-primary" @onclick="SaveCategory">Add</button>
-<label>@msg</label>
-@code {
-    private string msg;
-
-    private async void SaveCategory()
-    {
-        var category = new ProductCategory
+<div class="row">
+    <div class="col">
+        @if (IsSaving)
         {
-            Id = Guid.NewGuid(),
-            Name = "Fleisch",
-            ColorCode = "#c827ce"
-        };
-
-        var result = await Http.PostAsJsonAsync<ProductCategory>("api/ProductCategory",category);
-        if (result.IsSuccessStatusCode)
-        {
-            msg = "Saved successfully";
+            <strong>Speichere daten....</strong>
         }
         else
         {
-            msg = "Error";
+            <EditForm EditContext="@editContext" OnSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="row">
+                    <div class="col">
+                        <label>
+                            Name
+                            <InputText class="form-control" @bind-Value="category.Name" />
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label>
+                            Farbe
+                            <input class="form-control" type="color" @bind-value="category.ColorCode" />
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-primary" type="submit">
+                            <span class="oi oi-task" /> Speichern
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
         }
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        @if (AlertData.Title != null)
+        {
+            <AlertComponent Title="@AlertData.Title" Type="@AlertData.Type">
+                @AlertData.Message
+            </AlertComponent>
+        }
+    </div>
+</div>
+<hr />
+
+@if (categories != null)
+{
+    <div class="row">
+        <div class="col">
+            <input type="search" class="form-control"
+                   @bind="SearchInput" @bind:event="oninput"
+                   placeholder="Search for category..." />
+        </div>
+        <div class="col">
+            <button class="btn btn-light" @onclick="LoadProductCategories">
+                <span class="oi oi-reload" />
+            </button>
+        </div>
+    </div>
+    <div class="row" style="margin-top:24px">
+        <div class="col">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th @onclick="OnTableColumnClicked">
+                            Name
+                            <span class="@SortingData.Icon" />
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var category in categories)
+                    {
+                        string borderContent = $"15px solid {category.ColorCode}";
+                        <tr>
+                            <td style="border-left: @borderContent">@category.Name</td>
+                            <td>
+                                <button class="btn btn-danger" @onclick="@(()=>DeleteCategory(category.Id.ToString()))">
+                                    <span class="oi oi-trash" />
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col">
+            Loading data ...
+        </div>
+    </div>
+}
+
+
+
+@code {
+
+    private AlertComponentModel AlertData = new AlertComponentModel();
+    private SortingModel SortingData = new SortingModel();
+
+
+    private bool IsSaving = false;
+
+
+
+    private string searchInput;
+    public string SearchInput
+    {
+        get => searchInput;
+        set
+        {
+            searchInput = value;
+            OnSearchInputChanged();
+        }
+    }
+
+    private List<ProductCategory> localBackup = null;
+
+    private List<ProductCategory> categories = null;
+    private ProductCategory category = new ProductCategory();
+    private EditContext editContext;
+
+    protected override async Task OnInitializedAsync()
+    {
+        editContext = new EditContext(category);
+        await LoadProductCategories();
+    }
+
+    private async Task HandleSubmit()
+    {
+        var isValid = editContext.Validate();
+        var categoryAlreadyExists = localBackup.Any(c => c.Name.Equals(category.Name) || c.ColorCode.Equals(category.ColorCode));
+        if (isValid)
+        {
+            if (!categoryAlreadyExists)
+            {
+                IsSaving = true;
+                var result = await Http.PostAsJsonAsync<ProductCategory>("api/ProductCategory", category);
+                if (result.IsSuccessStatusCode)
+                {
+                    var resultObject = await result.Content.ReadFromJsonAsync<ProductCategory>();
+                    localBackup.Add(resultObject);
+                    categories.Add(resultObject);
+
+                    SavingSuccessAlert();
+                }
+                else
+                {
+                    SavingFailureAlert(result.ReasonPhrase);
+                }
+                SortTable();
+                IsSaving = false;
+            }
+            else
+            {
+                SavingFailureAlert("Category name or color already exists");
+            }
+        }
+    }
+
+
+    private async Task LoadProductCategories()
+    {
+        localBackup = null;
+        categories = null;
+
+        localBackup = await Http.GetFromJsonAsync<List<ProductCategory>>("api/ProductCategory");
+        categories = new List<ProductCategory>(localBackup);
+
+        SearchInput = null;
+
+        SortTable();
+    }
+
+    private async Task DeleteCategory(string id)
+    {
+        var response = await Http.DeleteAsync($"api/ProductCategory/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            DeleteFailureAlert(response.ReasonPhrase);
+        }
+        await LoadProductCategories();
+    }
+
+    private void OnSearchInputChanged()
+    {
+        categories = new List<ProductCategory>(localBackup);
+        if (!string.IsNullOrEmpty(searchInput))
+        {
+            categories = localBackup
+                .Where(e => e.Name.Contains(searchInput, StringComparison.InvariantCultureIgnoreCase))
+                .ToList();
+        }
+    }
+    private void OnTableColumnClicked()
+    {
+        SortingData.Toggle();
+        SortTable();
+    }
+    private void SortTable()
+    {
+        switch (SortingData.Type)
+        {
+            case SortingType.Ascending:
+                categories = categories.OrderBy(e => e.Name).ToList();
+                break;
+            case SortingType.Descending:
+                categories = categories.OrderByDescending(e => e.Name).ToList();
+                break;
+        }
+    }
+
+    private void SavingSuccessAlert()
+    {
+        AlertData = AlertComponentModel.CreateSuccessAlert("Category saved", $"Category '{category.Name}' with Color: '{category.ColorCode}' successfully saved");
+        Logger?.LogInformation(AlertData.ToString());
+    }
+    private void SavingFailureAlert(string resultMsg)
+    {
+        AlertData = AlertComponentModel.CreateErrorAlert("Error with saving", $"Could not save {category.Name}: {resultMsg}");
+        Logger?.LogError(AlertData.ToString());
+    }
+    private void DeleteFailureAlert(string resultMsg)
+    {
+        AlertData = AlertComponentModel.CreateErrorAlert("Error with deletion", $"Could not delete {category.Name}: {resultMsg}");
     }
 }
