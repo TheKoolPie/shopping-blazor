@@ -8,7 +8,7 @@ namespace Shopping.Shared.Enums
     public enum ProductUnit
     {
         [Description("Gramm")]
-        Gramm,
+        Gramm = 1,
         [Description("Kilogramm")]
         KiloGramm,
         [Description("Stück")]

@@ -1,7 +1,254 @@
 ﻿@page "/product/"
+@using Shopping.Shared.Data;
+@using Shopping.Shared.Enums;
+@using Shopping.Shared.Model;
+@inject HttpClient Http
 
 <h3>Produkte</h3>
 
+@if (IsLoading)
+{
+    <div class="row">
+        <div class="col">
+            <strong>Loading...</strong>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col">
+            @if (IsSaving)
+            {
+                <strong>Speichere Daten....</strong>
+            }
+            else
+            {
+                <EditForm EditContext="@editContext" OnSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="row">
+                        <div class="col">
+                            <label>
+                                Name
+                                <InputText class="form-control" @bind-Value="product.Name" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label>
+                                Unit
+                                <InputSelect class="form-control" @bind-Value="product.Unit">
+                                    <option value="0">Choose Unit...</option>
+                                    @foreach (var unit in Enum.GetValues(typeof(ProductUnit)).Cast<ProductUnit>())
+                                            {
+                                        <option value="@unit">@unit.GetDescription()</option>
+                                            }
+                                </InputSelect>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label>
+                                Category
+                                <InputSelect class="form-control" @bind-Value="product.CategoryId">
+                                    <option value="" selected>Choose Category...</option>
+                                    @foreach (var category in categories)
+                                            {
+                                                string borderContent = $"15px solid {category.ColorCode}";
+                                        <option style="border-left: @borderContent" value="@category.Id">@category.Name</option>
+                                            }
+                                </InputSelect>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn btn-primary" type="submit">
+                                <span class="oi oi-task" /> Speichern
+                            </button>
+                        </div>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            @if (AlertData.Title != null)
+            {
+                <AlertComponent Title="@AlertData.Title" Type="@AlertData.Type">
+                    @AlertData.Message
+                </AlertComponent>
+            }
+        </div>
+    </div>
+    <hr />
+    @if (products != null)
+    {
+        <div class="row">
+            <div class="col">
+                <input type="search" class="form-control" 
+                       @bind="SearchInput" @bind:event="oninput"
+                       placeholder="Search for product..." />
+            </div>
+            <div class="col">
+                <button class="btn btn-light" @onclick="LoadProductItems">
+                    <span class="oi oi-reload" />
+                </button>
+            </div>
+        </div>
+        <div class="row" style="margin-top:24px">
+            <div class="col">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Einheit</th>
+                            <th>Kategorie</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in products)
+                        {
+                            string borderContent = $"15px solid {product.Category.ColorCode}";
+                            <tr>
+                                <td>@product.Name</td>
+                                <td>@product.Unit.GetDescription()</td>
+                                <td style="border-left: @borderContent">@product.Category.Name</td>
+                                <td>
+                                    <button class="btn btn-danger" @onclick="@(()=>DeleteProduct(product.Id))">
+                                        <span class="oi oi-trash" />
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
 @code {
 
+    private AlertComponentModel AlertData = new AlertComponentModel();
+    private SortingModel SortingData = new SortingModel();
+
+    private ProductItem product = new ProductItem();
+    private EditContext editContext;
+
+    private bool IsSaving = false;
+    private bool IsLoading = false;
+
+    private string searchInput;
+    public string SearchInput
+    {
+        get => searchInput;
+        set
+        {
+            searchInput = value;
+            OnSearchInputChanged();
+        }
+    }
+
+    private void OnSearchInputChanged()
+    {
+        products = new List<ProductItem>(localBackup);
+        if (!string.IsNullOrEmpty(searchInput))
+        {
+            products = products.Where(p => p.Name.Contains(searchInput, StringComparison.InvariantCultureIgnoreCase) || p.Category.Name.Contains(searchInput, StringComparison.InvariantCultureIgnoreCase))
+                .ToList();
+        }
+    }
+
+    private List<ProductCategory> categories = new List<ProductCategory>();
+    private List<ProductItem> localBackup = null;
+    private List<ProductItem> products = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        editContext = new EditContext(product);
+
+        IsLoading = true;
+
+        await LoadProductCategories();
+        await LoadProductItems();
+
+        IsLoading = false;
+    }
+
+    private async Task HandleSubmit()
+    {
+        var isValid = editContext.Validate();
+        var productExists = localBackup.Any(c => c.Name.Equals(product.Name));
+        var category = categories.FirstOrDefault(c => c.Id.Equals(product.CategoryId));
+
+        if (isValid)
+        {
+
+            if (productExists)
+            {
+                SavingFailureAlert($"Product with name '{product.Name}' already exists");
+            }
+            else
+            {
+                IsSaving = true;
+                product.Category = category;
+                var result = await Http.PostAsJsonAsync<ProductItem>("api/Product", product);
+                if (result.IsSuccessStatusCode)
+                {
+                    var resultObject = await result.Content.ReadFromJsonAsync<ProductItem>();
+                    localBackup.Add(resultObject);
+                    products.Add(resultObject);
+                }
+                else
+                {
+                    SavingFailureAlert(result.ReasonPhrase);
+                }
+
+                IsSaving = false;
+            }
+
+        }
+    }
+
+    private async Task LoadProductItems()
+    {
+        localBackup = null;
+        products = null;
+
+        localBackup = (await Http.GetFromJsonAsync<List<ProductItem>>("api/Product")).ToList();
+        products = new List<ProductItem>(localBackup);
+    }
+    private async Task LoadProductCategories()
+    {
+        categories = (await Http.GetFromJsonAsync<List<ProductCategory>>("api/ProductCategory")).ToList();
+    }
+
+    private async Task DeleteProduct(string id)
+    {
+        var response = await Http.DeleteAsync($"api/Product/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            DeleteFailureAlert(response.ReasonPhrase);
+        }
+        await LoadProductItems();
+    }
+
+    private void SavingSuccessAlert()
+    {
+        AlertData = AlertComponentModel.CreateSuccessAlert("Product saved", $"");
+    }
+    private void SavingFailureAlert(string resultMsg)
+    {
+        AlertData = AlertComponentModel.CreateErrorAlert("Error with saving", resultMsg);
+    }
+    private void DeleteFailureAlert(string resultMsg)
+    {
+        AlertData = AlertComponentModel.CreateErrorAlert("Error with deletion", resultMsg);
+    }
 }
