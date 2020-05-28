@@ -1,4 +1,5 @@
-﻿@page "/shopping-list/details/{datestring}"
+﻿@page "/shopping-list/details"
+@page "/shopping-list/details/{datestring}"
 
 @inject IProducts ProductRepo
 @inject IShoppingLists ShoppingListRepo
@@ -79,8 +80,9 @@ else
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Done</th>
+                        <th>  </th>
                         <th>Amount</th>
+                        <th>Unit</th>
                         <th>Product</th>
                         <th></th>
                     </tr>
@@ -89,9 +91,15 @@ else
                     @foreach (var item in shoppingList.Items)
                     {
                         <tr @onclick="@(()=>ToggleItemState(item.Id))">
-                            <td><span style="color:green" class="@(item.Done ? "oi oi-circle-check" : "")"></span></td>
-                            <td>@item.Amount [@item.ProductItem.Unit.GetDescription()]</td>
+                            <td><span style="color:@(item.Done ? "green" : "white")" class="oi oi-circle-check"></span></td>
+                            <td>@item.Amount</td>
+                            <td>@item.ProductItem.Unit.GetDescription()</td>
                             <td>@item.ProductItem.Name</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" @onclick="@(()=>DeleteListItem(item.Id))">
+                                    <span class="oi oi-trash" />
+                                </button>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -104,6 +112,7 @@ else
     [Parameter]
     public string DateString { get; set; }
 
+    private AlertComponentModel AlertData = new AlertComponentModel();
     private DateTime date;
     private ShoppingListModel shoppingList = null;
 
@@ -153,6 +162,11 @@ else
             {
                 shoppingList.Items.Add(savedEntity);
                 item = new ShoppingListItem(date);
+                ProductSearch = "";
+            }
+            else
+            {
+                SavingFailureAlert();
             }
 
             IsSaving = false;
@@ -182,5 +196,22 @@ else
     {
         var toggleItem = shoppingList.Items.FirstOrDefault(i => i.Id == id);
         toggleItem.Done = !toggleItem.Done;
+    }
+    private async Task DeleteListItem(string id)
+    {
+        if (!(await ItemRepo.DeleteByIdAsync(id)))
+        {
+            DeleteFailureAlert();
+        }
+        shoppingList = await ShoppingListRepo.GetByDate(date);
+    }
+
+    private void SavingFailureAlert(string resultMsg = "")
+    {
+        AlertData = AlertComponentModel.CreateErrorAlert("Error with saving", $"Could not save list item: {resultMsg}");
+    }
+    private void DeleteFailureAlert(string resultMsg = "")
+    {
+        AlertData = AlertComponentModel.CreateErrorAlert("Error with deletion", $"Could not delete list item: {resultMsg}");
     }
 }
