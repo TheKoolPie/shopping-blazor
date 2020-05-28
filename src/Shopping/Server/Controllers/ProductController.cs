@@ -56,7 +56,7 @@ namespace Shopping.Server.Controllers
             {
                 await _context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch (DbUpdateException)
             {
                 if (ProductExists(product.Name))
                 {
