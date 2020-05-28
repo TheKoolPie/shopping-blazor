@@ -19,7 +19,9 @@ namespace Shopping.Client
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-            builder.Services.AddSingleton<IProductCategoryAccess, ProductCategoryApiAccess>();
+
+            builder.Services.AddSingleton<IProductCategories, ProductCategoryApiAccess>();
+            builder.Services.AddSingleton<IProducts, ProductsApiAccess>();
 
             await builder.Build().RunAsync();
         }

@@ -6,10 +6,8 @@ using System.Text;
 
 namespace Shopping.Shared.Data
 {
-    public class ProductItem
+    public class ProductItem : BaseItem
     {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Product Id is needed")]
-        public string Id { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Product name is needed")]
         public string Name { get; set; }
         [Required(ErrorMessage = "Unit is needed")]

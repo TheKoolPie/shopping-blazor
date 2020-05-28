@@ -5,11 +5,8 @@ using System.Text;
 
 namespace Shopping.Shared.Data
 {
-    public class ShoppingListItem
+    public class ShoppingListItem : BaseItem
     {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Id is needed")]
-        public string Id { get; set; }
-
         public string ProductItemId { get; set; }
         public ProductItem ProductItem { get; set; }
 

@@ -3,6 +3,8 @@
 @using Shopping.Shared.Enums;
 @using Shopping.Shared.Model;
 @inject HttpClient Http
+@inject IProductCategories CategoryRepo
+@inject IProducts ProductRepo
 
 <h3>Produkte</h3>
 
@@ -91,7 +93,7 @@ else
     {
         <div class="row">
             <div class="col">
-                <input type="search" class="form-control" 
+                <input type="search" class="form-control"
                        @bind="SearchInput" @bind:event="oninput"
                        placeholder="Search for product..." />
             </div>
@@ -198,16 +200,15 @@ else
             {
                 IsSaving = true;
                 product.Category = category;
-                var result = await Http.PostAsJsonAsync<ProductItem>("api/Product", product);
-                if (result.IsSuccessStatusCode)
+                var savedEntity = await ProductRepo.CreateAsync(product);
+                if (savedEntity != null)
                 {
-                    var resultObject = await result.Content.ReadFromJsonAsync<ProductItem>();
-                    localBackup.Add(resultObject);
-                    products.Add(resultObject);
+                    localBackup.Add(savedEntity);
+                    products.Add(savedEntity);
                 }
                 else
                 {
-                    SavingFailureAlert(result.ReasonPhrase);
+                    SavingFailureAlert();
                 }
 
                 IsSaving = false;
@@ -221,20 +222,19 @@ else
         localBackup = null;
         products = null;
 
-        localBackup = (await Http.GetFromJsonAsync<List<ProductItem>>("api/Product")).ToList();
+        localBackup = await ProductRepo.GetAllAsync();
         products = new List<ProductItem>(localBackup);
     }
     private async Task LoadProductCategories()
     {
-        categories = (await Http.GetFromJsonAsync<List<ProductCategory>>("api/ProductCategory")).ToList();
+        categories = await CategoryRepo.GetAllAsync();
     }
 
     private async Task DeleteProduct(string id)
     {
-        var response = await Http.DeleteAsync($"api/Product/{id}");
-        if (!response.IsSuccessStatusCode)
+        if (!(await ProductRepo.DeleteByIdAsync(id)))
         {
-            DeleteFailureAlert(response.ReasonPhrase);
+            DeleteFailureAlert();
         }
         await LoadProductItems();
     }
@@ -243,11 +243,11 @@ else
     {
         AlertData = AlertComponentModel.CreateSuccessAlert("Product saved", $"");
     }
-    private void SavingFailureAlert(string resultMsg)
+    private void SavingFailureAlert(string resultMsg = "")
     {
         AlertData = AlertComponentModel.CreateErrorAlert("Error with saving", resultMsg);
     }
-    private void DeleteFailureAlert(string resultMsg)
+    private void DeleteFailureAlert(string resultMsg = "")
     {
         AlertData = AlertComponentModel.CreateErrorAlert("Error with deletion", resultMsg);
     }

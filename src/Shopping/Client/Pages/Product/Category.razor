@@ -2,7 +2,7 @@
 
 @inject HttpClient Http
 @inject ILogger<Category> Logger
-@inject IProductCategoryAccess CategoryRepo
+@inject IProductCategories CategoryRepo
 
 <h3>Product categories</h3>
 
@@ -165,7 +165,7 @@ else
             {
                 IsSaving = true;
 
-                var savedEntity = await CategoryRepo.SaveAsync(category);
+                var savedEntity = await CategoryRepo.CreateAsync(category);
 
                 if(savedEntity != null)
                 {
@@ -204,7 +204,7 @@ else
 
     private async Task DeleteCategory(string id)
     {
-        if (!(await CategoryRepo.DeleteAsync(id)))
+        if (!(await CategoryRepo.DeleteByIdAsync(id)))
         {
             DeleteFailureAlert();
         }

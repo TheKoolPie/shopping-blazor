@@ -6,11 +6,8 @@ using System.Text;
 
 namespace Shopping.Shared.Data
 {
-    public class ProductCategory
+    public class ProductCategory : BaseItem
     {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Product category Id is needed")]
-        [DisplayFormat(ConvertEmptyStringToNull = false)]
-        public string Id { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Category name is needed")]
         public string Name { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Farbcode is needed")]
