@@ -14,9 +14,8 @@ namespace Shopping.Server
         public DbSet<ProductCategory> Categories { get; set; }
         public DbSet<ProductItem> Products { get; set; }
         public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
-        public DbSet<ShoppingList> ShoppingLists { get; set; }
 
-
+        public ShoppingDbContext() : base() { }
         public ShoppingDbContext(DbContextOptions<ShoppingDbContext> options) : base(options)
         {
 

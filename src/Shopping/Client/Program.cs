@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shopping.Shared.Services;
 
 namespace Shopping.Client
 {
@@ -18,6 +19,7 @@ namespace Shopping.Client
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddSingleton<IProductCategoryAccess, ProductCategoryApiAccess>();
 
             await builder.Build().RunAsync();
         }

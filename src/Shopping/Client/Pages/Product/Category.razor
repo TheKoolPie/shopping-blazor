@@ -1,18 +1,16 @@
 ﻿@page "/product/category"
-@using Shopping.Shared.Data
-@using Shopping.Shared.Enums
-@using Shopping.Shared.Model
-@using System.Linq
+
 @inject HttpClient Http
 @inject ILogger<Category> Logger
+@inject IProductCategoryAccess CategoryRepo
 
-<h3>Produkt Kategorien</h3>
+<h3>Product categories</h3>
 
 <div class="row">
     <div class="col">
         @if (IsSaving)
         {
-            <strong>Speichere daten....</strong>
+            <strong>Save data....</strong>
         }
         else
         {
@@ -30,7 +28,7 @@
                 <div class="row">
                     <div class="col">
                         <label>
-                            Farbe
+                            Color
                             <input class="form-control" type="color" @bind-value="category.ColorCode" />
                         </label>
                     </div>
@@ -38,7 +36,7 @@
                 <div class="row">
                     <div class="col">
                         <button class="btn btn-primary" type="submit">
-                            <span class="oi oi-task" /> Speichern
+                            <span class="oi oi-task" /> Save
                         </button>
                     </div>
                 </div>
@@ -60,47 +58,58 @@
 
 @if (categories != null)
 {
-    <div class="row">
-        <div class="col">
-            <input type="search" class="form-control"
-                   @bind="SearchInput" @bind:event="oninput"
-                   placeholder="Search for category..." />
+    @if (categories.Count > 0)
+    {
+        <div class="row">
+            <div class="col">
+                <input type="search" class="form-control"
+                       @bind="SearchInput" @bind:event="oninput"
+                       placeholder="Search for category..." />
+            </div>
+            <div class="col">
+                <button class="btn btn-light" @onclick="LoadProductCategories">
+                    <span class="oi oi-reload" />
+                </button>
+            </div>
         </div>
-        <div class="col">
-            <button class="btn btn-light" @onclick="LoadProductCategories">
-                <span class="oi oi-reload" />
-            </button>
-        </div>
-    </div>
-    <div class="row" style="margin-top:24px">
-        <div class="col">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th @onclick="OnTableColumnClicked">
-                            Name
-                            <span class="@SortingData.Icon" />
-                        </th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var category in categories)
-                    {
-                        string borderContent = $"15px solid {category.ColorCode}";
+        <div class="row" style="margin-top:24px">
+            <div class="col">
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <td style="border-left: @borderContent">@category.Name</td>
-                            <td>
-                                <button class="btn btn-danger" @onclick="@(()=>DeleteCategory(category.Id.ToString()))">
-                                    <span class="oi oi-trash" />
-                                </button>
-                            </td>
+                            <th @onclick="OnTableColumnClicked">
+                                Name
+                                <span class="@SortingData.Icon" />
+                            </th>
+                            <th></th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var category in categories)
+                        {
+                            string borderContent = $"15px solid {category.ColorCode}";
+                            <tr>
+                                <td style="border-left: @borderContent">@category.Name</td>
+                                <td>
+                                    <button class="btn btn-danger" @onclick="@(() => DeleteCategory(category.Id))">
+                                        <span class="oi oi-trash" />
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col">
+                <strong>No categories available yet...</strong>
+            </div>
+        </div>
+    }
 }
 else
 {
@@ -155,19 +164,20 @@ else
             if (!categoryAlreadyExists)
             {
                 IsSaving = true;
-                var result = await Http.PostAsJsonAsync<ProductCategory>("api/ProductCategory", category);
-                if (result.IsSuccessStatusCode)
-                {
-                    var resultObject = await result.Content.ReadFromJsonAsync<ProductCategory>();
-                    localBackup.Add(resultObject);
-                    categories.Add(resultObject);
 
+                var savedEntity = await CategoryRepo.SaveAsync(category);
+
+                if(savedEntity != null)
+                {
+                    localBackup.Add(savedEntity);
+                    categories.Add(savedEntity);
                     SavingSuccessAlert();
                 }
                 else
                 {
-                    SavingFailureAlert(result.ReasonPhrase);
+                    SavingFailureAlert();
                 }
+
                 SortTable();
                 IsSaving = false;
             }
@@ -184,7 +194,7 @@ else
         localBackup = null;
         categories = null;
 
-        localBackup = await Http.GetFromJsonAsync<List<ProductCategory>>("api/ProductCategory");
+        localBackup = await CategoryRepo.GetAllAsync();
         categories = new List<ProductCategory>(localBackup);
 
         SearchInput = null;
@@ -194,10 +204,9 @@ else
 
     private async Task DeleteCategory(string id)
     {
-        var response = await Http.DeleteAsync($"api/ProductCategory/{id}");
-        if (!response.IsSuccessStatusCode)
+        if (!(await CategoryRepo.DeleteAsync(id)))
         {
-            DeleteFailureAlert(response.ReasonPhrase);
+            DeleteFailureAlert();
         }
         await LoadProductCategories();
     }
@@ -235,12 +244,12 @@ else
         AlertData = AlertComponentModel.CreateSuccessAlert("Category saved", $"Category '{category.Name}' with Color: '{category.ColorCode}' successfully saved");
         Logger?.LogInformation(AlertData.ToString());
     }
-    private void SavingFailureAlert(string resultMsg)
+    private void SavingFailureAlert(string resultMsg = "")
     {
         AlertData = AlertComponentModel.CreateErrorAlert("Error with saving", $"Could not save {category.Name}: {resultMsg}");
         Logger?.LogError(AlertData.ToString());
     }
-    private void DeleteFailureAlert(string resultMsg)
+    private void DeleteFailureAlert(string resultMsg = "")
     {
         AlertData = AlertComponentModel.CreateErrorAlert("Error with deletion", $"Could not delete {category.Name}: {resultMsg}");
     }
