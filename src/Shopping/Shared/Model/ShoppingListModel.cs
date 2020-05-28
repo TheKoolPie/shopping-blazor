@@ -1,6 +1,7 @@
 ﻿using Shopping.Shared.Data;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Shopping.Shared.Model
@@ -22,7 +23,7 @@ namespace Shopping.Shared.Model
             Items = new List<ShoppingListItem>(items);
         }
 
-        public int ItemCount { get => Items.Count; }
-
+        public int ItemCount => Items.Count;
+        public int DoneCount => Items.Where(i => i.Done).Count();
     }
 }

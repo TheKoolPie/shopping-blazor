@@ -1,8 +1,5 @@
 ﻿@page "/product/"
-@using Shopping.Shared.Data;
-@using Shopping.Shared.Enums;
-@using Shopping.Shared.Model;
-@inject HttpClient Http
+
 @inject IProductCategories CategoryRepo
 @inject IProducts ProductRepo
 
@@ -70,7 +67,7 @@ else
                     <div class="row">
                         <div class="col">
                             <button class="btn btn-primary" type="submit">
-                                <span class="oi oi-task" /> Speichern
+                                <span class="oi oi-task" /> Save
                             </button>
                         </div>
                     </div>
@@ -205,6 +202,7 @@ else
                 {
                     localBackup.Add(savedEntity);
                     products.Add(savedEntity);
+                    product = new ProductItem();
                 }
                 else
                 {
@@ -239,10 +237,6 @@ else
         await LoadProductItems();
     }
 
-    private void SavingSuccessAlert()
-    {
-        AlertData = AlertComponentModel.CreateSuccessAlert("Product saved", $"");
-    }
     private void SavingFailureAlert(string resultMsg = "")
     {
         AlertData = AlertComponentModel.CreateErrorAlert("Error with saving", resultMsg);

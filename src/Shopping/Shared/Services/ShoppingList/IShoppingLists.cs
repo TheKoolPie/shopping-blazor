@@ -3,12 +3,13 @@ using Shopping.Shared.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Shopping.Shared.Services
 {
     public interface IShoppingLists
     {
-        List<ShoppingListModel> GetAllAsync();
-        ShoppingListModel GetByDate(DateTime Date);
+        Task<List<ShoppingListModel>> GetAllAsync();
+        Task<ShoppingListModel> GetByDate(DateTime Date);
     }
 }

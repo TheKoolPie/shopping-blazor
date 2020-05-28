@@ -1,0 +1,186 @@
+﻿@page "/shopping-list/details/{datestring}"
+
+@inject IProducts ProductRepo
+@inject IShoppingLists ShoppingListRepo
+@inject IShoppingListItems ItemRepo
+
+
+<h3>List for @date.ToString("dd.MM.yyyy")</h3>
+<hr />
+@if (IsLoading)
+{
+    <div class="row">
+        <div class="col">
+            <strong>Loading data...</strong>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col">
+            <h5>Add Products to list</h5>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col">
+            @if (!IsSaving)
+            {
+                <EditForm EditContext="@editContext" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-group">
+                        <div>
+                            <input class="form-control" type="search" @bind="ProductSearch" @bind:event="oninput" placeholder="Search for product" />
+                            <div class="product-search-content">
+                                @if (products != null)
+                                {
+                                    @if (products.Count > 0)
+                                    {
+                                        @foreach (var product in products)
+                                        {
+                                            <a @onclick="@(() => OnProductSelected(product.Id))">@product.Name [@product.Unit.GetDescription()]</a>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    @if (item.ProductItem != null)
+                    {
+                        <div class="form-group">
+
+                            <div class="input-group mb-3">
+                                <InputNumber type="text" class="form-control" @bind-Value="item.Amount" step="0.1" min="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">[@item.ProductItem.Unit.GetDescription()]</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="submit">
+                                <span class="oi oi-plus"></span> Add
+                            </button>
+                        </div>
+                    }
+                </EditForm>
+            }
+            else
+            {
+                <strong>Saving data...</strong>
+            }
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Done</th>
+                        <th>Amount</th>
+                        <th>Product</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in shoppingList.Items)
+                    {
+                        <tr @onclick="@(()=>ToggleItemState(item.Id))">
+                            <td><span style="color:green" class="@(item.Done ? "oi oi-circle-check" : "")"></span></td>
+                            <td>@item.Amount [@item.ProductItem.Unit.GetDescription()]</td>
+                            <td>@item.ProductItem.Name</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string DateString { get; set; }
+
+    private DateTime date;
+    private ShoppingListModel shoppingList = null;
+
+    private List<ProductItem> productBacklog = null;
+    private List<ProductItem> products = null;
+
+    private ShoppingListItem item = null;
+    private EditContext editContext;
+
+    private bool IsLoading = true;
+    private bool IsSaving = false;
+
+    private string productSearch;
+    public string ProductSearch
+    {
+        get => productSearch;
+        set
+        {
+            productSearch = value;
+            OnProductSearchInputChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        date = string.IsNullOrEmpty(DateString) ? DateTime.Now.Date : DateTime.Parse(DateString);
+        item = new ShoppingListItem(date);
+        editContext = new EditContext(item);
+
+        shoppingList = await ShoppingListRepo.GetByDate(date);
+
+        await LoadProducts();
+
+        IsLoading = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (editContext.Validate())
+        {
+            IsSaving = true;
+
+            var savedEntity = await ItemRepo.CreateAsync(item);
+            if (savedEntity != null)
+            {
+                shoppingList.Items.Add(savedEntity);
+                item = new ShoppingListItem(date);
+            }
+
+            IsSaving = false;
+        }
+    }
+
+    private async Task LoadProducts()
+    {
+        products = null;
+        productBacklog = await ProductRepo.GetAllAsync();
+    }
+    private void OnProductSearchInputChanged()
+    {
+        item.ProductItem = null;
+
+        products = string.IsNullOrEmpty(productSearch) ? null :
+            new List<ProductItem>(productBacklog.Where(p => p.Name.Contains(productSearch, StringComparison.InvariantCultureIgnoreCase)));
+    }
+    private void OnProductSelected(string id)
+    {
+        item.ProductItem = productBacklog.FirstOrDefault(p => p.Id == id);
+        productSearch = $"{item.ProductItem.Name}";
+        products = null;
+    }
+
+    private void ToggleItemState(string id)
+    {
+        var toggleItem = shoppingList.Items.FirstOrDefault(i => i.Id == id);
+        toggleItem.Done = !toggleItem.Done;
+    }
+}

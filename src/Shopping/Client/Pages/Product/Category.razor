@@ -1,6 +1,5 @@
 ﻿@page "/product/category"
 
-@inject HttpClient Http
 @inject ILogger<Category> Logger
 @inject IProductCategories CategoryRepo
 
@@ -171,7 +170,7 @@ else
                 {
                     localBackup.Add(savedEntity);
                     categories.Add(savedEntity);
-                    SavingSuccessAlert();
+                    category = new ProductCategory();
                 }
                 else
                 {
@@ -239,11 +238,6 @@ else
         }
     }
 
-    private void SavingSuccessAlert()
-    {
-        AlertData = AlertComponentModel.CreateSuccessAlert("Category saved", $"Category '{category.Name}' with Color: '{category.ColorCode}' successfully saved");
-        Logger?.LogInformation(AlertData.ToString());
-    }
     private void SavingFailureAlert(string resultMsg = "")
     {
         AlertData = AlertComponentModel.CreateErrorAlert("Error with saving", $"Could not save {category.Name}: {resultMsg}");

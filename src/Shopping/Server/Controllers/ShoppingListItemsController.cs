@@ -25,7 +25,13 @@ namespace Shopping.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ShoppingListItem>>> GetShoppingListItems()
         {
-            return await _context.ShoppingListItems.ToListAsync();
+            var listItems = await _context.ShoppingListItems.ToListAsync();
+            var products = await _context.Products.ToListAsync();
+            foreach (var item in listItems)
+            {
+                item.ProductItem = products.FirstOrDefault(p => p.Id == item.ProductItemId);
+            }
+            return listItems;
         }
 
         // GET: api/ShoppingListItems/5
@@ -33,11 +39,12 @@ namespace Shopping.Server.Controllers
         public async Task<ActionResult<ShoppingListItem>> GetShoppingListItem(string id)
         {
             var shoppingListItem = await _context.ShoppingListItems.FindAsync(id);
-
             if (shoppingListItem == null)
             {
                 return NotFound();
             }
+
+            shoppingListItem.ProductItem = await _context.Products.FirstOrDefaultAsync(p => p.Id == shoppingListItem.ProductItemId);
 
             return shoppingListItem;
         }
@@ -46,7 +53,7 @@ namespace Shopping.Server.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutShoppingListItem(string id, ShoppingListItem shoppingListItem)
+        public async Task<ActionResult<ShoppingListItem>> PutShoppingListItem(string id, ShoppingListItem shoppingListItem)
         {
             if (id != shoppingListItem.Id)
             {
@@ -71,7 +78,7 @@ namespace Shopping.Server.Controllers
                 }
             }
 
-            return NoContent();
+            return shoppingListItem;
         }
 
         // POST: api/ShoppingListItems
@@ -80,6 +87,7 @@ namespace Shopping.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<ShoppingListItem>> PostShoppingListItem(ShoppingListItem shoppingListItem)
         {
+            shoppingListItem.ProductItem = await GetProductItem(shoppingListItem.ProductItem.Id);
             _context.ShoppingListItems.Add(shoppingListItem);
             try
             {
@@ -119,6 +127,11 @@ namespace Shopping.Server.Controllers
         private bool ShoppingListItemExists(string id)
         {
             return _context.ShoppingListItems.Any(e => e.Id == id);
+        }
+
+        private async Task<ProductItem> GetProductItem(string id)
+        {
+            return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
         }
     }
 }

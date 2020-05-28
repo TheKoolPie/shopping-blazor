@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -63,9 +64,19 @@ namespace Shopping.Shared.Services.Base
             return await _client.GetFromJsonAsync<T>($"{BaseAddress}/{id}");
         }
 
-        public Task<T> UpdateAsync(string id, T category)
+        public async Task<T> UpdateAsync(string id, T item)
         {
-            throw new NotImplementedException();
+            T retVal = null;
+            var response = await _client.PutAsJsonAsync<T>($"{BaseAddress}/{id}", item);
+            if (response.IsSuccessStatusCode)
+            {
+                retVal = await response.Content.ReadFromJsonAsync<T>();
+            }
+            else
+            {
+                _logger.LogError(response.ReasonPhrase);
+            }
+            return retVal;
         }
     }
 }

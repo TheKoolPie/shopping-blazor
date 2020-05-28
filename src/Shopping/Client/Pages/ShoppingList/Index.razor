@@ -1,12 +1,65 @@
 ﻿@page "/shopping-list/"
-@using Shopping.Shared.Data;
-@using Shopping.Shared.Enums;
-@using Shopping.Shared.Model;
-@inject HttpClient Http
-@inject NavigationManager NavigationManager
+
+@inject IShoppingLists ShoppingListRepo
+@inject NavigationManager Navigation
 
 <h3>Shopping lists</h3>
+<hr />
+<div class="row">
+    <div class="col">
+        <button class="btn btn-primary" @onclick="OnTodayClicked">
+            <span class="oi oi-clock"></span> Today
+        </button>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        @if (shoppingLists != null && shoppingLists.Count > 0)
+        {
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Item Count</th>
+                        <th>Done Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var list in shoppingLists)
+                    {
+                        <tr @onclick="@(() => NavigateToShoppingList(list.ListDate))">
+                            <td>@list.ListDate.Date.ToString()</td>
+                            <td>@list.ItemCount</td>
+                            <td>@list.DoneCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Currently no shopping lists are created</p>
+        }
+    </div>
+</div>
 
 @code {
+    private List<ShoppingListModel> shoppingLists = null;
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        shoppingLists = await ShoppingListRepo.GetAllAsync();
+    }
+
+    private void OnTodayClicked()
+    {
+        NavigateToShoppingList(DateTime.Now);
+    }
+
+    private void NavigateToShoppingList(DateTime date)
+    {
+        Navigation.NavigateTo($"/shopping-list/details/{date.Date.ToString()}");
+    }
 }

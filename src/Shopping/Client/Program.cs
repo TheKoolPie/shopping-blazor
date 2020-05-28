@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shopping.Shared.Services;
+using Shopping.Shared.Services.ShoppingList;
 
 namespace Shopping.Client
 {
@@ -22,6 +23,8 @@ namespace Shopping.Client
 
             builder.Services.AddSingleton<IProductCategories, ProductCategoryApiAccess>();
             builder.Services.AddSingleton<IProducts, ProductsApiAccess>();
+            builder.Services.AddSingleton<IShoppingListItems, ShoppingListItemsApiAccess>();
+            builder.Services.AddSingleton<IShoppingLists, ShoppingListsApiAccess>();
 
             await builder.Build().RunAsync();
         }
