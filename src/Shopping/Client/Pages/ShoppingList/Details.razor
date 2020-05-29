@@ -5,7 +5,6 @@
 @inject IShoppingLists ShoppingListRepo
 @inject IShoppingListItems ItemRepo
 
-
 <h3>List for @date.ToString("dd.MM.yyyy")</h3>
 <hr />
 @if (IsLoading)
@@ -98,11 +97,11 @@ else
                 <tbody>
                     @foreach (var item in shoppingList.Items)
                     {
-                        <tr @onclick="@(()=>ToggleItemState(item.Id))">
-                            <td><span style="color:@(item.Done ? "green" : "white")" class="oi oi-circle-check"></span></td>
-                            <td>@item.Amount</td>
-                            <td>@item.ProductItem.Unit.GetDescription()</td>
-                            <td>@item.ProductItem.Name</td>
+                        <tr >
+                            <td @onclick="@(()=>ToggleItemState(item.Id))"><span style="color:@(item.Done ? "green" : "white")" class="oi oi-circle-check"></span></td>
+                            <td @onclick="@(()=>ToggleItemState(item.Id))">@item.Amount</td>
+                            <td @onclick="@(()=>ToggleItemState(item.Id))">@item.ProductItem.Unit.GetDescription()</td>
+                            <td @onclick="@(()=>ToggleItemState(item.Id))">@item.ProductItem.Name</td>
                             <td>
                                 <button class="btn btn-danger btn-sm" @onclick="@(()=>DeleteListItem(item.Id))">
                                     <span class="oi oi-trash" />

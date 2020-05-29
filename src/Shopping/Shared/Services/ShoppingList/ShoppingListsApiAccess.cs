@@ -50,10 +50,28 @@ namespace Shopping.Shared.Services.ShoppingList
 
         public async Task<ShoppingListModel> SaveShoppingList(ShoppingListModel model)
         {
-            var listItems = await _shoppingListItems.GetAllAsync();
-            foreach (var item in model.Items)
+            var dbData = (await GetByDate(model.ListDate.Date)).Items;
+            var modelData = model.Items;
+
+            var dbIds = dbData.Select(i => i.Id);
+            var modelIds = modelData.Select(i => i.Id);
+
+            var idsToDelete = dbIds.Except(modelIds).ToList();
+            if (idsToDelete.Count > 0)
             {
-                var existing = listItems.FirstOrDefault(i => i.Id == item.Id);
+                foreach (var id in idsToDelete)
+                {
+                    if (!await _shoppingListItems.DeleteByIdAsync(id))
+                    {
+                        throw new Exception($"Could not delete shopping list item with id {id}");
+                    }
+                }
+            }
+
+
+            foreach (var item in modelData)
+            {
+                var existing = dbData.FirstOrDefault(i => i.Id == item.Id);
                 if (existing == null)
                 {
                     _logger.LogInformation($"No item with id {item.Id} exists in DB. Create new one");
