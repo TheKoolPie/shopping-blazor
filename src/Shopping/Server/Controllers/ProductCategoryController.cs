@@ -18,7 +18,7 @@ namespace Shopping.Server.Controllers
         public ProductCategoryController(ShoppingDbContext context)
         {
             _context = context;
-            
+
         }
 
         [HttpGet]
@@ -29,10 +29,10 @@ namespace Shopping.Server.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProductCategory>> GetProductCategory(string name)
+        public async Task<ActionResult<ProductCategory>> GetProductCategory(string id)
         {
-            var category = await _context.Categories.FirstOrDefaultAsync(e => e.Name.Equals(name));
-            if(category == null)
+            var category = await _context.Categories.FirstOrDefaultAsync(e => e.Id == id);
+            if (category == null)
             {
                 return NotFound();
             }
@@ -76,7 +76,7 @@ namespace Shopping.Server.Controllers
             return category;
         }
 
-        private bool CategoryExists(string name) 
+        private bool CategoryExists(string name)
         {
             return _context.Categories.Any(e => e.Name.Equals(name));
         }

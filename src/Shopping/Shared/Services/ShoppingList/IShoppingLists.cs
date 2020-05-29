@@ -11,5 +11,7 @@ namespace Shopping.Shared.Services
     {
         Task<List<ShoppingListModel>> GetAllAsync();
         Task<ShoppingListModel> GetByDate(DateTime Date);
+
+        Task<ShoppingListModel> SaveShoppingList(ShoppingListModel model);
     }
 }

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shopping.Server;
 using Shopping.Shared.Data;
 
@@ -15,10 +17,11 @@ namespace Shopping.Server.Controllers
     public class ShoppingListItemsController : ControllerBase
     {
         private readonly ShoppingDbContext _context;
-
-        public ShoppingListItemsController(ShoppingDbContext context)
+        private readonly ILogger<ShoppingListItemsController> _logger;
+        public ShoppingListItemsController(ShoppingDbContext context, ILogger<ShoppingListItemsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/ShoppingListItems
@@ -57,27 +60,30 @@ namespace Shopping.Server.Controllers
         {
             if (id != shoppingListItem.Id)
             {
+                _logger.LogError($"Target id does not match item id: {id} --> {shoppingListItem.Id}");
                 return BadRequest();
             }
 
-            _context.Entry(shoppingListItem).State = EntityState.Modified;
-
-            try
+            var existingItem = await _context.ShoppingListItems.FirstOrDefaultAsync(i => i.Id == id);
+            if (HasChanged(existingItem, shoppingListItem))
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ShoppingListItemExists(id))
+                Change(existingItem, shoppingListItem);
+                try
                 {
-                    return NotFound();
+                    await _context.SaveChangesAsync();
                 }
-                else
+                catch (DbUpdateConcurrencyException)
                 {
-                    throw;
+                    if (!ShoppingListItemExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
             }
-
             return shoppingListItem;
         }
 
@@ -132,6 +138,16 @@ namespace Shopping.Server.Controllers
         private async Task<ProductItem> GetProductItem(string id)
         {
             return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        private bool HasChanged(ShoppingListItem dbItem, ShoppingListItem targetItem)
+        {
+            return dbItem.Amount != targetItem.Amount || dbItem.Done != targetItem.Done;
+        }
+        private void Change(ShoppingListItem dbItem, ShoppingListItem targetItem)
+        {
+            dbItem.Amount = targetItem.Amount;
+            dbItem.Done = targetItem.Done;
         }
     }
 }

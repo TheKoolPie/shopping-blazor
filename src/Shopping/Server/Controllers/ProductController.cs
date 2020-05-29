@@ -26,7 +26,7 @@ namespace Shopping.Server.Controllers
         {
             var products = await _context.Products.ToListAsync();
             var productCategories = await _context.Categories.ToListAsync();
-            foreach(var product in products)
+            foreach (var product in products)
             {
                 product.Category = productCategories.FirstOrDefault(c => c.Id.Equals(product.Category.Id));
             }
@@ -35,10 +35,10 @@ namespace Shopping.Server.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProductItem>> GetProduct(string name)
+        public async Task<ActionResult<ProductItem>> GetProduct(string id)
         {
             var product = await _context.Products
-                .FirstOrDefaultAsync(e => e.Name.Equals(name));
+                .FirstOrDefaultAsync(e => e.Id == id);
             if (product == null)
             {
                 return NotFound();

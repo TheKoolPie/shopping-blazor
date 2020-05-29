@@ -60,6 +60,6 @@
 
     private void NavigateToShoppingList(DateTime date)
     {
-        Navigation.NavigateTo($"/shopping-list/details/{date.Date.ToString()}");
+        Navigation.NavigateTo($"/shopping-list/details/{date.Date.ToString("dd-MM-yyyy")}");
     }
 }
