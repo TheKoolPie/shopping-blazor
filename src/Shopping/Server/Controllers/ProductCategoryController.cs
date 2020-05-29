@@ -11,6 +11,7 @@ namespace Shopping.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Produces("application/json")]
     public class ProductCategoryController : ControllerBase
     {
         private readonly ShoppingDbContext _context;
@@ -25,7 +26,7 @@ namespace Shopping.Server.Controllers
         public async Task<ActionResult<List<ProductCategory>>> GetProductCategories()
         {
             var categories = await _context.Categories.ToListAsync();
-            return categories;
+            return Ok(categories);
         }
 
         [HttpGet("{id}")]
@@ -36,7 +37,7 @@ namespace Shopping.Server.Controllers
             {
                 return NotFound();
             }
-            return category;
+            return Ok(category);
         }
 
         [HttpPost]
@@ -73,7 +74,7 @@ namespace Shopping.Server.Controllers
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
-            return category;
+            return Ok(category);
         }
 
         private bool CategoryExists(string name)
