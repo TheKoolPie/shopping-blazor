@@ -189,6 +189,8 @@ else
         await LoadProductCategories();
         await LoadProductItems();
 
+        SortTable(ProductTableColumn.Name);
+
         IsLoading = false;
     }
 
@@ -237,7 +239,6 @@ else
         products = new List<ProductItem>(localBackup);
 
         SearchInput = null;
-        SortTable(ProductTableColumn.Name);
     }
     private async Task LoadProductCategories()
     {

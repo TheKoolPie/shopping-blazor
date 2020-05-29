@@ -149,6 +149,8 @@ else
     {
         editContext = new EditContext(category);
         await LoadProductCategories();
+
+        SortTable();
     }
 
     private async Task HandleSubmit()
@@ -194,8 +196,6 @@ else
         categories = new List<ProductCategory>(localBackup);
 
         SearchInput = null;
-
-        SortTable();
     }
 
     private async Task DeleteCategory(string id)

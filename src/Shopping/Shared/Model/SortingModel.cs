@@ -13,7 +13,7 @@ namespace Shopping.Shared.Model
 
         public SortingModel()
         {
-            Type = SortingType.Descending;
+            Type = SortingType.Ascending;
             Icon = Type.ToOpenIconicCssClassName();
         }
 
