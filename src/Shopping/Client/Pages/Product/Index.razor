@@ -105,9 +105,18 @@ else
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Einheit</th>
-                            <th>Kategorie</th>
+                            <th @onclick="OnNameColumnClicked">
+                                Name
+                                <span class="@NameSortingData.Icon" />
+                            </th>
+                            <th @onclick="OnUnitColumnClicked">
+                                Einheit
+                                <span class="@UnitSortingData.Icon" />
+                            </th>
+                            <th @onclick="OnCategoryColumnClicked">
+                                Kategorie
+                                <span class="@CategorySortingData.Icon" />
+                            </th>
                             <th></th>
                         </tr>
                     </thead>
@@ -135,7 +144,10 @@ else
 @code {
 
     private AlertComponentModel AlertData = new AlertComponentModel();
-    private SortingModel SortingData = new SortingModel();
+
+    private SortingModel NameSortingData = new SortingModel();
+    private SortingModel UnitSortingData = new SortingModel();
+    private SortingModel CategorySortingData = new SortingModel();
 
     private ProductItem product = new ProductItem();
     private EditContext editContext;
@@ -196,6 +208,7 @@ else
             else
             {
                 IsSaving = true;
+                product.Name = product.Name.Trim();
                 product.Category = category;
                 var savedEntity = await ProductRepo.CreateAsync(product);
                 if (savedEntity != null)
@@ -208,7 +221,7 @@ else
                 {
                     SavingFailureAlert();
                 }
-
+                SortTable(ProductTableColumn.Name);
                 IsSaving = false;
             }
 
@@ -222,11 +235,15 @@ else
 
         localBackup = await ProductRepo.GetAllAsync();
         products = new List<ProductItem>(localBackup);
+
+        SearchInput = null;
+        SortTable(ProductTableColumn.Name);
     }
     private async Task LoadProductCategories()
     {
         categories = await CategoryRepo.GetAllAsync();
     }
+
 
     private async Task DeleteProduct(string id)
     {
@@ -235,6 +252,70 @@ else
             DeleteFailureAlert();
         }
         await LoadProductItems();
+    }
+
+    private void OnNameColumnClicked()
+    {
+        NameSortingData.Toggle();
+        SortTable(ProductTableColumn.Name);
+    }
+    private void OnUnitColumnClicked()
+    {
+        UnitSortingData.Toggle();
+        SortTable(ProductTableColumn.Unit);
+    }
+    private void OnCategoryColumnClicked()
+    {
+        CategorySortingData.Toggle();
+        SortTable(ProductTableColumn.Category);
+    }
+
+    private void SortTable(ProductTableColumn column)
+    {
+        switch (column)
+        {
+            case ProductTableColumn.Name:
+                {
+
+                    switch (NameSortingData.Type)
+                    {
+                        case SortingType.Ascending:
+                            products = products.OrderBy(e => e.Name).ToList();
+                            break;
+                        case SortingType.Descending:
+                            products = products.OrderByDescending(e => e.Name).ToList();
+                            break;
+                    }
+                }
+                break;
+            case ProductTableColumn.Unit:
+                {
+                    switch (UnitSortingData.Type)
+                    {
+                        case SortingType.Ascending:
+                            products = products.OrderBy(e => e.Unit).ToList();
+                            break;
+                        case SortingType.Descending:
+                            products = products.OrderByDescending(e => e.Unit).ToList();
+                            break;
+                    }
+                }
+                break;
+            case ProductTableColumn.Category:
+                {
+                    switch (CategorySortingData.Type)
+                    {
+                        case SortingType.Ascending:
+                            products = products.OrderBy(e => e.Category.Name).ToList();
+                            break;
+                        case SortingType.Descending:
+                            products = products.OrderByDescending(e => e.Category.Name).ToList();
+                            break;
+                    }
+                }
+                break;
+        }
+
     }
 
     private void SavingFailureAlert(string resultMsg = "")

@@ -19,5 +19,11 @@ namespace Shopping.Shared.Enums
         MilliLiter,
         [Description("Liter")]
         Liter,
+        [Description("Dose")]
+        Can,
+        [Description("Glas")]
+        Glas,
+        [Description("Flasche")]
+        Bottle
     }
 }

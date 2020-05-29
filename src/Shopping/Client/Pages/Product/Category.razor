@@ -160,7 +160,7 @@ else
             if (!categoryAlreadyExists)
             {
                 IsSaving = true;
-
+                category.Name = category.Name.Trim();
                 var savedEntity = await CategoryRepo.CreateAsync(category);
 
                 if(savedEntity != null)
