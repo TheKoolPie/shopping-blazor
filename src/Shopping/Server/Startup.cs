@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Shopping.Server.Data;
 using Shopping.Server.Models;
 using Microsoft.AspNetCore.Authentication;
+using System.Reflection;
+using System;
 
 namespace Shopping.Server
 {
@@ -27,8 +29,12 @@ namespace Shopping.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(o =>
-                o.UseSqlServer(
-                    Configuration.GetConnectionString("MSSQL")));
+                o.UseMySql(Configuration.GetConnectionString("MYSQLCONNSTR_localdb"),
+                sqlOptions => 
+                {
+                    sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                    sqlOptions.EnableRetryOnFailure(15, TimeSpan.FromSeconds(30), null);
+                }));
 
             services.AddDefaultIdentity<ApplicationUser>(o => o.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
