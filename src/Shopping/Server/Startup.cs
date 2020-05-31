@@ -31,9 +31,10 @@ namespace Shopping.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var mysqlConnString = Configuration.GetConnectionString("IdentityMySQL");
+
             services.AddDbContext<ApplicationDbContext>(o =>
-                o.UseMySql(Configuration.GetValue<string>("MYSQLCONNSTR_localdb"),
-                sqlOptions =>
+                o.UseMySql(mysqlConnString, sqlOptions =>
                 {
                     sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
                     sqlOptions.EnableRetryOnFailure(15, TimeSpan.FromSeconds(30), null);
