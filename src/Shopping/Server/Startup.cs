@@ -12,6 +12,9 @@ using Shopping.Server.Models;
 using Microsoft.AspNetCore.Authentication;
 using System.Reflection;
 using System;
+using Microsoft.AspNetCore.Identity;
+using IdentityServer4.Services;
+using Shopping.Server.Services;
 
 namespace Shopping.Server
 {
@@ -37,6 +40,7 @@ namespace Shopping.Server
                 }));
 
             services.AddDefaultIdentity<ApplicationUser>(o => o.SignIn.RequireConfirmedAccount = false)
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddIdentityServer()
@@ -49,6 +53,8 @@ namespace Shopping.Server
             var connData = new CosmosDbConnStringData(connString);
 
             services.AddDbContext<ShoppingDbContext>(o => o.UseCosmos(connData.Endpoint, connData.Key, "shopping-list"));
+
+            services.AddTransient<IProfileService, ProfileService>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();

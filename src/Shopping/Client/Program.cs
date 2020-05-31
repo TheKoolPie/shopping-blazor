@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shopping.Shared.Services;
 using Shopping.Shared.Services.ShoppingList;
+using Shopping.Client.Factories;
 
 namespace Shopping.Client
 {
@@ -26,7 +27,8 @@ namespace Shopping.Client
             // Supply HttpClient instances that include access tokens when making requests to the server project
             builder.Services.AddTransient(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Shopping.ServerAPI"));
 
-            builder.Services.AddApiAuthorization();
+            builder.Services.AddApiAuthorization()
+                .AddAccountClaimsPrincipalFactory<CustomUserFactory>();
 
             builder.Services.AddSingleton<IProductCategories, ProductCategoryApiAccess>();
             builder.Services.AddSingleton<IProducts, ProductsApiAccess>();
