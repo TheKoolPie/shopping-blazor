@@ -17,7 +17,7 @@ using Shopping.Server.Models;
 
 namespace Shopping.Server.Areas.Identity.Pages.Account
 {
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;

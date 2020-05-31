@@ -33,7 +33,7 @@ namespace Shopping.Server
         {
             services.AddDbContext<ApplicationDbContext>(o =>
                 o.UseMySql(Configuration.GetConnectionString("MYSQLCONNSTR_localdb"),
-                sqlOptions => 
+                sqlOptions =>
                 {
                     sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
                     sqlOptions.EnableRetryOnFailure(15, TimeSpan.FromSeconds(30), null);
@@ -56,12 +56,15 @@ namespace Shopping.Server
 
             services.AddTransient<IProfileService, ProfileService>();
 
+            services.AddHealthChecks();
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -90,8 +93,12 @@ namespace Shopping.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
                 endpoints.MapFallbackToFile("index.html");
             });
+
+            ApplicationDbInitializer.SeedRoles(roleManager);
+            ApplicationDbInitializer.SeedUsers(userManager);
         }
     }
 }
