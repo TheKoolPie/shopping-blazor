@@ -1,5 +1,7 @@
 ﻿@page "/product/category"
 
+@attribute [Authorize]
+
 @inject ILogger<Category> Logger
 @inject IProductCategories CategoryRepo
 
@@ -165,7 +167,7 @@ else
                 category.Name = category.Name.Trim();
                 var savedEntity = await CategoryRepo.CreateAsync(category);
 
-                if(savedEntity != null)
+                if (savedEntity != null)
                 {
                     localBackup.Add(savedEntity);
                     categories.Add(savedEntity);

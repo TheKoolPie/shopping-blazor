@@ -1,6 +1,8 @@
 ﻿@page "/shopping-list/details"
 @page "/shopping-list/details/{datestring}"
 
+@attribute [Authorize]
+
 @inject IProducts ProductRepo
 @inject IShoppingLists ShoppingListRepo
 @inject IShoppingListItems ItemRepo
@@ -97,7 +99,7 @@ else
                 <tbody>
                     @foreach (var item in shoppingList.Items)
                     {
-                        <tr >
+                        <tr>
                             <td @onclick="@(()=>ToggleItemState(item.Id))"><span style="color:@(item.Done ? "green" : "white")" class="oi oi-circle-check"></span></td>
                             <td @onclick="@(()=>ToggleItemState(item.Id))">@item.Amount</td>
                             <td @onclick="@(()=>ToggleItemState(item.Id))">@item.ProductItem.Unit.GetDescription()</td>
