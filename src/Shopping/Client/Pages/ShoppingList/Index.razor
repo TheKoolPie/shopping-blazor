@@ -1,5 +1,6 @@
-﻿
-@page "/shopping-list/"
+﻿@page "/shopping-list/"
+
+@attribute [Authorize]
 
 @inject IShoppingLists ShoppingListRepo
 @inject NavigationManager Navigation
