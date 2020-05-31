@@ -32,7 +32,7 @@ namespace Shopping.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(o =>
-                o.UseMySql(Configuration.GetConnectionString("MYSQLCONNSTR_localdb"),
+                o.UseMySql(Configuration.GetValue<string>("MYSQLCONNSTR_localdb"),
                 sqlOptions =>
                 {
                     sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
