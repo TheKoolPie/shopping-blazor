@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Shared.Data;
+using Shopping.Server.Data;
 
 namespace Shopping.Server.Controllers
 {
