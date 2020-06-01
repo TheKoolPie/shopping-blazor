@@ -3,12 +3,10 @@ using Shopping.Shared.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
+using Shopping.Client.Services.Interfaces;
 using System.Threading.Tasks;
 
-namespace Shopping.Shared.Services.ShoppingList
+namespace Shopping.Client.Services.Implementations
 {
     public class ShoppingListsApiAccess : IShoppingLists
     {

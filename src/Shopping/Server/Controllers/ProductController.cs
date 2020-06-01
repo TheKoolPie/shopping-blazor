@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Shared.Data;
 using Shopping.Server.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Shopping.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly ShoppingDbContext _context;
