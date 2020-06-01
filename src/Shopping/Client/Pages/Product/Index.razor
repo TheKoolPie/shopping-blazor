@@ -3,6 +3,8 @@
 @inject IProductCategories CategoryRepo
 @inject IProducts ProductRepo
 
+@attribute [Authorize]
+
 <h3>Produkte</h3>
 
 @if (IsLoading)
