@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Shopping.Server.Models;
 
 namespace Shopping.Server
 {
@@ -29,7 +30,7 @@ namespace Shopping.Server
             services.AddDbContext<ApplicationDbContext>(o =>
                 o.UseMySql(Configuration.GetConnectionString("IdentityMySQL")));
 
-            services.AddDefaultIdentity<IdentityUser>()
+            services.AddDefaultIdentity<ShoppingUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             var connString = Configuration.GetConnectionString("Shopping_Azure");
