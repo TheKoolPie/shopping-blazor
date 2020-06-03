@@ -1,6 +1,8 @@
 ﻿@page "/shopping-list/details"
 @page "/shopping-list/details/{datestring}"
 
+@attribute [Authorize]
+
 @inject IProducts ProductRepo
 @inject IShoppingLists ShoppingListRepo
 @inject IShoppingListItems ItemRepo

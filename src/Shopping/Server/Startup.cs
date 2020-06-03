@@ -32,7 +32,7 @@ namespace Shopping.Server
 
             services.AddDefaultIdentity<ShoppingUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-
+          
             var connString = Configuration.GetConnectionString("Shopping_Azure");
             var connData = new CosmosDbConnStringData(connString);
 
@@ -55,15 +55,16 @@ namespace Shopping.Server
 
             services.AddControllersWithViews();
             services.AddRazorPages();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
                 app.UseWebAssemblyDebugging();
             }
             else
@@ -86,8 +87,12 @@ namespace Shopping.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
                 endpoints.MapFallbackToFile("index.html");
             });
+
+            ApplicationDbInitializer.SeedRoles(roleManager);
+            ApplicationDbInitializer.SeedUsers(userManager);
         }
     }
 }

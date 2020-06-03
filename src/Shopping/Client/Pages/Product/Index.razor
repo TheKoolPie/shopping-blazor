@@ -1,5 +1,7 @@
 ﻿@page "/product/"
 
+@attribute [Authorize]
+
 @inject IProductCategories CategoryRepo
 @inject IProducts ProductRepo
 

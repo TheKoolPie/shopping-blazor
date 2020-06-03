@@ -11,9 +11,9 @@ using Shopping.Shared.Data;
 
 namespace Shopping.Server.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     [Authorize]
+    [ApiController]
+    [Route("api/[controller]")]
     public class ProductCategoryController : ControllerBase
     {
         private readonly ShoppingDbContext _context;
