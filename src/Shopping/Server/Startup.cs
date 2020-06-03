@@ -11,6 +11,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Shopping.Server.Models;
+using Shopping.Server.Configuration;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Shopping.Server
 {
@@ -31,12 +34,15 @@ namespace Shopping.Server
                 o.UseMySql(Configuration.GetConnectionString("IdentityMySQL")));
 
             services.AddDefaultIdentity<ShoppingUser>()
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-          
+
             var connString = Configuration.GetConnectionString("Shopping_Azure");
             var connData = new CosmosDbConnStringData(connString);
 
             services.AddDbContext<ShoppingDbContext>(o => o.UseCosmos(connData.Endpoint, connData.Key, "shopping-list"));
+
+            services.AddHealthChecks();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(o =>
@@ -59,7 +65,7 @@ namespace Shopping.Server
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
-            UserManager<ShoppingUser> userManager, RoleManager<IdentityRole> roleManager)
+            UserManager<ShoppingUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -90,8 +96,10 @@ namespace Shopping.Server
                 endpoints.MapFallbackToFile("index.html");
             });
 
-            ApplicationDbInitializer.SeedRoles(roleManager);
-            ApplicationDbInitializer.SeedUsers(userManager);
+            AdminSettings admin = Configuration.GetSection("AdminSettings").Get<AdminSettings>();
+            List<string> userRoles = Configuration.GetSection("UserRoles").Get<List<string>>();
+            ApplicationDbInitializer.SeedRoles(roleManager, userRoles, logger);
+            ApplicationDbInitializer.SeedUsers(userManager, admin, userRoles, logger);
         }
     }
 }

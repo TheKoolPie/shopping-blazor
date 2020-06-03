@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Shopping.Server.Configuration;
 using Shopping.Server.Models;
 using System;
 using System.Collections.Generic;
@@ -9,36 +11,64 @@ namespace Shopping.Server.Data
 {
     public static class ApplicationDbInitializer
     {
-        private static List<string> userRoleNames = new List<string>
+        public static void SeedRoles(RoleManager<IdentityRole> roleManager, List<string> userRoleNames, ILogger logger = null)
         {
-            "Admin", "Manager", "Creator", "User"
-        };
-        public static void SeedRoles(RoleManager<IdentityRole> roleManager)
-        {
-            foreach (var roleName in userRoleNames)
+            if (userRoleNames == null) 
             {
-                if (roleManager.FindByNameAsync(roleName).Result == null)
+                logger?.LogWarning("No user roles found");
+            }
+            else
+            {
+                foreach (var roleName in userRoleNames)
                 {
-                    var result = roleManager.CreateAsync(new IdentityRole
+                    if (roleManager.FindByNameAsync(roleName).Result == null)
                     {
-                        Name = roleName
-                    }).Result;
+                        var result = roleManager.CreateAsync(new IdentityRole
+                        {
+                            Name = roleName
+                        }).Result;
+                    }
                 }
             }
         }
-        public static void SeedUsers(UserManager<ShoppingUser> userManager)
+        public static void SeedUsers(UserManager<ShoppingUser> userManager, AdminSettings settings, List<string> userRoleNames, ILogger logger = null)
         {
-            if (userManager.FindByEmailAsync("admin@shopping.de").Result == null)
+            if (settings == null)
             {
-                ShoppingUser user = new ShoppingUser
+                logger?.LogWarning("No admin settings found");
+            }
+            else if (userRoleNames == null)
+            {
+                logger?.LogWarning("No user roles found");
+            }
+            else
+            {
+                ShoppingUser admin = userManager.FindByEmailAsync(settings.Email).Result;
+
+                if (admin == null)
                 {
-                    UserName = "Admin",
-                    Email = "admin@shopping.de"
-                };
-                var result = userManager.CreateAsync(user, "Shopping3105!#2020").Result;
-                if (result.Succeeded)
+                    admin = new ShoppingUser
+                    {
+                        UserName = settings.UserName,
+                        Email = settings.Email
+                    };
+                    var result = userManager.CreateAsync(admin, settings.Password).Result;
+                    if (!result.Succeeded)
+                    {
+                        throw new Exception($"Could not create admin user");
+                    }
+                }
+
+                foreach (var role in userRoleNames)
                 {
-                    userManager.AddToRoleAsync(user, "Admin").Wait();
+                    if (!userManager.IsInRoleAsync(admin, role).Result)
+                    {
+                        var result = userManager.AddToRoleAsync(admin, role).Result;
+                        if (!result.Succeeded)
+                        {
+                            throw new Exception($"Could not add admin user to role: {role}");
+                        }
+                    }
                 }
             }
         }
