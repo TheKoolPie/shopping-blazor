@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Shared.Data;
 using Shopping.Server.Data;
-using Microsoft.AspNetCore.Authorization;
+using Shopping.Shared.Model.Account;
 
 namespace Shopping.Server.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = ShoppingUserPolicies.IsProductCategoryModifier)]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase

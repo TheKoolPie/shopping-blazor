@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Shopping.Client.Provider;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Client.Services.Implementations;
+using Shopping.Shared.Services;
 
 namespace Shopping.Client
 {

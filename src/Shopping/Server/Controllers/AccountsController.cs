@@ -35,7 +35,7 @@ namespace Shopping.Server.Controllers
             _signInManager = signInManager;
             _logger = logger;
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = ShoppingUserRoles.Admin)]
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {

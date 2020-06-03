@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Server.Data;
 using Shopping.Shared.Data;
+using Shopping.Shared.Model.Account;
 
 namespace Shopping.Server.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = ShoppingUserPolicies.IsProductCategoryModifier)]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductCategoryController : ControllerBase

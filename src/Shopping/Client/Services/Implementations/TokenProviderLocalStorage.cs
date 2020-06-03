@@ -3,6 +3,7 @@ using Shopping.Client.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Shopping.Shared.Services;
 using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations

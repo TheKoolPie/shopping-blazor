@@ -14,6 +14,8 @@ using Shopping.Server.Models;
 using Shopping.Server.Configuration;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Shopping.Shared.Model.Account;
+using Shopping.Server.Services;
 
 namespace Shopping.Server
 {
@@ -58,9 +60,21 @@ namespace Shopping.Server
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityKey"]))
                     };
                 });
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy(ShoppingUserPolicies.IsAdmin, ShoppingUserPolicies.IsAdminPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsProductModifier, ShoppingUserPolicies.IsProductModifierPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsProductCategoryModifier, ShoppingUserPolicies.IsProductCategoryModifierPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsUserManager, ShoppingUserPolicies.IsUserManagerPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsUserCreator, ShoppingUserPolicies.IsUserCreatorPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsUserRoleManager, ShoppingUserPolicies.IsUserRoleManagerPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsDatabaseManager, ShoppingUserPolicies.IsDatabaseManagerPolicy());
+            });
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddHttpContextAccessor();
+            services.AddTransient<IUserProvider, UserFromHttpContextProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

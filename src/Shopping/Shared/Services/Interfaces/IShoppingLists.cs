@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shopping.Client.Services.Interfaces
+namespace Shopping.Shared.Services
 {
     public interface IShoppingLists
     {

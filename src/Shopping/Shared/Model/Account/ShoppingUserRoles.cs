@@ -6,9 +6,9 @@ namespace Shopping.Shared.Model.Account
 {
     public static class ShoppingUserRoles
     {
-        public static string Admin => "Admin";
-        public static string Manager => "Manager";
-        public static string Creator => "Creator";
-        public static string User => "User";
+        public const string Admin = "Admin";
+        public const string Manager = "Manager";
+        public const string Creator = "Creator";
+        public const string User = "User";
     }
 }

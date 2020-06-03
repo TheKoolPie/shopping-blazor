@@ -15,14 +15,13 @@ namespace Shopping.Shared.Data
         public float Amount { get; set; }
         public bool Done { get; set; }
 
-        [Required(ErrorMessage = "Creation date is needed")]
-        public DateTime CreatedAt { get; set; }
+        public string OwnerId { get; set; }
+        public List<UserGroup> UserGroups { get; set; }
 
-        public ShoppingListItem()
+        public ShoppingListItem() : base()
         {
-            Id = Guid.NewGuid().ToString();
-            CreatedAt = DateTime.Now;
             Done = false;
+            UserGroups = new List<UserGroup>();
         }
         public ShoppingListItem(DateTime date) : this()
         {

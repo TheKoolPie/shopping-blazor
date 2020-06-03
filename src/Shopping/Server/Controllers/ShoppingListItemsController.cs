@@ -4,11 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shopping.Server.Data;
+using Shopping.Server.Models;
+using Shopping.Server.Services;
 using Shopping.Shared.Data;
 
 namespace Shopping.Server.Controllers
@@ -20,17 +23,24 @@ namespace Shopping.Server.Controllers
     {
         private readonly ShoppingDbContext _context;
         private readonly ILogger<ShoppingListItemsController> _logger;
-        public ShoppingListItemsController(ShoppingDbContext context, ILogger<ShoppingListItemsController> logger)
+        private readonly IUserProvider _userProvider;
+        public ShoppingListItemsController(ShoppingDbContext context, 
+            ILogger<ShoppingListItemsController> logger,
+            IUserProvider userProvider)
         {
             _context = context;
             _logger = logger;
+            _userProvider = userProvider;
         }
 
         // GET: api/ShoppingListItems
         [HttpGet]
         public async Task<ActionResult<List<ShoppingListItem>>> GetShoppingListItems()
         {
-            var listItems = await _context.ShoppingListItems.ToListAsync();
+            var user = await _userProvider.GetUserAsync();
+
+            var listItems = await _context.ShoppingListItems
+                .ToListAsync();
             var products = await _context.Products.ToListAsync();
             foreach (var item in listItems)
             {
@@ -151,5 +161,14 @@ namespace Shopping.Server.Controllers
             dbItem.Amount = targetItem.Amount;
             dbItem.Done = targetItem.Done;
         }
+
+        private async Task<List<ShoppingListItem>> GetItemsRelatedToUserAsync()
+        {
+            var user = await _userProvider.GetUserAsync();
+            var allItems = await _context.ShoppingListItems
+                                    .ToListAsync();
+            return null;
+        }
+
     }
 }

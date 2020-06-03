@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Shopping.Client.Services.Interfaces;
 using System.Threading.Tasks;
+using Shopping.Shared.Services;
 
 namespace Shopping.Client.Services.Implementations
 {
