@@ -26,11 +26,11 @@ namespace Shopping.Server.Data
                 }
             }
         }
-        public static void SeedUsers(UserManager<ApplicationUser> userManager)
+        public static void SeedUsers(UserManager<ShoppingUser> userManager)
         {
             if (userManager.FindByEmailAsync("admin@shopping.de").Result == null)
             {
-                ApplicationUser user = new ApplicationUser
+                ShoppingUser user = new ShoppingUser
                 {
                     UserName = "Admin",
                     Email = "admin@shopping.de"
