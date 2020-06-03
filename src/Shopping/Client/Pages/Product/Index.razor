@@ -17,77 +17,79 @@
 }
 else
 {
-    <div class="row">
-        <div class="col">
-            @if (IsSaving)
-            {
-                <strong>Speichere Daten....</strong>
-            }
-            else
-            {
-                <EditForm EditContext="@editContext" OnSubmit="HandleSubmit">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-                    <div class="row">
-                        <div class="col">
-                            <label>
-                                Name
-                                <InputText class="form-control" @bind-Value="product.Name" />
-                            </label>
+    <AuthorizeView Context="Auth">
+        <div class="row">
+            <div class="col">
+                @if (IsSaving)
+                {
+                    <strong>Speichere Daten....</strong>
+                }
+                else
+                {
+                    <EditForm EditContext="@editContext" OnSubmit="HandleSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="row">
+                            <div class="col">
+                                <label>
+                                    Name
+                                    <InputText class="form-control" @bind-Value="product.Name" />
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <label>
-                                Unit
-                                <InputSelect class="form-control" @bind-Value="product.Unit">
-                                    <option value="0">Choose Unit...</option>
-                                    @foreach (var unit in Enum.GetValues(typeof(ProductUnit)).Cast<ProductUnit>())
-                                            {
-                                        <option value="@unit">@unit.GetDescription()</option>
-                                            }
-                                </InputSelect>
-                            </label>
+                        <div class="row">
+                            <div class="col">
+                                <label>
+                                    Unit
+                                    <InputSelect class="form-control" @bind-Value="product.Unit">
+                                        <option value="0">Choose Unit...</option>
+                                        @foreach (var unit in Enum.GetValues(typeof(ProductUnit)).Cast<ProductUnit>())
+                                                {
+                                            <option value="@unit">@unit.GetDescription()</option>
+                                                }
+                                    </InputSelect>
+                                </label>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col">
-                            <label>
-                                Category
-                                <InputSelect class="form-control" @bind-Value="product.CategoryId">
-                                    <option value="" selected>Choose Category...</option>
-                                    @foreach (var category in categories)
-                                            {
-                                                string borderContent = $"15px solid {category.ColorCode}";
-                                        <option style="border-left: @borderContent" value="@category.Id">@category.Name</option>
-                                            }
-                                </InputSelect>
-                            </label>
+                        <div class="row">
+                            <div class="col">
+                                <label>
+                                    Category
+                                    <InputSelect class="form-control" @bind-Value="product.CategoryId">
+                                        <option value="" selected>Choose Category...</option>
+                                        @foreach (var category in categories)
+                                                {
+                                                    string borderContent = $"15px solid {category.ColorCode}";
+                                            <option style="border-left: @borderContent" value="@category.Id">@category.Name</option>
+                                                }
+                                    </InputSelect>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <button class="btn btn-primary" type="submit">
-                                <span class="oi oi-task" /> Save
-                            </button>
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-primary" type="submit">
+                                    <span class="oi oi-task" /> Save
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </EditForm>
-            }
+                    </EditForm>
+                }
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            @if (AlertData.Title != null)
-            {
-                <AlertComponent Title="@AlertData.Title" Type="@AlertData.Type">
-                    @AlertData.Message
-                </AlertComponent>
-            }
+        <div class="row">
+            <div class="col">
+                @if (AlertData.Title != null)
+                {
+                    <AlertComponent Title="@AlertData.Title" Type="@AlertData.Type">
+                        @AlertData.Message
+                    </AlertComponent>
+                }
+            </div>
         </div>
-    </div>
-    <hr />
+        <hr />
+    </AuthorizeView>
     @if (products != null)
     {
         <div class="row">
@@ -102,45 +104,59 @@ else
                 </button>
             </div>
         </div>
-        <div class="row" style="margin-top:24px">
-            <div class="col">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th @onclick="OnNameColumnClicked">
-                                Name
-                                <span class="@NameSortingData.Icon" />
-                            </th>
-                            <th @onclick="OnUnitColumnClicked">
-                                Einheit
-                                <span class="@UnitSortingData.Icon" />
-                            </th>
-                            <th @onclick="OnCategoryColumnClicked">
-                                Kategorie
-                                <span class="@CategorySortingData.Icon" />
-                            </th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var product in products)
-                        {
-                            string borderContent = $"15px solid {product.Category.ColorCode}";
+        @if (products.Count > 0)
+        {
+            <div class="row" style="margin-top:24px">
+                <div class="col">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
-                                <td>@product.Name</td>
-                                <td>@product.Unit.GetDescription()</td>
-                                <td style="border-left: @borderContent">@product.Category.Name</td>
-                                <td>
-                                    <button class="btn btn-danger" @onclick="@(()=>DeleteProduct(product.Id))">
-                                        <span class="oi oi-trash" />
-                                    </button>
-                                </td>
+                                <th @onclick="OnNameColumnClicked">
+                                    Name
+                                    <span class="@NameSortingData.Icon" />
+                                </th>
+                                <th @onclick="OnUnitColumnClicked">
+                                    Einheit
+                                    <span class="@UnitSortingData.Icon" />
+                                </th>
+                                <th @onclick="OnCategoryColumnClicked">
+                                    Kategorie
+                                    <span class="@CategorySortingData.Icon" />
+                                </th>
+                                <th></th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in products)
+                            {
+                                string borderContent = $"15px solid {product.Category.ColorCode}";
+                                <tr>
+                                    <td>@product.Name</td>
+                                    <td>@product.Unit.GetDescription()</td>
+                                    <td style="border-left: @borderContent">@product.Category.Name</td>
+                                    <td>
+                                        <AuthorizeView>
+                                            <button class="btn btn-danger" @onclick="@(() => DeleteProduct(product.Id))">
+                                                <span class="oi oi-trash" />
+                                            </button>
+                                        </AuthorizeView>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <strong>No products found</strong>
+                </div>
+            </div>
+        }
     }
 }
 @code {
@@ -220,6 +236,7 @@ else
                     localBackup.Add(savedEntity);
                     products.Add(savedEntity);
                     product = new ProductItem();
+                    AlertData = AlertComponentModel.CreateSuccessAlert("Saving successful", "");
                 }
                 else
                 {

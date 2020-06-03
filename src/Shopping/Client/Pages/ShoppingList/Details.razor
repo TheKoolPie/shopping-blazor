@@ -7,6 +7,8 @@
 @inject IShoppingLists ShoppingListRepo
 @inject IShoppingListItems ItemRepo
 
+@attribute [Authorize]
+
 <h3>List for @date.ToString("dd.MM.yyyy")</h3>
 <hr />
 @if (IsLoading)

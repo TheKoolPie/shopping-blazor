@@ -1,20 +1,16 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Shopping.Server.Data;
-using Shopping.Server.Models;
-using Microsoft.AspNetCore.Authentication;
-using System.Reflection;
-using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using IdentityServer4.Services;
-using Shopping.Server.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Runtime.CompilerServices;
+using System.Text;
+using Shopping.Server.Models;
 
 namespace Shopping.Server
 {
@@ -31,33 +27,31 @@ namespace Shopping.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var mysqlConnString = Configuration.GetConnectionString("IdentityMySQL");
-
             services.AddDbContext<ApplicationDbContext>(o =>
-                o.UseMySql(mysqlConnString, sqlOptions =>
-                {
-                    sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
-                    sqlOptions.EnableRetryOnFailure(15, TimeSpan.FromSeconds(30), null);
-                }));
+                o.UseMySql(Configuration.GetConnectionString("IdentityMySQL")));
 
-            services.AddDefaultIdentity<ApplicationUser>(o => o.SignIn.RequireConfirmedAccount = false)
-                .AddRoles<IdentityRole>()
+            services.AddDefaultIdentity<ShoppingUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
-
-            services.AddAuthentication()
-                .AddIdentityServerJwt();
-
+          
             var connString = Configuration.GetConnectionString("Shopping_Azure");
             var connData = new CosmosDbConnStringData(connString);
 
             services.AddDbContext<ShoppingDbContext>(o => o.UseCosmos(connData.Endpoint, connData.Key, "shopping-list"));
 
-            services.AddTransient<IProfileService, ProfileService>();
-
-            services.AddHealthChecks();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(o =>
+                {
+                    o.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["JwtIssuer"],
+                        ValidAudience = Configuration["JwtAudience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityKey"]))
+                    };
+                });
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -86,7 +80,6 @@ namespace Shopping.Server
 
             app.UseRouting();
 
-            app.UseIdentityServer();
             app.UseAuthentication();
             app.UseAuthorization();
 

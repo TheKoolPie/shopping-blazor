@@ -5,6 +5,36 @@
     </button>
 </div>
 
+<ul class="nav flex-column">
+    <li class="nav-item px-3">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="oi oi-person"></span>
+            <AuthorizeView>
+                <Authorized>@context.User.Identity.Name</Authorized>
+                <NotAuthorized>Account</NotAuthorized>
+            </AuthorizeView>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <AuthorizeView>
+                <Authorized>
+                    <NavLink class="nav-link text-dark" href="/account/manager" Match="NavLinkMatch.All">
+                        <span class="oi oi-spreadsheet" aria-hidden="true"></span> Manage
+                    </NavLink>
+                    <div class="dropdown-divider"></div>
+                    <NavLink class="nav-link text-dark" href="/account/logout" Match="NavLinkMatch.All">
+                        <span class="oi oi-account-logout" aria-hidden="true"></span> Log out
+                    </NavLink>
+                </Authorized>
+                <NotAuthorized>
+                    <NavLink class="nav-link text-dark" href="/account/login" Match="NavLinkMatch.All">
+                        <span class="oi oi-account-login" aria-hidden="true"></span> Log in
+                    </NavLink>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </li>
+</ul>
+
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
@@ -32,6 +62,12 @@
                 <span class="oi oi-clipboard" aria-hidden="true"></span> Categories
             </NavLink>
         </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="https://github.com/TheKoolPie/shopping-blazor" Match="NavLinkMatch.All">
+                <span class="oi oi-info" aria-hidden="true"></span> About
+            </NavLink>
+        </li>
+
     </ul>
 </div>
 

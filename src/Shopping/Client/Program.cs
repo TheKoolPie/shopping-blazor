@@ -1,16 +1,13 @@
 using System;
 using System.Net.Http;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Text;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Shopping.Shared.Services;
-using Shopping.Shared.Services.ShoppingList;
-using Shopping.Client.Factories;
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using Shopping.Client.Provider;
+using Shopping.Client.Services.Interfaces;
+using Shopping.Client.Services.Implementations;
 
 namespace Shopping.Client
 {
@@ -30,10 +27,18 @@ namespace Shopping.Client
             builder.Services.AddApiAuthorization()
                 .AddAccountClaimsPrincipalFactory<CustomUserFactory>();
 
-            builder.Services.AddSingleton<IProductCategories, ProductCategoryApiAccess>();
-            builder.Services.AddSingleton<IProducts, ProductsApiAccess>();
-            builder.Services.AddSingleton<IShoppingListItems, ShoppingListItemsApiAccess>();
-            builder.Services.AddSingleton<IShoppingLists, ShoppingListsApiAccess>();
+            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddAuthorizationCore();
+            builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+
+            builder.Services.AddScoped<ITokenProvider, TokenProviderLocalStorage>();
+
+            builder.Services.AddTransient<IProductCategories, ProductCategoryApiAccess>();
+            builder.Services.AddTransient<IProducts, ProductsApiAccess>();
+            builder.Services.AddTransient<IShoppingListItems, ShoppingListItemsApiAccess>();
+            builder.Services.AddTransient<IShoppingLists, ShoppingListsApiAccess>();
+
 
 
             await builder.Build().RunAsync();

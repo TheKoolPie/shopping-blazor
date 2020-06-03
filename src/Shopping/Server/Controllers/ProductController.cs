@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Shared.Data;
+using Shopping.Server.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Shopping.Server.Controllers
 {
@@ -22,7 +24,7 @@ namespace Shopping.Server.Controllers
             _context = context;
 
         }
-
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<ProductItem>>> GetProducts()
         {
@@ -35,7 +37,7 @@ namespace Shopping.Server.Controllers
 
             return products;
         }
-
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductItem>> GetProduct(string id)
         {

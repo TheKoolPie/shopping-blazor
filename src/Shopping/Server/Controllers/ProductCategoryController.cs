@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Shopping.Server.Data;
 using Shopping.Shared.Data;
 
 namespace Shopping.Server.Controllers
@@ -13,7 +14,6 @@ namespace Shopping.Server.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Produces("application/json")]
     public class ProductCategoryController : ControllerBase
     {
         private readonly ShoppingDbContext _context;
@@ -24,13 +24,14 @@ namespace Shopping.Server.Controllers
 
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<ProductCategory>>> GetProductCategories()
         {
             var categories = await _context.Categories.ToListAsync();
             return Ok(categories);
         }
-
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductCategory>> GetProductCategory(string id)
         {
