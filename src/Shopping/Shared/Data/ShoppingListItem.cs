@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Shopping.Shared.Data
@@ -16,11 +17,15 @@ namespace Shopping.Shared.Data
         public bool Done { get; set; }
 
         public string OwnerId { get; set; }
+        public List<string> UserGroupIds { get; set; }
+
+        [NotMapped]
         public List<UserGroup> UserGroups { get; set; }
 
         public ShoppingListItem() : base()
         {
             Done = false;
+            UserGroupIds = new List<string>();
             UserGroups = new List<UserGroup>();
         }
         public ShoppingListItem(DateTime date) : this()

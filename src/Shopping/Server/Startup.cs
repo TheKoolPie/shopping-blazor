@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Shopping.Shared.Model.Account;
 using Shopping.Server.Services;
+using Shopping.Shared.Services.Interfaces;
+using Shopping.Server.Services.Implementations;
 
 namespace Shopping.Server
 {
@@ -74,7 +76,9 @@ namespace Shopping.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddHttpContextAccessor();
+
             services.AddTransient<IUserProvider, UserFromHttpContextProvider>();
+            services.AddTransient<IUserGroups, UserGroupRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
