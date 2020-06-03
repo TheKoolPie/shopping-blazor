@@ -16,7 +16,7 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Please enter your details</h5>
-        <EditForm Model="RegisterModel" OnValidSubmit="HandleRegistration">
+        <EditForm EditContext="@editContext" OnSubmit="HandleRegistration">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
@@ -56,23 +56,32 @@
 </div>
 
 @code {
+    private EditContext editContext;
     private RegisterModel RegisterModel = new RegisterModel();
     private bool ShowErrors;
     private IEnumerable<string> Errors;
 
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(RegisterModel);
+    }
+
     private async Task HandleRegistration()
     {
         ShowErrors = false;
+        if (editContext.Validate())
+        {
 
-        var result = await AuthService.Register(RegisterModel);
-        if (result.Successful)
-        {
-            NavigationManager.NavigateTo("/account/login");
-        }
-        else
-        {
-            Errors = result.Errors;
-            ShowErrors = true;
+            var result = await AuthService.Register(RegisterModel);
+            if (result.Successful)
+            {
+                NavigationManager.NavigateTo("/account/login");
+            }
+            else
+            {
+                Errors = result.Errors;
+                ShowErrors = true;
+            }
         }
     }
 }

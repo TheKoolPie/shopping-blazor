@@ -49,7 +49,7 @@ namespace Shopping.Client.Services.Implementations
             }
 
             await _localStorage.SetItemAsync("authToken", result.Token);
-            ((ApiAuthenticationStateProvider)_authStateProvider).MarkUserAsAuthenticated(model.LoginName);
+            ((ApiAuthenticationStateProvider)_authStateProvider).MarkUserAsAuthenticated(result.Token);
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", result.Token);
 
             return result;
