@@ -23,7 +23,7 @@ namespace Shopping.Server.Controllers
             _context = context;
 
         }
-
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<ProductItem>>> GetProducts()
         {
@@ -36,7 +36,7 @@ namespace Shopping.Server.Controllers
 
             return products;
         }
-
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductItem>> GetProduct(string id)
         {

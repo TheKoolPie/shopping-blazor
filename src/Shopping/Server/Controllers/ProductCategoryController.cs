@@ -24,13 +24,14 @@ namespace Shopping.Server.Controllers
 
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<ProductCategory>>> GetProductCategories()
         {
             var categories = await _context.Categories.ToListAsync();
             return Ok(categories);
         }
-
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductCategory>> GetProductCategory(string id)
         {
