@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\ShoppingList\" />
     <Folder Include="wwwroot\js\bootstrap\" />
   </ItemGroup>
 
