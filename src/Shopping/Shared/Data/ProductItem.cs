@@ -20,7 +20,14 @@ namespace Shopping.Shared.Data
 
         public ProductItem() : base()
         {
-            Category = new ProductCategory("");
+            Category = new ProductCategory();
+        }
+        public ProductItem(ProductItem item) : base(item)
+        {
+            this.Name = item.Name;
+            this.Unit = item.Unit;
+            this.CategoryId = item.CategoryId;
+            this.Category = new ProductCategory(item.Category);
         }
     }
 }

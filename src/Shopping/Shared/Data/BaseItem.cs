@@ -18,5 +18,10 @@ namespace Shopping.Shared.Data
             Id = Guid.NewGuid().ToString();
             CreatedAt = DateTime.Now;
         }
+        public BaseItem(BaseItem item)
+        {
+            this.Id = item.Id;
+            this.CreatedAt = item.CreatedAt;
+        }
     }
 }

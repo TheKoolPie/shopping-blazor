@@ -15,14 +15,8 @@ namespace Shopping.Shared.Data
         public ProductCategory() : base()
         {
         }
-        public ProductCategory(string id) : this()
+        public ProductCategory(ProductCategory category) : base(category)
         {
-            Id = id;
-        }
-
-        public ProductCategory(ProductCategory category)
-        {
-            Id = category.Id;
             Name = category.Name;
             ColorCode = category.ColorCode;
         }

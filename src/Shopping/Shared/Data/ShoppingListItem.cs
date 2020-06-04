@@ -20,9 +20,26 @@ namespace Shopping.Shared.Data
         {
             Done = false;
         }
-        public ShoppingListItem(DateTime date) : this()
+        public ShoppingListItem(ShoppingListItem item) : base(item)
         {
-            CreatedAt = date;
+            this.ProductItemId = item.ProductItemId;
+            this.ProductItem = new ProductItem(item.ProductItem);
+            this.Amount = item.Amount;
+            this.Done = item.Done;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ShoppingListItem item &&
+                   Id == item.Id &&
+                   ProductItemId == item.ProductItemId &&
+                   Amount == item.Amount &&
+                   Done == item.Done;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, CreatedAt, ProductItemId, Amount, Done);
         }
     }
 }
