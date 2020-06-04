@@ -16,17 +16,9 @@ namespace Shopping.Shared.Data
         public float Amount { get; set; }
         public bool Done { get; set; }
 
-        public string OwnerId { get; set; }
-        public List<string> UserGroupIds { get; set; }
-
-        [NotMapped]
-        public List<UserGroup> UserGroups { get; set; }
-
         public ShoppingListItem() : base()
         {
             Done = false;
-            UserGroupIds = new List<string>();
-            UserGroups = new List<UserGroup>();
         }
         public ShoppingListItem(DateTime date) : this()
         {
