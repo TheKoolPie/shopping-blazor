@@ -7,6 +7,7 @@ namespace Shopping.Shared.Data
 {
     public class UserGroup : BaseItem
     {
+        public string Name { get; set; }
         public string OwnerId { get; set; }
         public List<string> MemberIds { get; set; }
         public UserGroup() : base()

@@ -8,6 +8,6 @@ namespace Shopping.Shared.Services.Interfaces
 {
     public interface IUserGroups : ICRUDAccess<UserGroup>
     {
-        Task<List<UserGroup>> GetContainingUserAsync(string userId);
+        Task<List<UserGroup>> GetAllOfUserAsync(string userId);
     }
 }

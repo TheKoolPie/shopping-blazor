@@ -8,6 +8,7 @@ namespace Shopping.Shared.Services.Interfaces
 {
     public interface IShoppingLists : ICRUDAccess<ShoppingList>
     {
+        Task<List<ShoppingList>> GetAllOfUserAsync(string userId);
         Task<UserGroup> AddUserGroupAsync(string listId, string userGroupId);
         Task<bool> RemoveUserGroupAsync(string listId, string userGroupId);
         Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item);

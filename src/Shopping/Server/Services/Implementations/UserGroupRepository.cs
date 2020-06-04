@@ -29,7 +29,7 @@ namespace Shopping.Server.Services.Implementations
             return await _context.UserGroups.FirstOrDefaultAsync(i => i.Id == id);
         }
 
-        public async Task<List<UserGroup>> GetContainingUserAsync(string userId)
+        public async Task<List<UserGroup>> GetAllOfUserAsync(string userId)
         {
             return (await GetAllAsync())
                 .Where(i => i.OwnerId == userId || i.MemberIds.Contains(userId))
@@ -38,12 +38,14 @@ namespace Shopping.Server.Services.Implementations
 
         public override bool ItemAlreadyExists(UserGroup item)
         {
-            return _context.UserGroups.Any(i => i.Id == item.Id);
+            return _context.UserGroups.Any(i => i.Id == item.Id || i.Name == item.Name);
         }
 
         public override bool ItemHasChanged(UserGroup existing, UserGroup updated)
         {
-            if (existing.OwnerId != updated.OwnerId || existing.MemberIds.Count != updated.MemberIds.Count)
+            if (existing.OwnerId != updated.OwnerId || 
+                existing.Name != updated.Name ||
+                existing.MemberIds.Count != updated.MemberIds.Count)
             {
                 return true;
             }
@@ -63,6 +65,7 @@ namespace Shopping.Server.Services.Implementations
         public override void UpdateExistingItem(UserGroup existing, UserGroup update)
         {
             existing.OwnerId = update.OwnerId;
+            existing.Name = update.Name;
             existing.MemberIds = new List<string>(update.MemberIds);
         }
     }

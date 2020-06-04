@@ -100,5 +100,22 @@ namespace Shopping.Server.Services.Implementations
         {
             existing.Update(update);
         }
+
+        public async Task<List<ShoppingList>> GetAllOfUserAsync(string userId)
+        {
+            var allLists = await GetAllAsync();
+            var allGroupIdsOfUser = (await _userGroups.GetAllOfUserAsync(userId)).Select(g => g.Id);
+            for (int i = allLists.Count - 1; i >= 0; i--)
+            {
+                var list = allLists[i];
+                var isOwner = list.OwnerId == userId;
+                var hasUserGroupIdInCommon = list.UserGroupIds.Intersect(allGroupIdsOfUser).Count() != 0;
+                if (!isOwner && !hasUserGroupIdInCommon)
+                {
+                    allLists.Remove(list);
+                }
+            }
+            return allLists;
+        }
     }
 }
