@@ -16,7 +16,7 @@ namespace Shopping.Shared.Data
         public UserGroup(UserGroup group) : base(group)
         {
             this.OwnerId = group.OwnerId;
-            this.MemberIds = new List<string>(group.MemberIds);
+            this.MemberIds = new List<string>(group.MemberIds ?? new List<string>());
         }
     }
 }

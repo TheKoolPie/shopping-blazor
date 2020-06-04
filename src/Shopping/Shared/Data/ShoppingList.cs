@@ -29,9 +29,9 @@ namespace Shopping.Shared.Data
         {
             this.ListDate = list.ListDate;
             this.OwnerId = list.OwnerId;
-            this.UserGroupIds = new List<string>(list.UserGroupIds);
-            this.UserGroups = new List<UserGroup>(list.UserGroups);
-            this.Items = new List<ShoppingListItem>(list.Items);
+            this.UserGroupIds = new List<string>(list.UserGroupIds ?? new List<string>());
+            this.UserGroups = new List<UserGroup>(list.UserGroups ?? new List<UserGroup>());
+            this.Items = new List<ShoppingListItem>(list.Items ?? new List<ShoppingListItem>());
         }
         public void AddOrUpdateItem(ShoppingListItem item)
         {
@@ -66,7 +66,7 @@ namespace Shopping.Shared.Data
 
         public void RemoveUserGroup(string groupId)
         {
-            if (UserGroupIds.Any(i => i == groupId))
+            if (UserGroupIds.Contains(groupId))
             {
                 UserGroupIds.Remove(groupId);
             }
@@ -94,7 +94,9 @@ namespace Shopping.Shared.Data
             {
                 for (int i = 0; i < current.Count; i++)
                 {
-                    if (current[i] != upd[i])
+                    var item1 = current[i];
+                    var item2 = upd[i];
+                    if (!item1.Equals(item2))
                     {
                         hasDifferentItems = true;
                         break;
@@ -106,26 +108,7 @@ namespace Shopping.Shared.Data
 
         public bool HasDifferentUserGroupIds(List<string> compareIds)
         {
-            var hasDifferentGroupIds = false;
-
-            var current = this.UserGroupIds.OrderBy(x => x).ToList();
-            var upd = compareIds.OrderBy(x => x).ToList();
-            if (current.Count != upd.Count)
-            {
-                hasDifferentGroupIds = true;
-            }
-            else
-            {
-                for (int i = 0; i < current.Count; i++)
-                {
-                    if (current[i] != upd[i])
-                    {
-                        hasDifferentGroupIds = true;
-                        break;
-                    }
-                }
-            }
-            return hasDifferentGroupIds;
+            return !UserGroupIds.All(compareIds.Contains);
         }
 
         public override bool Equals(object obj)

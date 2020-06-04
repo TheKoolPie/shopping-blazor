@@ -23,7 +23,7 @@ namespace Shopping.Shared.Data
         public ShoppingListItem(ShoppingListItem item) : base(item)
         {
             this.ProductItemId = item.ProductItemId;
-            this.ProductItem = new ProductItem(item.ProductItem);
+            this.ProductItem = new ProductItem(item.ProductItem ?? new ProductItem());
             this.Amount = item.Amount;
             this.Done = item.Done;
         }
@@ -39,7 +39,7 @@ namespace Shopping.Shared.Data
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, CreatedAt, ProductItemId, Amount, Done);
+            return HashCode.Combine(Id, ProductItemId, Amount, Done);
         }
     }
 }

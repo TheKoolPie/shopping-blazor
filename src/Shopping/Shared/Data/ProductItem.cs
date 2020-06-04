@@ -27,7 +27,7 @@ namespace Shopping.Shared.Data
             this.Name = item.Name;
             this.Unit = item.Unit;
             this.CategoryId = item.CategoryId;
-            this.Category = new ProductCategory(item.Category);
+            this.Category = new ProductCategory(item.Category ?? new ProductCategory());
         }
     }
 }
