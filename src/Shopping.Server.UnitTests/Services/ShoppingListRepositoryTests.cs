@@ -1,4 +1,5 @@
 using Microsoft.Azure.Documents.SystemFunctions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using Moq;
 using Shopping.Server.Services.Implementations;
@@ -23,8 +24,8 @@ namespace Shopping.Server.UnitTests.Services
             using (var context = DBContextMocks.GetMock())
             {
                 var repo = new ShoppingListRepository(context, null, null);
-                await Assert.ThrowsAsync<ItemNotFoundException>( async () =>
-                    await repo.GetAsync(DateTime.Now.ToString("ddMMyyyyHHmm")));
+                await Assert.ThrowsAsync<ItemNotFoundException>(async () =>
+                   await repo.GetAsync(DateTime.Now.ToString("ddMMyyyyHHmm")));
             }
         }
         [Fact]
@@ -65,6 +66,53 @@ namespace Shopping.Server.UnitTests.Services
                 .ReturnsAsync(retList);
 
             return userRepoMock.Object;
+        }
+        [Fact]
+        public async Task AddOrUpdateItemAsync_AddNewItemToList_ListGetsUpdated()
+        {
+            using (var context = DBContextMocks.GetMock())
+            {
+                var listRepo = new ShoppingListRepository(context, null, null);
+                var list = await context.ShoppingLists.FirstOrDefaultAsync();
+                int itemCountBefore = list.Items.Count;
+                list.AddOrUpdateItem(new ShoppingListItem()
+                {
+                    ProductItemId = "0010",
+                    Amount = 250.5f,
+                });
+                var upd = await listRepo.UpdateAsync(list.Id, list);
+
+                Assert.Equal(itemCountBefore + 1, upd.Items.Count);
+            }
+        }
+        [Fact]
+        public async Task AddOrUpdateItemAsync_UpdateExistingItemToList_ListGetsUpdated()
+        {
+            using (var context = DBContextMocks.GetMock())
+            {
+                var listRepo = new ShoppingListRepository(context, null, null);
+                var list = await context.ShoppingLists.FirstOrDefaultAsync();
+
+                var listCount = list.Items.Count;
+
+                var firstItemInList = list.Items.FirstOrDefault();
+                var firstItemId = firstItemInList.Id;
+                var firstItemAmount = firstItemInList.Amount;
+
+                var updatedAmount = firstItemAmount + 100.0f;
+
+                var updItem = new ShoppingListItem(firstItemInList);
+                updItem.Amount = updatedAmount;
+
+                await listRepo.AddOrUpdateItemAsync(list.Id, updItem);
+
+                var updatedList = await listRepo.GetAsync(list.Id);
+
+                Assert.Equal(listCount, updatedList.Items.Count);
+                Assert.Equal(
+                    updatedList.Items.FirstOrDefault(i => i.Id == firstItemId).Amount,
+                    updatedAmount);
+            }
         }
     }
 }
