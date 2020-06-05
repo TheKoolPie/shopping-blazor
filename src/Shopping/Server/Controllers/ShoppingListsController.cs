@@ -32,8 +32,17 @@ namespace Shopping.Server.Controllers
         public async Task<ActionResult<List<ShoppingList>>> GetLists()
         {
             var user = await _users.GetUserAsync();
-            var lists = await _lists.GetAllOfUserAsync(user.Id);
 
+            List<ShoppingList> lists = new List<ShoppingList>();
+
+            if (await _users.IsUserAdminAsync())
+            {
+                lists = await _lists.GetAllAsync();
+            }
+            else
+            {
+                lists = await _lists.GetAllOfUserAsync(user.Id);
+            }
             return Ok(lists);
         }
         [HttpGet("{id}")]
@@ -55,13 +64,6 @@ namespace Shopping.Server.Controllers
             }
 
             return Ok(list);
-        }
-        [HttpGet("GetAll")]
-        [Authorize(Policy = ShoppingUserPolicies.IsAdmin)]
-        public async Task<ActionResult<List<ShoppingList>>> GetAllLists()
-        {
-            var lists = await _lists.GetAllAsync();
-            return Ok(lists);
         }
 
         [HttpPost]
