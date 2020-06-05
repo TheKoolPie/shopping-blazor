@@ -1,0 +1,48 @@
+
+trigger:
+  branches:
+    include:
+      - '*'
+
+pool:
+  vmImage: 'vs2017-win2016'
+
+variables:
+  buildConfiguration: 'Debug'
+
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    projects: '**/*.csproj'
+    arguments: '--no-restore --configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Test
+  inputs:
+    command: test
+    projects: '**/*.UnitTests.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: '**/Shopping.Server.csproj'
+    arguments: '--configuration $(buildConfiguration) --output "$(build.artifactstagingdirectory)"'
+    zipAfterPublish: True
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'],'refs/heads/master'))
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'],'refs/heads/master'))
