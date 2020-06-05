@@ -39,12 +39,6 @@ namespace Shopping.Server.Services.Implementations
             i.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase) ||
             i.ColorCode == item.ColorCode);
         }
-
-        public override bool ItemHasChanged(ProductCategory existing, ProductCategory updated)
-        {
-            return existing.Name != updated.Name || existing.ColorCode != updated.ColorCode;
-        }
-
         public override void UpdateExistingItem(ProductCategory existing, ProductCategory update)
         {
             existing.Name = update.Name;

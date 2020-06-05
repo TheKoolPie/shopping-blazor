@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 
 namespace Shopping.Shared.Data
@@ -18,6 +19,19 @@ namespace Shopping.Shared.Data
         {
             this.OwnerId = group.OwnerId;
             this.MemberIds = new List<string>(group.MemberIds ?? new List<string>());
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is UserGroup group &&
+                   Name == group.Name &&
+                   OwnerId == group.OwnerId &&
+                   MemberIds.All(group.MemberIds.Contains);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name, OwnerId, MemberIds);
         }
     }
 }

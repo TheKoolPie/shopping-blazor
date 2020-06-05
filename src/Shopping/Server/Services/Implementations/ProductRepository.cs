@@ -42,13 +42,6 @@ namespace Shopping.Server.Services.Implementations
             return _context.Products.Any(i => i.Id == item.Id || i.Name == item.Name);
         }
 
-        public override bool ItemHasChanged(ProductItem existing, ProductItem updated)
-        {
-            return (existing.Name != updated.Name) ||
-                (existing.Unit != updated.Unit) ||
-                (existing.CategoryId != updated.CategoryId);
-        }
-
         public override void UpdateExistingItem(ProductItem existing, ProductItem update)
         {
             existing.Name = update.Name;

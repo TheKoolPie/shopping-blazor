@@ -20,5 +20,17 @@ namespace Shopping.Shared.Data
             Name = category.Name;
             ColorCode = category.ColorCode;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ProductCategory category &&
+                   Name == category.Name &&
+                   ColorCode == category.ColorCode;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name, ColorCode);
+        }
     }
 }

@@ -49,7 +49,7 @@ namespace Shopping.Server.Services.Implementations
             {
                 throw new ItemNotFoundException(typeof(T), id);
             }
-            if (ItemHasChanged(existingItem, item))
+            if (!(existingItem.Equals(item)))
             {
                 UpdateExistingItem(existingItem, item);
                 try
@@ -86,7 +86,6 @@ namespace Shopping.Server.Services.Implementations
         public abstract Task<List<T>> GetAllAsync();
         public abstract Task<T> GetAsync(string id);
         public abstract bool ItemAlreadyExists(T item);
-        public abstract bool ItemHasChanged(T existing, T updated);
         public abstract void UpdateExistingItem(T existing, T update);
     }
 }

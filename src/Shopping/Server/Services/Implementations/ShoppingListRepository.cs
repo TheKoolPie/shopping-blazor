@@ -66,11 +66,6 @@ namespace Shopping.Server.Services.Implementations
             return _context.ShoppingLists.Any(i => i.Id == item.Id);
         }
 
-        public override bool ItemHasChanged(ShoppingList existing, ShoppingList updated)
-        {
-            return existing != updated;
-        }
-
         public async Task<bool> RemoveItemAsync(string listId, string itemId)
         {
             var list = await GetAsync(listId);
@@ -104,18 +99,27 @@ namespace Shopping.Server.Services.Implementations
         public async Task<List<ShoppingList>> GetAllOfUserAsync(string userId)
         {
             var allLists = await GetAllAsync();
-            var allGroupIdsOfUser = (await _userGroups.GetAllOfUserAsync(userId)).Select(g => g.Id);
+
             for (int i = allLists.Count - 1; i >= 0; i--)
             {
                 var list = allLists[i];
-                var isOwner = list.OwnerId == userId;
-                var hasUserGroupIdInCommon = list.UserGroupIds.Intersect(allGroupIdsOfUser).Count() != 0;
-                if (!isOwner && !hasUserGroupIdInCommon)
+
+                if (!(await CheckIfListIsFromUser(allLists[i], userId)))
                 {
                     allLists.Remove(list);
                 }
             }
             return allLists;
+        }
+
+        public async Task<bool> CheckIfListIsFromUser(ShoppingList list, string userId)
+        {
+            var allGroupIdsOfUser = (await _userGroups.GetAllOfUserAsync(userId)).Select(g => g.Id);
+
+            var isOwner = list.OwnerId == userId;
+            var hasUserGroupIdInCommon = list.UserGroupIds.Intersect(allGroupIdsOfUser).Count() != 0;
+
+            return isOwner || hasUserGroupIdInCommon;
         }
     }
 }
