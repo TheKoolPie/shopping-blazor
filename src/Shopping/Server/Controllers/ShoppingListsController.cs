@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Shopping.Server.Services;
@@ -69,6 +67,12 @@ namespace Shopping.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<ShoppingList>> PostList(ShoppingList shoppingList)
         {
+            var user = await _users.GetUserAsync();
+            if (user.Id != shoppingList.OwnerId)
+            {
+                return Unauthorized();
+            }
+
             ShoppingList item;
             try
             {
@@ -84,29 +88,56 @@ namespace Shopping.Server.Controllers
             }
             return Ok(item);
         }
-
-        [HttpPut]
-        public async Task<ActionResult<ShoppingList>> PutList(string id, ShoppingList shoppingList)
+        [HttpPost("AddItem/{id}")]
+        public async Task<ActionResult<ShoppingList>> AddItemToList(string id, [FromBody] ShoppingListItem item)
         {
-            if (id != shoppingList.Id)
+            var user = await _users.GetUserAsync();
+            var list = await _lists.GetAsync(id);
+            if (!(await _lists.CheckIfListIsFromUser(list, user.Id)))
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
-            ShoppingList update;
+            var createdItem = await _lists.AddOrUpdateItemAsync(list.Id, item);
+
+            return Ok(createdItem);
+        }
+        [HttpPost("AddUserGroup/{id}")]
+        public async Task<ActionResult<UserGroup>> AddGroupToList(string id, [FromBody] string userGroupId)
+        {
+            var user = await _users.GetUserAsync();
+            var list = await _lists.GetAsync(id);
+            if (!(await _lists.CheckIfListIsFromUser(list, user.Id)))
+            {
+                return Unauthorized();
+            }
+
+            var addedGroup = await _lists.AddUserGroupAsync(list.Id, userGroupId);
+
+            return Ok(addedGroup);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<bool>> DeleteList(string id)
+        {
             try
             {
-                update = await _lists.UpdateAsync(id, shoppingList);
+                var list = await _lists.GetAsync(id);
+                var user = await _users.GetUserAsync();
+
+                bool isAdmin = await _users.IsUserAdminAsync();
+                bool isOwner = await _lists.CheckIfListIsFromUser(list, user.Id);
+
+                if (isAdmin || isOwner)
+                {
+                    await _lists.DeleteByIdAsync(id);
+                }
             }
             catch (ItemNotFoundException)
             {
                 return NotFound();
             }
-            catch (Exception)
-            {
-                throw;
-            }
-            return Ok(update);
+            return Ok(true);
         }
     }
 }
