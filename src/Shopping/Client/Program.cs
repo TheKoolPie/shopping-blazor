@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Shopping.Client.Provider;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Client.Services.Implementations;
+using Shopping.Shared.Services;
 
 namespace Shopping.Client
 {
@@ -30,10 +31,6 @@ namespace Shopping.Client
 
             builder.Services.AddTransient<IProductCategories, ProductCategoryApiAccess>();
             builder.Services.AddTransient<IProducts, ProductsApiAccess>();
-            builder.Services.AddTransient<IShoppingListItems, ShoppingListItemsApiAccess>();
-            builder.Services.AddTransient<IShoppingLists, ShoppingListsApiAccess>();
-
-
 
             await builder.Build().RunAsync();
         }

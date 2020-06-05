@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Data;
+using Shopping.Shared.Services;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;

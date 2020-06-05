@@ -2,11 +2,13 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
+@attribute [Authorize(Policy = ShoppingUserPolicies.IsUserCreator)]
+
 <h1>Register</h1>
 @if (ShowErrors)
 {
     <div class="alert alert-danger" role="alert">
-        @foreach(var error in Errors)
+        @foreach (var error in Errors)
         {
             <p>@error</p>
         }
@@ -16,7 +18,7 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Please enter your details</h5>
-        <EditForm Model="RegisterModel" OnValidSubmit="HandleRegistration">
+        <EditForm EditContext="@editContext" OnSubmit="HandleRegistration">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
@@ -56,23 +58,32 @@
 </div>
 
 @code {
+    private EditContext editContext;
     private RegisterModel RegisterModel = new RegisterModel();
     private bool ShowErrors;
     private IEnumerable<string> Errors;
 
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(RegisterModel);
+    }
+
     private async Task HandleRegistration()
     {
         ShowErrors = false;
+        if (editContext.Validate())
+        {
 
-        var result = await AuthService.Register(RegisterModel);
-        if (result.Successful)
-        {
-            NavigationManager.NavigateTo("/account/login");
-        }
-        else
-        {
-            Errors = result.Errors;
-            ShowErrors = true;
+            var result = await AuthService.Register(RegisterModel);
+            if (result.Successful)
+            {
+                NavigationManager.NavigateTo("/account/login");
+            }
+            else
+            {
+                Errors = result.Errors;
+                ShowErrors = true;
+            }
         }
     }
 }

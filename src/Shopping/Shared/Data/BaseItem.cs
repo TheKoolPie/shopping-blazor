@@ -9,5 +9,19 @@ namespace Shopping.Shared.Data
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "Id is needed")]
         public string Id { get; set; }
+
+        [Required(ErrorMessage = "Creation date is needed")]
+        public DateTime CreatedAt { get; set; }
+
+        public BaseItem()
+        {
+            Id = Guid.NewGuid().ToString();
+            CreatedAt = DateTime.Now;
+        }
+        public BaseItem(BaseItem item)
+        {
+            this.Id = item.Id;
+            this.CreatedAt = item.CreatedAt;
+        }
     }
 }

@@ -15,7 +15,7 @@
 }
 else
 {
-    <AuthorizeView Context="Auth">
+    <AuthorizeView Context="Auth" Roles="@ShoppingUserPolicies.IsProductModifier">
         <div class="row">
             <div class="col">
                 @if (IsSaving)

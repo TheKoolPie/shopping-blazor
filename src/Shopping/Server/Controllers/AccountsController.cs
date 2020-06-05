@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ namespace Shopping.Server.Controllers
             _signInManager = signInManager;
             _logger = logger;
         }
-
+        [Authorize(Roles = ShoppingUserRoles.Admin)]
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
@@ -82,6 +83,13 @@ namespace Shopping.Server.Controllers
                 });
             }
 
+            existing = await _userManager.FindByNameAsync(newUser.UserName);
+            var roleResult = await _userManager.AddToRoleAsync(existing, ShoppingUserRoles.User);
+            if (!roleResult.Succeeded)
+            {
+                _logger.LogWarning($"Could not add user {existing.UserName} to role {ShoppingUserRoles.User}");
+            }
+
             return Ok(new RegisterResult { Successful = true });
         }
         [HttpPost("Login")]
@@ -103,10 +111,15 @@ namespace Shopping.Server.Controllers
                 return BadRequest(new LoginResult { Successful = false, Error = $"Username and password combination is invalid." });
             }
 
-            var claims = new[]
+            var roles = await _userManager.GetRolesAsync(user);
+            var claims = new List<Claim>();
+            claims.Add(new Claim(ClaimTypes.Name, model.LoginName));
+            foreach (var role in roles)
             {
-                new Claim(ClaimTypes.Name,model.LoginName)
-            };
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecurityKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expiry = DateTime.Now.AddDays(Convert.ToInt32(_configuration["JwtExpiryInDays"]));

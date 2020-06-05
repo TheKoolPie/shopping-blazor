@@ -12,18 +12,11 @@ namespace Shopping.Shared.Data
         public string Name { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Farbcode is needed")]
         public string ColorCode { get; set; }
-        public ProductCategory()
+        public ProductCategory() : base()
         {
-            Id = Guid.NewGuid().ToString();
         }
-        public ProductCategory(string id)
+        public ProductCategory(ProductCategory category) : base(category)
         {
-            Id = id;
-        }
-
-        public ProductCategory(ProductCategory category)
-        {
-            Id = category.Id;
             Name = category.Name;
             ColorCode = category.ColorCode;
         }

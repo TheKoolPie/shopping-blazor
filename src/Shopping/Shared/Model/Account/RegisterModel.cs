@@ -28,5 +28,6 @@ namespace Shopping.Shared.Model.Account
         public string FirstName { get; set; }
         [Display(Name = "Last name")]
         public string LastName { get; set; }
+
     }
 }

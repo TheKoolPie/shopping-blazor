@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Shopping.Shared.Data
@@ -15,18 +16,30 @@ namespace Shopping.Shared.Data
         public float Amount { get; set; }
         public bool Done { get; set; }
 
-        [Required(ErrorMessage = "Creation date is needed")]
-        public DateTime CreatedAt { get; set; }
-
-        public ShoppingListItem()
+        public ShoppingListItem() : base()
         {
-            Id = Guid.NewGuid().ToString();
-            CreatedAt = DateTime.Now;
             Done = false;
         }
-        public ShoppingListItem(DateTime date) : this()
+        public ShoppingListItem(ShoppingListItem item) : base(item)
         {
-            CreatedAt = date;
+            this.ProductItemId = item.ProductItemId;
+            this.ProductItem = new ProductItem(item.ProductItem ?? new ProductItem());
+            this.Amount = item.Amount;
+            this.Done = item.Done;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ShoppingListItem item &&
+                   Id == item.Id &&
+                   ProductItemId == item.ProductItemId &&
+                   Amount == item.Amount &&
+                   Done == item.Done;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, ProductItemId, Amount, Done);
         }
     }
 }

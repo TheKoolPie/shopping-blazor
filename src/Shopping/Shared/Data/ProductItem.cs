@@ -18,10 +18,16 @@ namespace Shopping.Shared.Data
         public string CategoryId { get; set; }
         public ProductCategory Category { get; set; }
 
-        public ProductItem()
+        public ProductItem() : base()
         {
-            Id = Guid.NewGuid().ToString();
-            Category = new ProductCategory("");
+            Category = new ProductCategory();
+        }
+        public ProductItem(ProductItem item) : base(item)
+        {
+            this.Name = item.Name;
+            this.Unit = item.Unit;
+            this.CategoryId = item.CategoryId;
+            this.Category = new ProductCategory(item.Category ?? new ProductCategory());
         }
     }
 }
