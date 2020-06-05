@@ -21,5 +21,20 @@ namespace Shopping.Server.Data
         {
 
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .Entity<UserGroup>()
+                .Property(e => e.MemberIds)
+                .HasConversion(
+                    v => string.Join(",", v),
+                    v => v.Split(',', System.StringSplitOptions.None).Select(x => x).ToList());
+            modelBuilder
+                .Entity<ShoppingList>()
+                .Property(e => e.UserGroupIds)
+                .HasConversion(
+                    v => string.Join(",", v),
+                    v => v.Split(',', System.StringSplitOptions.None).Select(x => x).ToList());
+        }
     }
 }

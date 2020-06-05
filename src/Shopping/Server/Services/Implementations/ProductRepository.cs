@@ -20,6 +20,12 @@ namespace Shopping.Server.Services.Implementations
             _categories = categories;
         }
 
+        public override async Task<ProductItem> CreateAsync(ProductItem item)
+        {
+            item.Category = await _categories.GetAsync(item.CategoryId);
+            return await base.CreateAsync(item);
+        }
+
         public override async Task<List<ProductItem>> GetAllAsync()
         {
             var products = await _context.Products.ToListAsync();
@@ -39,7 +45,7 @@ namespace Shopping.Server.Services.Implementations
 
         public override bool ItemAlreadyExists(ProductItem item)
         {
-            return _context.Products.Any(i => i.Id == item.Id || i.Name == item.Name);
+            return _context.Products.Any(i => i.Id == item.Id || i.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public override void UpdateExistingItem(ProductItem existing, ProductItem update)

@@ -9,6 +9,7 @@ using Shopping.Client.Provider;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Client.Services.Implementations;
 using Shopping.Shared.Services;
+using Shopping.Shared.Model.Account;
 
 namespace Shopping.Client
 {
@@ -23,7 +24,16 @@ namespace Shopping.Client
 
 
             builder.Services.AddBlazoredLocalStorage();
-            builder.Services.AddAuthorizationCore();
+            builder.Services.AddAuthorizationCore(o=> 
+            {
+                o.AddPolicy(ShoppingUserPolicies.IsAdmin, ShoppingUserPolicies.IsAdminPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsProductModifier, ShoppingUserPolicies.IsProductModifierPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsProductCategoryModifier, ShoppingUserPolicies.IsProductCategoryModifierPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsUserManager, ShoppingUserPolicies.IsUserManagerPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsUserCreator, ShoppingUserPolicies.IsUserCreatorPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsUserRoleManager, ShoppingUserPolicies.IsUserRoleManagerPolicy());
+                o.AddPolicy(ShoppingUserPolicies.IsDatabaseManager, ShoppingUserPolicies.IsDatabaseManagerPolicy());
+            });
             builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
 

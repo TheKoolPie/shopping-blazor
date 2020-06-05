@@ -20,7 +20,16 @@ namespace Shopping.Server.Services.Implementations
 
         public override async Task<List<ProductCategory>> GetAllAsync()
         {
-            return await _context.Categories.ToListAsync();
+            List<ProductCategory> categories = new List<ProductCategory>();
+            try
+            {
+                categories = await _context.Categories.ToListAsync();
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e, "Could not load categories");
+            }
+            return categories;
         }
 
         public override async Task<ProductCategory> GetAsync(string id)

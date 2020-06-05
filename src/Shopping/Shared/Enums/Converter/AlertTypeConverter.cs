@@ -37,7 +37,6 @@ namespace Shopping.Shared.Enums.Converter
                     cssName += "dark";
                     break;
             }
-            cssName += " alert-dismissible fade show";
 
             return cssName;
         }

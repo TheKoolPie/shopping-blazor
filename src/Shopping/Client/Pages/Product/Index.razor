@@ -15,7 +15,7 @@
 }
 else
 {
-    <AuthorizeView Context="Auth" Roles="@ShoppingUserPolicies.IsProductModifier">
+    <AuthorizeView Context="Auth" Policy="@ShoppingUserPolicies.IsProductModifier">
         <div class="row">
             <div class="col">
                 @if (IsSaving)
@@ -78,12 +78,7 @@ else
         </div>
         <div class="row">
             <div class="col">
-                @if (AlertData.Title != null)
-                {
-                    <AlertComponent Title="@AlertData.Title" Type="@AlertData.Type">
-                        @AlertData.Message
-                    </AlertComponent>
-                }
+                <AlertComponent Model="@AlertData" />
             </div>
         </div>
         <hr />
@@ -159,7 +154,7 @@ else
 }
 @code {
 
-    private AlertComponentModel AlertData = new AlertComponentModel();
+    private AlertComponentModel AlertData;
 
     private SortingModel NameSortingData = new SortingModel();
     private SortingModel UnitSortingData = new SortingModel();
@@ -212,8 +207,9 @@ else
 
     private async Task HandleSubmit()
     {
+        AlertData = null;
         var isValid = editContext.Validate();
-        var productExists = localBackup.Any(c => c.Name.Equals(product.Name));
+        var productExists = localBackup.Any(c => c.Name.Equals(product.Name, StringComparison.InvariantCultureIgnoreCase) || c.Id != product.Id);
         var category = categories.FirstOrDefault(c => c.Id.Equals(product.CategoryId));
 
         if (isValid)
@@ -221,7 +217,7 @@ else
 
             if (productExists)
             {
-                SavingFailureAlert($"Product with name '{product.Name}' already exists");
+                SavingFailureAlert($"Product with name '{product.Name}' or id '{product.Id}' already exists");
             }
             else
             {

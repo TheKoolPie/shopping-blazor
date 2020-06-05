@@ -21,23 +21,21 @@ namespace Shopping.Server.Services.Implementations
             _logger = logger;
         }
 
-        public async Task<T> CreateAsync(T item)
+        public virtual async Task<T> CreateAsync(T item)
         {
+            if (ItemAlreadyExists(item))
+            {
+                throw new ItemAlreadyExistsException(typeof(T), item.Id);
+            }
+
             _context.Add<T>(item);
             try
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException e)
+            catch (Exception e)
             {
-                if (ItemAlreadyExists(item))
-                {
-                    throw new ItemAlreadyExistsException(typeof(T), item.Id);
-                }
-                else
-                {
-                    throw new PersistencyException("Could not create item", e);
-                }
+                throw new PersistencyException("Could not create item", e);
             }
             return item;
         }
