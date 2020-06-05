@@ -2,7 +2,7 @@
 
 Small shopping list web-app build with [Blazor WebAssembly](http://blazor.net). Using ASP.NET Core Hosting model.
 
-[![Build Status](https://dev.azure.com/philippnoecker/Noecker-Shopping/_apis/build/status/noecker-shopping?branchName=master)](https://dev.azure.com/philippnoecker/Noecker-Shopping/_build/latest?definitionId=12&branchName=master)
+[![Build Status](https://dev.azure.com/philippnoecker/Noecker-Shopping/_apis/build/status/TheKoolPie.shopping-blazor?branchName=master)](https://dev.azure.com/philippnoecker/Noecker-Shopping/_build/latest?definitionId=13&branchName=master)
 
  Hosted on Azure App Services in free tier. Using Azure Cosmos DB as data store and My SQL In-App databse for user storage with Aps Net Core Identity.
 
