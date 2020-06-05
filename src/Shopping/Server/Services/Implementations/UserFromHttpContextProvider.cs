@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Shopping.Server.Models;
+using Shopping.Shared.Model.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,28 @@ namespace Shopping.Server.Services
                 }
             }
             return user;
+        }
+
+        public async Task<List<string>> GetUserRolesAsync()
+        {
+            var user = await GetUserAsync();
+            return (await _userManager.GetRolesAsync(user)).ToList();
+        }
+
+        public async Task<List<ShoppingUser>> GetUsersInRoleAsync(string role)
+        {
+            return (await _userManager.GetUsersInRoleAsync(role)).ToList();
+        }
+
+        public async Task<bool> IsUserAdminAsync()
+        {
+            var user = await GetUserAsync();
+            return await _userManager.IsInRoleAsync(user, ShoppingUserRoles.Admin);
+        }
+        public async Task<bool> IsUserAdminAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            return await _userManager.IsInRoleAsync(user, ShoppingUserRoles.Admin);
         }
     }
 }
