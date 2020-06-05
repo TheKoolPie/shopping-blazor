@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -7,89 +8,76 @@ using Microsoft.EntityFrameworkCore;
 using Shopping.Shared.Data;
 using Shopping.Server.Data;
 using Shopping.Shared.Model.Account;
+using Shopping.Shared.Services;
+using Shopping.Shared.Exceptions;
 
 namespace Shopping.Server.Controllers
 {
-    [Authorize(Policy = ShoppingUserPolicies.IsProductCategoryModifier)]
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = ShoppingUserPolicies.IsProductCategoryModifier)]
     public class ProductController : ControllerBase
     {
-        private readonly ShoppingDbContext _context;
-
-        public ProductController(ShoppingDbContext context)
+        private readonly IProducts _products;
+        public ProductController(IProducts products)
         {
-            _context = context;
-
+            _products = products;
         }
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<ProductItem>>> GetProducts()
         {
-            var products = await _context.Products.ToListAsync();
-            var productCategories = await _context.Categories.ToListAsync();
-            foreach (var product in products)
-            {
-                product.Category = productCategories.FirstOrDefault(c => c.Id.Equals(product.Category.Id));
-            }
-
-            return products;
+            var products = await _products.GetAllAsync();
+            return Ok(products);
         }
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductItem>> GetProduct(string id)
         {
-            var product = await _context.Products
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (product == null)
+            ProductItem item;
+            try
+            {
+                item = await _products.GetAsync(id);
+            }
+            catch (ItemNotFoundException)
             {
                 return NotFound();
             }
-            return product;
+            return Ok(item);
         }
 
         [HttpPost]
         public async Task<ActionResult<ProductItem>> PostProduct(ProductItem product)
         {
-            product.Category = await _context.Categories.FirstOrDefaultAsync(c => c.Name.Equals(product.Category.Name));
-
-            _context.Products.Add(product);
+            ProductItem item;
             try
             {
-                await _context.SaveChangesAsync();
+                item = await _products.CreateAsync(product);
             }
-            catch (DbUpdateException)
+            catch (ItemAlreadyExistsException)
             {
-                if (ProductExists(product.Name))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict();
             }
-            return Ok(product);
+            catch (Exception)
+            {
+                throw;
+            }
+            return Ok(item);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ProductItem>> DeleteProduct(string id)
+        public async Task<ActionResult<bool>> DeleteProduct(string id)
         {
-            var products = await _context.Products.ToListAsync();
-            var product = products.FirstOrDefault(c => c.Id.Equals(id));
-            if (product == null)
+            try
+            {
+                await _products.DeleteByIdAsync(id);
+            }
+            catch (ItemNotFoundException)
             {
                 return NotFound();
             }
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
 
-            return product;
-        }
-
-        private bool ProductExists(string name)
-        {
-            return _context.Products.Any(e => e.Name.Equals(name));
+            return Ok(true);
         }
     }
 }

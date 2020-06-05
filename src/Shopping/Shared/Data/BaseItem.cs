@@ -11,7 +11,7 @@ namespace Shopping.Shared.Data
         public string Id { get; set; }
 
         [Required(ErrorMessage = "Creation date is needed")]
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         public BaseItem()
         {

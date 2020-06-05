@@ -9,17 +9,17 @@ namespace Shopping.Shared.Model
     {
         public string Title { get; set; }
         public string Message { get; set; }
-        public AlertType Type { get; set; }
+        public AlertType AlertType { get; set; }
 
         public AlertComponentModel()
         {
 
         }
-        public AlertComponentModel(string title, string message, AlertType type)
+        public AlertComponentModel(string title, string message, AlertType alertType)
         {
             Title = title;
             Message = message;
-            Type = type;
+            AlertType = alertType;
         }
 
         public static AlertComponentModel CreateSuccessAlert(string title, string message)
@@ -28,7 +28,7 @@ namespace Shopping.Shared.Model
             {
                 Title = title,
                 Message = message,
-                Type = AlertType.Success
+                AlertType = AlertType.Success
             };
         }
         public static AlertComponentModel CreateErrorAlert(string title, string message)
@@ -37,7 +37,7 @@ namespace Shopping.Shared.Model
             {
                 Title = title,
                 Message = message,
-                Type = AlertType.Danger
+                AlertType = AlertType.Danger
             };
         }
 

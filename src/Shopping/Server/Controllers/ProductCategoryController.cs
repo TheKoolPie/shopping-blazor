@@ -8,82 +8,84 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Server.Data;
 using Shopping.Shared.Data;
+using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
+using Shopping.Shared.Services;
 
 namespace Shopping.Server.Controllers
 {
-    [Authorize(Policy = ShoppingUserPolicies.IsProductCategoryModifier)]
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = ShoppingUserPolicies.IsProductCategoryModifier)]
     public class ProductCategoryController : ControllerBase
     {
-        private readonly ShoppingDbContext _context;
-
-        public ProductCategoryController(ShoppingDbContext context)
+        private readonly IProductCategories _categories;
+        public ProductCategoryController(IProductCategories categories)
         {
-            _context = context;
-
+            _categories = categories;
         }
 
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<ProductCategory>>> GetProductCategories()
         {
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _categories.GetAllAsync();
             return Ok(categories);
         }
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductCategory>> GetProductCategory(string id)
         {
-            var category = await _context.Categories.FirstOrDefaultAsync(e => e.Id == id);
-            if (category == null)
+            ProductCategory category;
+            try
+            {
+                category = await _categories.GetAsync(id);
+            }
+            catch (ItemNotFoundException)
             {
                 return NotFound();
             }
+
             return Ok(category);
         }
 
         [HttpPost]
         public async Task<ActionResult<ProductCategory>> PostProductCategory(ProductCategory category)
         {
-            _context.Categories.Add(category);
+            ProductCategory createdCategory;
             try
             {
-                await _context.SaveChangesAsync();
+                createdCategory = await _categories.CreateAsync(category);
             }
-            catch (DbUpdateException)
+            catch (ItemAlreadyExistsException)
             {
-                if (CategoryExists(category.Name))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict();
             }
-            return Ok(category);
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return Ok(createdCategory);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ProductCategory>> DeleteProductCategory(string id)
+        public async Task<ActionResult> DeleteProductCategory(string id)
         {
-            var categories = await _context.Categories.ToListAsync();
-            var category = categories.FirstOrDefault(c => c.Id.ToString().Equals(id));
-            if (category == null)
+            try
+            {
+                await _categories.DeleteByIdAsync(id);
+            }
+            catch (ItemNotFoundException)
             {
                 return NotFound();
             }
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            catch (Exception)
+            {
+                throw;
+            }
 
-            return Ok(category);
-        }
-
-        private bool CategoryExists(string name)
-        {
-            return _context.Categories.Any(e => e.Name.Equals(name));
+            return Ok(true);
         }
     }
 }

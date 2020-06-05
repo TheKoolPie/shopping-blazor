@@ -21,23 +21,21 @@ namespace Shopping.Server.Services.Implementations
             _logger = logger;
         }
 
-        public async Task<T> CreateAsync(T item)
+        public virtual async Task<T> CreateAsync(T item)
         {
+            if (ItemAlreadyExists(item))
+            {
+                throw new ItemAlreadyExistsException(typeof(T), item.Id);
+            }
+
             _context.Add<T>(item);
             try
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException e)
+            catch (Exception e)
             {
-                if (ItemAlreadyExists(item))
-                {
-                    throw new ItemAlreadyExistsException(typeof(T), item.Id);
-                }
-                else
-                {
-                    throw new PersistencyException("Could not create item", e);
-                }
+                throw new PersistencyException("Could not create item", e);
             }
             return item;
         }
@@ -49,7 +47,7 @@ namespace Shopping.Server.Services.Implementations
             {
                 throw new ItemNotFoundException(typeof(T), id);
             }
-            if (ItemHasChanged(existingItem, item))
+            if (!(existingItem.Equals(item)))
             {
                 UpdateExistingItem(existingItem, item);
                 try
@@ -86,7 +84,6 @@ namespace Shopping.Server.Services.Implementations
         public abstract Task<List<T>> GetAllAsync();
         public abstract Task<T> GetAsync(string id);
         public abstract bool ItemAlreadyExists(T item);
-        public abstract bool ItemHasChanged(T existing, T updated);
         public abstract void UpdateExistingItem(T existing, T update);
     }
 }

@@ -18,6 +18,7 @@ using Shopping.Shared.Model.Account;
 using Shopping.Server.Services;
 using Shopping.Shared.Services.Interfaces;
 using Shopping.Server.Services.Implementations;
+using Shopping.Shared.Services;
 
 namespace Shopping.Server
 {
@@ -79,6 +80,9 @@ namespace Shopping.Server
 
             services.AddTransient<IUserProvider, UserFromHttpContextProvider>();
             services.AddTransient<IUserGroups, UserGroupRepository>();
+            services.AddTransient<IProductCategories, ProductCategoryRepository>();
+            services.AddTransient<IProducts, ProductRepository>();
+            services.AddTransient<IShoppingLists, ShoppingListRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -110,7 +114,7 @@ namespace Shopping.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/health");
+                endpoints.MapHealthChecks("/hc");
                 endpoints.MapFallbackToFile("index.html");
             });
 

@@ -40,28 +40,6 @@ namespace Shopping.Server.Services.Implementations
         {
             return _context.UserGroups.Any(i => i.Id == item.Id || i.Name == item.Name);
         }
-
-        public override bool ItemHasChanged(UserGroup existing, UserGroup updated)
-        {
-            if (existing.OwnerId != updated.OwnerId || 
-                existing.Name != updated.Name ||
-                existing.MemberIds.Count != updated.MemberIds.Count)
-            {
-                return true;
-            }
-
-            var existingUsers = existing.MemberIds.OrderBy(x => x).ToList();
-            var updatedUsers = existing.MemberIds.OrderBy(x => x).ToList();
-            for (int i = 0; i < existingUsers.Count(); i++)
-            {
-                if (existingUsers[i] != updatedUsers[i])
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         public override void UpdateExistingItem(UserGroup existing, UserGroup update)
         {
             existing.OwnerId = update.OwnerId;

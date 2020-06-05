@@ -1,25 +1,28 @@
 ﻿@using Shopping.Shared.Enums;
 @using Shopping.Shared.Enums.Converter;
-
+@if (_model != null)
+{
     <div class="@cssClass" role="alert" style="margin:12px 0px 12px 0px">
-        <h4>@Title</h4>
-        <p>@ChildContent</p>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <p><strong>@_model.Title</strong> @_model.Message</p>
     </div>
+}
 @code {
-    [Parameter]
-    public string Title { get; set; }
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
-    [Parameter]
-    public AlertType Type { get; set; }
 
+    private AlertComponentModel _model;
+
+    [Parameter]
+    public AlertComponentModel Model
+    {
+        get => _model;
+        set
+        {
+            _model = value;
+            if (_model != null)
+            {
+                cssClass = _model.AlertType.ToBootstrapClassName();
+            }
+        }
+    }
     private string cssClass { get; set; }
 
-    protected override void OnInitialized()
-    {
-        cssClass = Type.ToBootstrapClassName();
-    }
 }

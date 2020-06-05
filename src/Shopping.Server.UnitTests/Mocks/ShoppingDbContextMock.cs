@@ -8,39 +8,17 @@ using System.Linq;
 
 namespace Shopping.Server.UnitTests.Mocks
 {
-    public class ShoppingDbMockContext : ShoppingDbContext
-    {
-        public ShoppingDbMockContext(DbContextOptions<ShoppingDbContext> options) : base(options)
-        {
-        }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder
-                .Entity<UserGroup>()
-                .Property(e => e.MemberIds)
-                .HasConversion(
-                    v => string.Join(",", v),
-                    v => v.Split(',', System.StringSplitOptions.None).Select(x => x).ToList());
-            modelBuilder
-                .Entity<ShoppingList>()
-                .Property(e=>e.UserGroupIds)
-                .HasConversion(
-                    v => string.Join(",", v),
-                    v => v.Split(',', System.StringSplitOptions.None).Select(x => x).ToList());
-        }
-    }
-
     public static class DBContextMocks
     {
 
 
-        public static ShoppingDbMockContext GetMock()
+        public static ShoppingDbContext GetMock()
         {
             var options = new DbContextOptionsBuilder<ShoppingDbContext>()
                 .UseInMemoryDatabase($"InMemoryShopping_{Guid.NewGuid().ToString()}")
                 .Options;
 
-            var context = new ShoppingDbMockContext(options);
+            var context = new ShoppingDbContext(options);
 
             foreach (var group in DataMocks.GetUserGroups())
             {

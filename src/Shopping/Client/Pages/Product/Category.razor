@@ -5,7 +5,7 @@
 
 <h3>Product categories</h3>
 
-<AuthorizeView Context="Auth" Roles="@ShoppingUserPolicies.IsProductCategoryModifier">
+<AuthorizeView Context="Auth" Policy="@ShoppingUserPolicies.IsProductCategoryModifier">
     <div class="row">
         <div class="col">
             @if (IsSaving)
@@ -46,12 +46,7 @@
     </div>
     <div class="row">
         <div class="col">
-            @if (AlertData.Title != null)
-            {
-                <AlertComponent Title="@AlertData.Title" Type="@AlertData.Type">
-                    @AlertData.Message
-                </AlertComponent>
-            }
+            <AlertComponent Model="@AlertData" />
         </div>
     </div>
     <hr />
@@ -128,7 +123,7 @@ else
 
 @code {
 
-    private AlertComponentModel AlertData = new AlertComponentModel();
+    private AlertComponentModel AlertData;
     private SortingModel SortingData = new SortingModel();
 
     private bool IsSaving = false;
@@ -147,7 +142,7 @@ else
     private List<ProductCategory> localBackup = null;
 
     private List<ProductCategory> categories = null;
-    private ProductCategory category = new ProductCategory();
+    private ProductCategory category = new ProductCategory() { ColorCode = "#000000" };
     private EditContext editContext;
 
     protected override async Task OnInitializedAsync()
@@ -160,8 +155,10 @@ else
 
     private async Task HandleSubmit()
     {
+        AlertData = null;
         var isValid = editContext.Validate();
-        var categoryAlreadyExists = localBackup.Any(c => c.Name.Equals(category.Name) || c.ColorCode.Equals(category.ColorCode));
+        var categoryAlreadyExists = localBackup.Any(c => c.Name.Equals(category.Name, StringComparison.InvariantCultureIgnoreCase) ||
+                                                    c.ColorCode.Equals(category.ColorCode, StringComparison.InvariantCultureIgnoreCase));
         if (isValid)
         {
             if (!categoryAlreadyExists)
@@ -243,11 +240,11 @@ else
 
     private void SavingFailureAlert(string resultMsg = "")
     {
-        AlertData = AlertComponentModel.CreateErrorAlert("Error with saving", $"Could not save {category.Name}: {resultMsg}");
+        AlertData = AlertComponentModel.CreateErrorAlert("Error with saving", resultMsg);
         Logger?.LogError(AlertData.ToString());
     }
     private void DeleteFailureAlert(string resultMsg = "")
     {
-        AlertData = AlertComponentModel.CreateErrorAlert("Error with deletion", $"Could not delete {category.Name}: {resultMsg}");
+        AlertData = AlertComponentModel.CreateErrorAlert("Error with deletion", resultMsg);
     }
 }
