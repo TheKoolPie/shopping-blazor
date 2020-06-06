@@ -9,6 +9,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
@@ -69,15 +70,26 @@ namespace Shopping.Client.Services.Implementations
         public async Task<List<T>> GetAllAsync()
         {
             var client = await GetHttpClient();
+            List<T> items = null;
 
-            return await client.GetFromJsonAsync<List<T>>(BaseAddress);
+            var response = await client.GetAsync(BaseAddress);
+            if (response.IsSuccessStatusCode)
+            {
+                items = await response.Content.ReadFromJsonAsync<List<T>>();
+            }
+            return items;
         }
 
         public async Task<T> GetAsync(string id)
         {
             var client = await GetHttpClient();
-
-            return await client.GetFromJsonAsync<T>($"{BaseAddress}/{id}");
+            T item = null;
+            var response = await client.GetAsync($"{BaseAddress}/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                item = await response.Content.ReadFromJsonAsync<T>();
+            }
+            return item;
         }
 
         public async Task<T> UpdateAsync(string id, T item)
