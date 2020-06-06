@@ -115,7 +115,7 @@ namespace Shopping.Server.Controllers
             return Ok(addedGroup);
         }
 
-        [HttpGet("{id}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> DeleteList(string id)
         {
             try
