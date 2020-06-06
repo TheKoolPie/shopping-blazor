@@ -3,7 +3,9 @@
 @if (_model != null)
 {
     <div class="@cssClass" role="alert" style="margin:12px 0px 12px 0px">
-        <p><strong>@_model.Title</strong> @_model.Message</p>
+        <h6>@_model.Title</h6>
+        <hr />
+        <p>@_model.Message</p>
     </div>
 }
 @code {
