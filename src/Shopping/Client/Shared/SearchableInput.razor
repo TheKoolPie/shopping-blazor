@@ -1,0 +1,63 @@
+﻿
+<div class="form-group">
+    <label for="searchInput">@Label</label>
+    <input type="search" class="form-control"
+           placeholder="@Placeholder" @bind="@SearchValue" @bind:event="oninput" />
+    @if (_localValueOptions != null && _localValueOptions.Keys.Count > 0)
+    {
+        <div class="input-search-content">
+
+            @foreach (var key in _localValueOptions.Keys)
+            {
+                <a @onclick="(() => OnItemSelected(key))">@_localValueOptions[key]</a>
+            }
+
+        </div>
+    }
+</div>
+
+
+@code {
+
+    private Dictionary<string, string> _localValueOptions;
+
+    private string _searchValue;
+    public string SearchValue
+    {
+        get => _searchValue;
+        set
+        {
+            _searchValue = value;
+            OnSearchInputChanged();
+        }
+    }
+
+    [Parameter]
+    public Dictionary<string, string> ValueOptions { get; set; }
+    [Parameter]
+    public string Label { get; set; }
+    [Parameter]
+    public string Value { get; set; }
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+    [Parameter]
+    public string Placeholder { get; set; }
+
+    private Task OnItemSelected(string id)
+    {
+        Value = _localValueOptions[id];
+        return ValueChanged.InvokeAsync(Value);
+    }
+
+    private void OnSearchInputChanged()
+    {
+        _localValueOptions = null;
+        if (!string.IsNullOrEmpty(_searchValue))
+        {
+            _localValueOptions = new Dictionary<string, string>(ValueOptions);
+            _localValueOptions = _localValueOptions
+            .Where(k => k.Value.Contains(_searchValue, StringComparison.InvariantCultureIgnoreCase))
+            .ToDictionary(x => x.Key, v => v.Value);
+        }
+    }
+}
