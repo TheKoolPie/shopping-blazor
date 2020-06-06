@@ -97,7 +97,7 @@ namespace Shopping.Client.Services.Implementations
             return retVal;
         }
 
-        private async Task<HttpClient> GetHttpClient()
+        protected async Task<HttpClient> GetHttpClient()
         {
             if (_client.DefaultRequestHeaders.Authorization == null)
             {

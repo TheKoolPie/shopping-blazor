@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,9 @@ namespace Shopping.Shared.Data
 {
     public class ShoppingList : BaseItem
     {
+        [Required]
+        public string Name { get; set; }
+        [Required]
         public DateTime ListDate { get; set; }
         public string OwnerId { get; set; }
         public List<string> UserGroupIds { get; set; }
@@ -24,14 +28,6 @@ namespace Shopping.Shared.Data
             UserGroupIds = new List<string>();
             UserGroups = new List<UserGroup>();
             Items = new List<ShoppingListItem>();
-        }
-        public ShoppingList(ShoppingList list) : base(list)
-        {
-            this.ListDate = list.ListDate;
-            this.OwnerId = list.OwnerId;
-            this.UserGroupIds = new List<string>(list.UserGroupIds ?? new List<string>());
-            this.UserGroups = new List<UserGroup>(list.UserGroups ?? new List<UserGroup>());
-            this.Items = new List<ShoppingListItem>(list.Items ?? new List<ShoppingListItem>());
         }
         public void AddOrUpdateItem(ShoppingListItem item)
         {
@@ -74,6 +70,7 @@ namespace Shopping.Shared.Data
 
         public void Update(ShoppingList list)
         {
+            this.Name = list.Name;
             this.ListDate = list.ListDate;
             this.OwnerId = list.OwnerId;
             this.UserGroupIds = new List<string>(list.UserGroupIds);
@@ -114,6 +111,7 @@ namespace Shopping.Shared.Data
         public override bool Equals(object obj)
         {
             return obj is ShoppingList list &&
+                   Name == list.Name &&
                    Id == list.Id &&
                    ListDate == list.ListDate &&
                    OwnerId == list.OwnerId &&
@@ -123,7 +121,7 @@ namespace Shopping.Shared.Data
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, ListDate, OwnerId, UserGroupIds, Items);
+            return HashCode.Combine(Name, Id, ListDate, OwnerId, UserGroupIds, Items);
         }
     }
 }

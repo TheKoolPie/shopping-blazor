@@ -67,14 +67,10 @@ namespace Shopping.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ShoppingList>> PostList(ShoppingList shoppingList)
+        public async Task<ActionResult<ShoppingList>> CreateList(ShoppingList shoppingList)
         {
             var user = await _users.GetUserAsync();
-            if (user.Id != shoppingList.OwnerId)
-            {
-                return Unauthorized();
-            }
-
+            shoppingList.OwnerId = user.Id;
             ShoppingList item;
             try
             {

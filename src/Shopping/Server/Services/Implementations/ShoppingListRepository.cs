@@ -63,7 +63,9 @@ namespace Shopping.Server.Services.Implementations
 
         public override bool ItemAlreadyExists(ShoppingList item)
         {
-            return _context.ShoppingLists.Any(i => i.Id == item.Id);
+            var list = _context.ShoppingLists
+                        .FirstOrDefault(i => i.Id == item.Id || (i.OwnerId == item.OwnerId && i.Name == item.Name));
+            return list != null;
         }
 
         public async Task<bool> RemoveItemAsync(string listId, string itemId)
