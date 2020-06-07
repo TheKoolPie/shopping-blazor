@@ -21,9 +21,9 @@
     private string _id = Guid.NewGuid().ToString();
 
     [Parameter]
-    public float Value { get; set; }
+    public float StepperValue { get; set; }
     [Parameter]
-    public EventCallback<float> ValueChanged { get; set; }
+    public EventCallback<float> StepperValueChanged { get; set; }
     [Parameter]
     public float Increment { get; set; }
     [Parameter]
@@ -38,7 +38,7 @@
 
     protected override void OnInitialized()
     {
-        _value = Value;
+        _value = StepperValue;
         _increment = Increment;
         if (InputAttributes.ContainsKey("id"))
         {
@@ -52,8 +52,8 @@
         if (tmp < Maximum)
         {
             _value = _value + _increment;
-            Value = _value;
-            ValueChanged.InvokeAsync(Value);
+            StepperValue = _value;
+            StepperValueChanged.InvokeAsync(StepperValue);
         }
     }
     private void DecreaseValue()
@@ -62,8 +62,8 @@
         if (tmp > Minimum)
         {
             _value = _value - _increment;
-            Value = _value;
-            ValueChanged.InvokeAsync(Value);
+            StepperValue = _value;
+            StepperValueChanged.InvokeAsync(StepperValue);
         }
     }
     private Task OnValueChanged(ChangeEventArgs e)
@@ -76,8 +76,8 @@
         var success = float.TryParse(stringValue, out float result);
         if (success)
         {
-            Value = _value = result;
-            return ValueChanged.InvokeAsync(Value);
+            StepperValue = _value = result;
+            return StepperValueChanged.InvokeAsync(StepperValue);
         }
         return Task.FromResult(false);
     }
