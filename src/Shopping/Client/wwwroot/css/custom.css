@@ -16,3 +16,15 @@
         .input-search-content a:hover {
             background-color: #f1f1f1;
         }
+
+.btn-primary {
+    color: #fff;
+    background-color: rgb(5, 39, 103);
+    border-color: rgb(5, 39, 103);
+}
+.list-group-item.active {
+    z-index: 2;
+    color: #fff;
+    background-color: rgb(5, 39, 103);
+    border-color: rgb(5, 39, 103);
+}
