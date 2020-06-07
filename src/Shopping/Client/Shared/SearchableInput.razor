@@ -1,20 +1,16 @@
-﻿
-<div class="form-group">
-    <label for="searchInput">@Label</label>
-    <input type="search" class="form-control"
-           placeholder="@Placeholder" @bind="@SearchValue" @bind:event="oninput" />
-    @if (_localValueOptions != null && _localValueOptions.Keys.Count > 0)
-    {
-        <div class="input-search-content">
+﻿<input type="search" class="form-control" id="@_id"
+       placeholder="@Placeholder" @bind="@SearchValue" @bind:event="oninput" />
+@if (_localValueOptions != null && _localValueOptions.Keys.Count > 0)
+{
+    <div class="input-search-content">
 
-            @foreach (var key in _localValueOptions.Keys)
-            {
-                <a @onclick="(() => OnItemSelected(key))">@_localValueOptions[key]</a>
-            }
+        @foreach (var key in _localValueOptions.Keys)
+        {
+            <a @onclick="(() => OnItemSelected(key))">@_localValueOptions[key]</a>
+        }
 
-        </div>
-    }
-</div>
+    </div>
+}
 
 
 @code {
@@ -35,18 +31,31 @@
     [Parameter]
     public Dictionary<string, string> ValueOptions { get; set; }
     [Parameter]
-    public string Label { get; set; }
+    public string SelectedValue { get; set; }
     [Parameter]
-    public string Value { get; set; }
-    [Parameter]
-    public EventCallback<string> ValueChanged { get; set; }
+    public EventCallback<string> SelectedValueChanged { get; set; }
     [Parameter]
     public string Placeholder { get; set; }
 
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> InputAttributes { get; set; }
+
+    private string _id = Guid.NewGuid().ToString();
+
+    protected override void OnInitialized()
+    {
+        if (InputAttributes.ContainsKey("id"))
+        {
+            _id = InputAttributes["id"].ToString();
+        }
+    }
+
     private Task OnItemSelected(string id)
     {
-        Value = _localValueOptions[id];
-        return ValueChanged.InvokeAsync(Value);
+        SelectedValue = id;
+        _searchValue = _localValueOptions[id];
+        _localValueOptions = null;
+        return SelectedValueChanged.InvokeAsync(SelectedValue);
     }
 
     private void OnSearchInputChanged()
