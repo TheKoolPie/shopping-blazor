@@ -6,7 +6,7 @@
         </button>
     </div>
     <input id="@_id" type="search" class="form-control text-center" value="@(_value.ToString("F2"))"
-           @onchange="OnValueChanged" @onkeydown="OnKeyDown" @onkeydown:preventDefault />
+           @onchange="OnValueChanged" />
     <div class="input-group-append">
         <button type="button" class="btn btn-primary" @onclick="IncreaseValue">
             <span class="oi oi-plus"></span>
@@ -80,17 +80,5 @@
             return ValueChanged.InvokeAsync(Value);
         }
         return Task.FromResult(false);
-    }
-    private void OnKeyDown(KeyboardEventArgs e)
-    {
-        switch (e.Key)
-        {
-            case "ArrowUp":
-                IncreaseValue();
-                break;
-            case "ArrowDown":
-                DecreaseValue();
-                break;
-        }
     }
 }
