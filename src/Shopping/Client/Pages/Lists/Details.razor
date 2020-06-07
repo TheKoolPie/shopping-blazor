@@ -153,7 +153,7 @@
         else
         {
             AddItemAlertModel = AlertComponentModel.CreateSuccessAlert("Saved item", 
-                $"{createdItem.ProductItem.CreatedAt} {createdItem.ProductItem.Unit.GetDescription()} of {createdItem.ProductItem.Name} ");
+                $"{createdItem.Amount} {createdItem.ProductItem.Unit.GetDescription()} of {createdItem.ProductItem.Name} ");
             CurrentList.AddOrUpdateItem(createdItem);
             AddItem = new ShoppingListItem();
         }
