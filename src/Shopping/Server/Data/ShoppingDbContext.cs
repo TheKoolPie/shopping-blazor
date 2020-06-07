@@ -35,6 +35,11 @@ namespace Shopping.Server.Data
                 .HasConversion(
                     v => string.Join(",", v),
                     v => v.Split(',', System.StringSplitOptions.None).Select(x => x).ToList());
+            modelBuilder
+                .Entity<ShoppingList>()
+                .OwnsMany(l => l.Items);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

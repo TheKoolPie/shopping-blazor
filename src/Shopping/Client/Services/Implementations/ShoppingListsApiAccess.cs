@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
@@ -17,9 +19,20 @@ namespace Shopping.Client.Services.Implementations
             BaseAddress = "api/ShoppingLists";
         }
 
-        public Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item)
+        public async Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item)
         {
-            throw new NotImplementedException();
+            var client = await GetHttpClientAsync();
+            ShoppingListItem createdItem = null;
+            var response = await client.PostAsJsonAsync<ShoppingListItem>($"{BaseAddress}/AddItem/{listId}", item);
+            if (response.IsSuccessStatusCode)
+            {
+                createdItem = await response.Content.ReadFromJsonAsync<ShoppingListItem>();
+            }
+            else
+            {
+                _logger.LogError($"Could not add item to list {listId}");
+            }
+            return createdItem;
         }
 
         public Task<UserGroup> AddUserGroupAsync(string listId, string userGroupId)

@@ -34,7 +34,7 @@ namespace Shopping.Shared.Data
             var existing = Items.FirstOrDefault(i => i.ProductItemId == item.ProductItemId);
             if (existing == null)
             {
-                Items.Add(new ShoppingListItem(item));
+                Items.Add(item);
             }
             else
             {

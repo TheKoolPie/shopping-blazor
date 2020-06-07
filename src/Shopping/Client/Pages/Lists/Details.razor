@@ -47,38 +47,51 @@
                     </div>
                     <div class="tab-pane fade" id="list-addItems" role="tabpanel" aria-labelledby="list-addItems-list">
                         <h4>Add Items</h4>
-                        <EditForm EditContext="addItemEditContext" OnSubmit="HandleAddItemSubmit">
-                            <DataAnnotationsValidator />
-                            <ValidationSummary />
-                            <div class="form-group">
-                                <label for="product-search">Product</label>
-                                <SearchableInput id="product-search"
-                                                 ValueOptions="products.ToDictionary(x=>x.Id,x=>x.Name)"
-                                                 Label="Product" @bind-SelectedValue="addItem.ProductItemId"
-                                                 Placeholder="Search Products..." />
+                        <hr />
+                        <AlertComponent Model="AddItemAlertModel" />
+                        @if (IsSavingItem)
+                        {
+                            <div class="row">
+                                <div class="col">
+                                    <strong>Is saving...</strong>
+                                </div>
                             </div>
-                            @if (!string.IsNullOrEmpty(addItem.ProductItemId))
-                            {
-                                <div class="form-row">
-                                    <div class="col">
-                                        <label for="product-amount">Amount</label>
-                                    </div>
+                        }
+                        else
+                        {
+                            <EditForm EditContext="AddItemEditContext" OnSubmit="HandleAddItemSubmit">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                                <div class="form-group">
+                                    <label for="product-search">Product</label>
+                                    <SearchableInput id="product-search"
+                                                     ValueOptions="Products.ToDictionary(x => x.Id, x => x.Name)"
+                                                     Label="Product" @bind-SelectedValue="AddItem.ProductItemId"
+                                                     Placeholder="Search Products..." />
                                 </div>
-                                <div class="form-row">
-                                    <div class="col">
-                                        <CustomStepper id="product-amount" @bind-Value="@addItem.Amount" Label="Amount" Increment="0.1f" Minimum="0" Maximum="(float.MaxValue)" />
+                                @if (!string.IsNullOrEmpty(AddItem.ProductItemId))
+                                {
+                                    <div class="form-row">
+                                        <div class="col">
+                                            <label for="product-amount">Amount</label>
+                                        </div>
                                     </div>
-                                    <div class="col-4">
-                                        <span class="input-group-text">
-                                            @(products.FirstOrDefault(p => p.Id == addItem.ProductItemId)?.Unit.GetDescription() ?? "")
-                                        </span>
+                                    <div class="form-row">
+                                        <div class="col">
+                                            <CustomStepper id="product-amount" @bind-Value="@AddItem.Amount" Label="Amount" Increment="0.1f" Minimum="0" Maximum="(float.MaxValue)" />
+                                        </div>
+                                        <div class="col-4">
+                                            <span class="input-group-text">
+                                                @(Products.FirstOrDefault(p => p.Id == AddItem.ProductItemId)?.Unit.GetDescription() ?? "")
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                                <hr />
-                                <button type="submit" class="btn btn-primary">Add to List</button>
-                            }
+                                    <hr />
+                                    <button type="submit" class="btn btn-primary">Add to List</button>
+                                }
 
-                        </EditForm>
+                            </EditForm>
+                        }
                     </div>
                     <div class="tab-pane fade" id="list-access" role="tabpanel" aria-labelledby="list-access-list">
                         <h4>Access</h4>
@@ -102,9 +115,11 @@
     private ShoppingList CurrentList;
 
     #region AddItem
-    private ShoppingListItem addItem = new ShoppingListItem();
-    private EditContext addItemEditContext;
-    private List<ProductItem> products = new List<ProductItem>();
+    private ShoppingListItem AddItem = new ShoppingListItem();
+    private EditContext AddItemEditContext;
+    private bool IsSavingItem = false;
+    AlertComponentModel AddItemAlertModel = null;
+    private List<ProductItem> Products = new List<ProductItem>();
     #endregion
 
     protected override async Task OnInitializedAsync()
@@ -119,15 +134,30 @@
         }
         else
         {
-            products = await ProductRepo.GetAllAsync();
-            addItemEditContext = new EditContext(addItem);
+            Products = await ProductRepo.GetAllAsync();
+            AddItemEditContext = new EditContext(AddItem);
         }
 
         IsLoading = false;
     }
 
-    private void HandleAddItemSubmit()
+    private async Task HandleAddItemSubmit()
     {
-        Console.WriteLine(addItem.ProductItemId);
+        IsSavingItem = true;
+        AddItemAlertModel = null;
+        var createdItem = await ShoppingListRepo.AddOrUpdateItemAsync(CurrentList.Id, AddItem);
+        if (createdItem == null)
+        {
+            AddItemAlertModel = AlertComponentModel.CreateErrorAlert("Error with adding", "Could not add item to list");
+        }
+        else
+        {
+            AddItemAlertModel = AlertComponentModel.CreateSuccessAlert("Saved item", 
+                $"{createdItem.ProductItem.CreatedAt} {createdItem.ProductItem.Unit.GetDescription()} of {createdItem.ProductItem.Name} ");
+            CurrentList.AddOrUpdateItem(createdItem);
+            AddItem = new ShoppingListItem();
+        }
+
+        IsSavingItem = false;
     }
 }

@@ -16,9 +16,9 @@ namespace Shopping.Client.Services.Implementations
 {
     public class CRUDAccessBaseImpl<T> : ICRUDAccess<T> where T : BaseItem
     {
-        private readonly HttpClient _client;
-        private readonly ILogger _logger;
-        private readonly ITokenProvider _tokenProvider;
+        protected readonly HttpClient _client;
+        protected readonly ILogger _logger;
+        protected readonly ITokenProvider _tokenProvider;
 
         public CRUDAccessBaseImpl(HttpClient httpClient,
             ITokenProvider tokenProvider,
@@ -35,7 +35,7 @@ namespace Shopping.Client.Services.Implementations
         {
             T retVal = null;
 
-            var client = await GetHttpClient();
+            var client = await GetHttpClientAsync();
 
             var response = await client.PostAsJsonAsync<T>(BaseAddress, item);
             if (response.IsSuccessStatusCode)
@@ -56,7 +56,7 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<bool> DeleteByIdAsync(string id)
         {
-            var client = await GetHttpClient();
+            var client = await GetHttpClientAsync();
 
             var response = await client.DeleteAsync($"{BaseAddress}/{id}");
             if (!response.IsSuccessStatusCode)
@@ -69,7 +69,7 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<List<T>> GetAllAsync()
         {
-            var client = await GetHttpClient();
+            var client = await GetHttpClientAsync();
             List<T> items = null;
 
             var response = await client.GetAsync(BaseAddress);
@@ -82,7 +82,7 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<T> GetAsync(string id)
         {
-            var client = await GetHttpClient();
+            var client = await GetHttpClientAsync();
             T item = null;
             var response = await client.GetAsync($"{BaseAddress}/{id}");
             if (response.IsSuccessStatusCode)
@@ -95,7 +95,7 @@ namespace Shopping.Client.Services.Implementations
         public async Task<T> UpdateAsync(string id, T item)
         {
             T retVal = null;
-            var client = await GetHttpClient();
+            var client = await GetHttpClientAsync();
 
             var response = await client.PutAsJsonAsync<T>($"{BaseAddress}/{id}", item);
             if (response.IsSuccessStatusCode)
@@ -109,7 +109,7 @@ namespace Shopping.Client.Services.Implementations
             return retVal;
         }
 
-        protected async Task<HttpClient> GetHttpClient()
+        protected async Task<HttpClient> GetHttpClientAsync()
         {
             if (_client.DefaultRequestHeaders.Authorization == null)
             {
