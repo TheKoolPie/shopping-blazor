@@ -44,6 +44,48 @@
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
                         <h4>Overview</h4>
+                        <hr />
+                        @if (CurrentList != null)
+                        {
+                            <h6>@CurrentList.Name</h6>
+                            <div class="row">
+                                <div class="col">
+                                    @if (CurrentList.Items.Count > 0)
+                                    {
+                                        <table class="table table-hover table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Name</th>
+                                                    <th>Amount</th>
+                                                    <th>Unit</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in CurrentList.Items)
+                                                {
+                                                    var opacity = item.Done ? "1" : "0";
+                                                    <tr>
+                                                        <td @onclick="(()=>item.Done = !item.Done)">
+                                                            <span style="opacity:@opacity" class="oi oi-circle-check table-check-status"></span>
+                                                        </td>
+                                                        <td @onclick="(()=>item.Done = !item.Done)"> @item.ProductItem.Name </td>
+                                                        <td @onclick="(()=>item.Done = !item.Done)"> @item.Amount </td>
+                                                        <td @onclick="(()=>item.Done = !item.Done)"> @item.ProductItem.Unit.GetDescription()</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-danger">
+                                                                <span class="oi oi-trash" />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                </div>
+                            </div>
+                        }
                     </div>
                     <div class="tab-pane fade" id="list-addItems" role="tabpanel" aria-labelledby="list-addItems-list">
                         <h4>Add Items</h4>
@@ -152,7 +194,7 @@
         }
         else
         {
-            AddItemAlertModel = AlertComponentModel.CreateSuccessAlert("Saved item", 
+            AddItemAlertModel = AlertComponentModel.CreateSuccessAlert("Saved item",
                 $"{createdItem.Amount} {createdItem.ProductItem.Unit.GetDescription()} of {createdItem.ProductItem.Name} ");
             CurrentList.AddOrUpdateItem(createdItem);
             AddItem = new ShoppingListItem();
