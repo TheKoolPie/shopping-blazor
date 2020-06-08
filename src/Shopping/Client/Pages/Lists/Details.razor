@@ -195,7 +195,7 @@
         {
             AddItemAlertModel = AlertComponentModel.CreateSuccessAlert("Saved item",
                 $"{createdItem.Amount} {createdItem.ProductItem.Unit.GetDescription()} of {createdItem.ProductItem.Name} ");
-            CurrentList.AddOrUpdateItem(createdItem);
+            CurrentList = await ShoppingListRepo.GetAsync(Id);
             AddItem = new ShoppingListItem();
         }
 

@@ -40,12 +40,12 @@ namespace Shopping.Client.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<bool> CheckIfListIsFromUser(ShoppingList list, string userId)
+        public Task<List<ShoppingList>> GetAllOfUserAsync(string userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<ShoppingList>> GetAllOfUserAsync(string userId)
+        public Task<bool> IsOfUser(ShoppingList list, string userId)
         {
             throw new NotImplementedException();
         }
@@ -56,11 +56,6 @@ namespace Shopping.Client.Services.Implementations
         }
 
         public Task<bool> RemoveItemAsync(string listId, ShoppingListItem item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> RemoveUserGroupAsync(string listId, string userGroupId)
         {
             throw new NotImplementedException();
         }

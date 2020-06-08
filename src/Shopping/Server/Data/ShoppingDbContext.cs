@@ -15,6 +15,7 @@ namespace Shopping.Server.Data
         public DbSet<ProductItem> Products { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
         public DbSet<ShoppingList> ShoppingLists { get; set; }
+        public DbSet<UserGroupShoppingList> UserGroupShoppingLists { get; set; }
 
         public ShoppingDbContext() : base() { }
         public ShoppingDbContext(DbContextOptions<ShoppingDbContext> options) : base(options)
@@ -24,20 +25,11 @@ namespace Shopping.Server.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .Entity<UserGroup>()
-                .Property(e => e.MemberIds)
-                .HasConversion(
-                    v => string.Join(",", v),
-                    v => v.Split(',', System.StringSplitOptions.None).Select(x => x).ToList());
-            modelBuilder
-                .Entity<ShoppingList>()
-                .Property(e => e.UserGroupIds)
-                .HasConversion(
-                    v => string.Join(",", v),
-                    v => v.Split(',', System.StringSplitOptions.None).Select(x => x).ToList());
-            modelBuilder
                 .Entity<ShoppingList>()
                 .OwnsMany(l => l.Items);
+            modelBuilder
+                .Entity<UserGroup>()
+                .OwnsMany(l => l.Members);
 
             base.OnModelCreating(modelBuilder);
         }

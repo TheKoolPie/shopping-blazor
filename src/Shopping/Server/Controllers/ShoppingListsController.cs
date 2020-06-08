@@ -55,7 +55,7 @@ namespace Shopping.Server.Controllers
             try
             {
                 list = await _lists.GetAsync(id);
-                if (!(await _lists.CheckIfListIsFromUser(list, user.Id)))
+                if (!(await _lists.IsOfUser(list, user.Id)))
                 {
                     return Unauthorized();
                 }
@@ -101,7 +101,7 @@ namespace Shopping.Server.Controllers
             {
                 return NotFound(e.Message);
             }
-            if (!(await _lists.CheckIfListIsFromUser(list, user.Id)))
+            if (!(await _lists.IsOfUser(list, user.Id)))
             {
                 return Unauthorized();
             }
@@ -121,20 +121,6 @@ namespace Shopping.Server.Controllers
 
             return Ok(createdItem);
         }
-        [HttpPost("AddUserGroup/{id}")]
-        public async Task<ActionResult<UserGroup>> AddGroupToList(string id, [FromBody] string userGroupId)
-        {
-            var user = await _users.GetUserAsync();
-            var list = await _lists.GetAsync(id);
-            if (!(await _lists.CheckIfListIsFromUser(list, user.Id)))
-            {
-                return Unauthorized();
-            }
-
-            var addedGroup = await _lists.AddUserGroupAsync(list.Id, userGroupId);
-
-            return Ok(addedGroup);
-        }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> DeleteList(string id)
@@ -145,7 +131,7 @@ namespace Shopping.Server.Controllers
                 var user = await _users.GetUserAsync();
 
                 bool isAdmin = await _users.IsUserAdminAsync();
-                bool isOwner = await _lists.CheckIfListIsFromUser(list, user.Id);
+                bool isOwner = await _lists.IsOfUser(list, user.Id);
 
                 if (isAdmin || isOwner)
                 {

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shopping.Server.Data;
 using Shopping.Shared.Data;
+using Shopping.Shared.Exceptions;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -26,13 +27,18 @@ namespace Shopping.Server.Services.Implementations
 
         public override async Task<UserGroup> GetAsync(string id)
         {
-            return await _context.UserGroups.FirstOrDefaultAsync(i => i.Id == id);
+            var userGroup = await _context.UserGroups.FirstOrDefaultAsync(i => i.Id == id);
+            if (userGroup == null)
+            {
+                throw new ItemNotFoundException(typeof(UserGroup), id);
+            }
+            return userGroup;
         }
 
         public async Task<List<UserGroup>> GetAllOfUserAsync(string userId)
         {
             return (await GetAllAsync())
-                .Where(i => i.OwnerId == userId || i.MemberIds.Contains(userId))
+                .Where(i => i.OwnerId == userId || i.Members.Select(i => i.UserId).Contains(userId))
                 .ToList();
         }
 
@@ -44,7 +50,17 @@ namespace Shopping.Server.Services.Implementations
         {
             existing.OwnerId = update.OwnerId;
             existing.Name = update.Name;
-            existing.MemberIds = new List<string>(update.MemberIds);
+            existing.Members = new List<UserGroupMember>(update.Members);
+        }
+
+        public async Task<bool> UserIsInGroupAsync(string userGroupId, string userId)
+        {
+            var group = await GetAsync(userGroupId);
+
+            bool isOwner = group.OwnerId == userId;
+            bool isMember = group.Members.Select(x => x.UserId).Contains(userId);
+
+            return isOwner || isMember;
         }
     }
 }

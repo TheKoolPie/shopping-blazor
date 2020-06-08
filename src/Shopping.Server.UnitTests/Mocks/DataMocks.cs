@@ -1,4 +1,5 @@
-﻿using Shopping.Server.Models;
+﻿using Microsoft.Azure.Cosmos;
+using Shopping.Server.Models;
 using Shopping.Shared.Data;
 using System;
 using System.Collections.Generic;
@@ -65,28 +66,58 @@ namespace Shopping.Server.UnitTests.Mocks
                     Id = Group_All_Id,
                     Name = "All",
                     OwnerId = AdminId,
-                    MemberIds = new List<string>(GetUsers().Select(x=>x.Id)),
+                    Members = new List<UserGroupMember>(GetUsers().Select(x=>new UserGroupMember{UserId = x.Id })),
                 },
                 new UserGroup()
                 {
                     Id = Group_ManagerCreatorUser_Id,
                     Name = "Group 1",
                     OwnerId = ManagerId,
-                    MemberIds = new List<string> { ManagerId, CreatorId, UserId }
+                    Members = new List<UserGroupMember>
+                    {
+                        new UserGroupMember
+                        {
+                            UserId = ManagerId,
+                        },
+                        new UserGroupMember
+                        {
+                            UserId = CreatorId,
+                        },
+                        new UserGroupMember
+                        {
+                            UserId = UserId,
+                        },
+                    }
                 },
                 new UserGroup()
                 {
                     Id = Group_Admin_Id,
                     Name = "Admin",
                     OwnerId = AdminId,
-                    MemberIds = new List<string>{ AdminId }
+                    Members = new List<UserGroupMember>
+                    {
+                        new UserGroupMember
+                        {
+                            UserId = AdminId,
+                        },
+                    }
                 },
                 new UserGroup()
                 {
                     Id = Group_ManagerUser_Id,
                     Name = "Group 2",
                     OwnerId = ManagerId,
-                    MemberIds = new List<string>{ ManagerId, UserId }
+                    Members = new List<UserGroupMember>
+                    {
+                        new UserGroupMember
+                        {
+                            UserId = ManagerId,
+                        },
+                        new UserGroupMember
+                        {
+                            UserId = UserId,
+                        },
+                    }
                 },
             };
         }
@@ -171,7 +202,17 @@ namespace Shopping.Server.UnitTests.Mocks
                     Id = "123456789",
                     ListDate = new DateTime(1993,5,4),
                     OwnerId = AdminId,
-                    UserGroupIds = new List<string>{ Group_ManagerCreatorUser_Id, Group_Admin_Id },
+                    UserGroups = new List<UserGroup>
+                    {
+                        new UserGroup
+                        {
+                            Id = Group_ManagerCreatorUser_Id,
+                        },
+                        new UserGroup
+                        {
+                            Id = Group_Admin_Id
+                        }
+                    },
                     Items = new List<ShoppingListItem>{ GetShoppingListItems()[0], GetShoppingListItems()[1] }
                 },
                 new ShoppingList
@@ -179,7 +220,13 @@ namespace Shopping.Server.UnitTests.Mocks
                     Id = "1011121314",
                     ListDate = new DateTime(1993,5,4),
                     OwnerId = CreatorId,
-                    UserGroupIds = new List<string>{ Group_ManagerUser_Id },
+                    UserGroups = new List<UserGroup>
+                    {
+                        new UserGroup
+                        {
+                            Id = Group_ManagerUser_Id
+                        },
+                    },
                     Items = new List<ShoppingListItem>{ GetShoppingListItems()[0], GetShoppingListItems()[1] }
                 }
             };

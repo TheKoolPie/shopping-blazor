@@ -16,15 +16,17 @@ namespace Shopping.Server.Services.Implementations
 {
     public class ShoppingListRepository : CRUDDbContextBaseImpl<ShoppingList>, IShoppingLists
     {
-        private readonly IUserGroups _userGroups;
+        private readonly IUserGroupShoppingLists _userGroupShoppingLists;
         private readonly IProducts _products;
+        private readonly IUserGroups _userGroups;
 
         public ShoppingListRepository(ShoppingDbContext context, ILogger<ShoppingList> logger,
-            IUserGroups userGroups, IProducts products)
+            IUserGroupShoppingLists userGroupShoppingLists, IProducts products, IUserGroups userGroups)
             : base(context, logger)
         {
-            _userGroups = userGroups;
+            _userGroupShoppingLists = userGroupShoppingLists;
             _products = products;
+            _userGroups = userGroups;
         }
 
         public override async Task<List<ShoppingList>> GetAllAsync()
@@ -57,10 +59,24 @@ namespace Shopping.Server.Services.Implementations
         public async Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item)
         {
             var list = await GetAsync(listId);
+            if (list == null)
+            {
+                throw new ItemNotFoundException(typeof(ShoppingList), listId);
+            }
 
             item.ProductItem = await _products.GetAsync(item.ProductItemId);
 
-            list.AddOrUpdateItem(item);
+            var existingItem = list.Items.FirstOrDefault(i => i.ProductItem.Name == item.ProductItem.Name);
+            if (existingItem == null)
+            {
+                list.Items.Add(item);
+            }
+            else
+            {
+                existingItem.Amount = item.Amount;
+                existingItem.Done = item.Done;
+            }
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -72,24 +88,6 @@ namespace Shopping.Server.Services.Implementations
             return item;
         }
 
-        public async Task<UserGroup> AddUserGroupAsync(string listId, string userGroupId)
-        {
-            var list = await GetAsync(listId);
-            var group = await _userGroups.GetAsync(userGroupId);
-            list.AddUserGroup(group);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException e)
-            {
-                throw new PersistencyException("Could not update item", e);
-            }
-            return group;
-        }
-
-
-
         public override bool ItemAlreadyExists(ShoppingList item)
         {
             var list = _context.ShoppingLists
@@ -100,7 +98,18 @@ namespace Shopping.Server.Services.Implementations
         public async Task<bool> RemoveItemAsync(string listId, string itemId)
         {
             var list = await GetAsync(listId);
-            list.RemoveItem(itemId);
+            if (list == null)
+            {
+                throw new ItemNotFoundException(typeof(ShoppingList), listId);
+            }
+            var deleteItem = list.Items.FirstOrDefault(i => i.Id == itemId);
+            if (deleteItem == null)
+            {
+                throw new ItemNotFoundException(typeof(ShoppingListItem), itemId);
+            }
+
+            list.Items.Remove(deleteItem);
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -117,24 +126,12 @@ namespace Shopping.Server.Services.Implementations
             return await RemoveItemAsync(listId, item.Id);
         }
 
-        public async Task<bool> RemoveUserGroupAsync(string listId, string userGroupId)
-        {
-            var list = await GetAsync(listId);
-            list.RemoveUserGroup(userGroupId);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException e)
-            {
-                throw new PersistencyException("Could not update item", e);
-            }
-            return true;
-        }
-
         public override void UpdateExistingItem(ShoppingList existing, ShoppingList update)
         {
-            existing.Update(update);
+            existing.Name = update.Name;
+            existing.ListDate = update.ListDate;
+            existing.OwnerId = update.OwnerId;
+            existing.Items = update.Items;
         }
 
         public async Task<List<ShoppingList>> GetAllOfUserAsync(string userId)
@@ -145,7 +142,7 @@ namespace Shopping.Server.Services.Implementations
             {
                 var list = allLists[i];
 
-                if (!(await CheckIfListIsFromUser(allLists[i], userId)))
+                if (!(await IsOfUser(allLists[i], userId)))
                 {
                     allLists.Remove(list);
                 }
@@ -153,14 +150,20 @@ namespace Shopping.Server.Services.Implementations
             return allLists;
         }
 
-        public async Task<bool> CheckIfListIsFromUser(ShoppingList list, string userId)
+        public async Task<bool> IsOfUser(ShoppingList list, string userId)
         {
-            var allGroupIdsOfUser = (await _userGroups.GetAllOfUserAsync(userId)).Select(g => g.Id);
+            bool isListOwner = list.OwnerId == userId;
+            if (isListOwner) { return true; }
 
-            var isOwner = list.OwnerId == userId;
-            var hasUserGroupIdInCommon = list.UserGroupIds.Intersect(allGroupIdsOfUser).Count() != 0;
-
-            return isOwner || hasUserGroupIdInCommon;
+            var userGroupsOfList = await _userGroupShoppingLists.GetUserGroupsOfShoppingListAsync(list.Id);
+            foreach (var group in userGroupsOfList)
+            {
+                if(await _userGroups.UserIsInGroupAsync(group.Id, userId))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

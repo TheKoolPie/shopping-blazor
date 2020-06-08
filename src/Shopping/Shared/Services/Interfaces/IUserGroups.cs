@@ -9,5 +9,6 @@ namespace Shopping.Shared.Services.Interfaces
     public interface IUserGroups : ICRUDAccess<UserGroup>
     {
         Task<List<UserGroup>> GetAllOfUserAsync(string userId);
+        Task<bool> UserIsInGroupAsync(string userGroupId, string userId);
     }
 }

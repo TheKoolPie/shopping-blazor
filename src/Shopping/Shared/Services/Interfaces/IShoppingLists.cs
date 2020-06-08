@@ -9,11 +9,9 @@ namespace Shopping.Shared.Services.Interfaces
     public interface IShoppingLists : ICRUDAccess<ShoppingList>
     {
         Task<List<ShoppingList>> GetAllOfUserAsync(string userId);
-        Task<UserGroup> AddUserGroupAsync(string listId, string userGroupId);
-        Task<bool> RemoveUserGroupAsync(string listId, string userGroupId);
         Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item);
         Task<bool> RemoveItemAsync(string listId, string itemId);
         Task<bool> RemoveItemAsync(string listId, ShoppingListItem item);
-        Task<bool> CheckIfListIsFromUser(ShoppingList list, string userId);
+        Task<bool> IsOfUser(ShoppingList list, string userId);
     }
 }
