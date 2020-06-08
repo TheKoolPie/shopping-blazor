@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class CRUDAccessBaseImpl<T> : ICRUDAccess<T> where T : BaseItem
+    public class CRUDApiAccessBaseImpl<T> : ICRUDAccess<T> where T : BaseItem
     {
         protected readonly HttpClient _client;
         protected readonly ILogger _logger;
         protected readonly ITokenProvider _tokenProvider;
 
-        public CRUDAccessBaseImpl(HttpClient httpClient,
+        public CRUDApiAccessBaseImpl(HttpClient httpClient,
             ITokenProvider tokenProvider,
             ILogger logger)
         {

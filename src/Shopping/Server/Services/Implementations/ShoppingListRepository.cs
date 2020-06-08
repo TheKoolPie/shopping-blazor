@@ -167,5 +167,11 @@ namespace Shopping.Server.Services.Implementations
             }
             return false;
         }
+
+        public async Task<bool> IsOfUserAsync(string listId, string userId)
+        {
+            var list = await GetAsync(listId);
+            return await IsOfUserAsync(list, userId);
+        }
     }
 }

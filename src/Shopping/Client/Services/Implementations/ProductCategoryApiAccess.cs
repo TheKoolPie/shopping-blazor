@@ -6,7 +6,7 @@ using Shopping.Shared.Services;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class ProductCategoryApiAccess : CRUDAccessBaseImpl<ProductCategory>, IProductCategories
+    public class ProductCategoryApiAccess : CRUDApiAccessBaseImpl<ProductCategory>, IProductCategories
     {
         public ProductCategoryApiAccess(HttpClient httpClient,
             ITokenProvider tokenProvider,

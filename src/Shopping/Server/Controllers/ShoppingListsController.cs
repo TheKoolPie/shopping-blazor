@@ -137,6 +137,10 @@ namespace Shopping.Server.Controllers
                 {
                     await _lists.DeleteByIdAsync(id);
                 }
+                else
+                {
+                    return Unauthorized();
+                }
             }
             catch (ItemNotFoundException)
             {

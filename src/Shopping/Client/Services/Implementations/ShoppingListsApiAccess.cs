@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class ShoppingListsApiAccess : CRUDAccessBaseImpl<ShoppingList>, IShoppingLists
+    public class ShoppingListsApiAccess : CRUDApiAccessBaseImpl<ShoppingList>, IShoppingLists
     {
         public ShoppingListsApiAccess(HttpClient httpClient, ITokenProvider tokenProvider, ILogger<ShoppingListsApiAccess> logger) : base(httpClient, tokenProvider, logger)
         {
@@ -46,6 +46,11 @@ namespace Shopping.Client.Services.Implementations
         }
 
         public Task<bool> IsOfUserAsync(ShoppingList list, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsOfUserAsync(string listId, string userId)
         {
             throw new NotImplementedException();
         }

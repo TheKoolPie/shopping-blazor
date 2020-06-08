@@ -23,17 +23,16 @@ namespace Shopping.Server.Services.Implementations
             _context = context;
             _logger = logger;
         }
-        public async Task<bool> CreateAssignmentAsync(string userGroupId, string shoppingListId)
+        public async Task<bool> CreateAssignmentAsync(UserGroupShoppingList assignment)
         {
-            if (!ItemExists(userGroupId, shoppingListId))
+            if (!ItemExists(assignment.UserGroupId, assignment.ShoppingListId))
             {
-                _logger.LogDebug($"Searching for user group with id {userGroupId}");
-                var group = await GetUserGroupAsync(userGroupId);
+                _logger.LogDebug($"Searching for user group with id {assignment.UserGroupId}");
+                var group = await GetUserGroupAsync(assignment.UserGroupId);
 
-                _logger.LogDebug($"Searching for shopping list with id {shoppingListId}");
-                var list = await GetShoppingListAsync(shoppingListId);
+                _logger.LogDebug($"Searching for shopping list with id {assignment.ShoppingListId}");
+                var list = await GetShoppingListAsync(assignment.ShoppingListId);
 
-                var assignment = new UserGroupShoppingList();
                 assignment.UserGroup = group;
                 assignment.ShoppingList = list;
                 _logger.LogDebug("Create assignment");
@@ -44,12 +43,12 @@ namespace Shopping.Server.Services.Implementations
                 }
                 catch (Exception e)
                 {
-                    throw new PersistencyException($"Could not save assignment between Group '{userGroupId}' and List '{shoppingListId}'", e);
+                    throw new PersistencyException($"Could not save assignment between Group '{assignment.UserGroupId}' and List '{assignment.ShoppingListId}'", e);
                 }
             }
             else
             {
-                throw new ItemAlreadyExistsException($"Assignment between Group '{userGroupId}' and List '{shoppingListId}' already exists");
+                throw new ItemAlreadyExistsException($"Assignment between Group '{assignment.UserGroupId}' and List '{assignment.ShoppingListId}' already exists");
             }
             return true;
         }
@@ -92,11 +91,12 @@ namespace Shopping.Server.Services.Implementations
             return userGroups;
         }
 
-        public async Task<bool> RemoveAssignmentAsync(string userGroupId, string shoppingListId)
+        public async Task<bool> RemoveAssignmentAsync(UserGroupShoppingList assignment)
         {
-            if (ItemExists(userGroupId, shoppingListId))
+            if (ItemExists(assignment.UserGroupId, assignment.ShoppingListId))
             {
-                var item = await _context.UserGroupShoppingLists.FirstOrDefaultAsync(i => i.UserGroupId == userGroupId && i.ShoppingListId == shoppingListId);
+                var item = await _context.UserGroupShoppingLists
+                    .FirstOrDefaultAsync(i => i.UserGroupId == assignment.UserGroupId && i.ShoppingListId == assignment.ShoppingListId);
                 _context.UserGroupShoppingLists.Remove(item);
                 try
                 {
@@ -104,12 +104,12 @@ namespace Shopping.Server.Services.Implementations
                 }
                 catch (Exception e)
                 {
-                    throw new PersistencyException($"Could not delete assignment between Group '{userGroupId}' and List '{shoppingListId}'", e);
+                    throw new PersistencyException($"Could not delete assignment between Group '{assignment.UserGroupId}' and List '{assignment.ShoppingListId}'", e);
                 }
             }
             else
             {
-                throw new ItemNotFoundException($"Assignment between Group '{userGroupId}' and List '{shoppingListId}' not found");
+                throw new ItemNotFoundException($"Assignment between Group '{assignment.UserGroupId}' and List '{assignment.ShoppingListId}' not found");
             }
             return true;
         }
