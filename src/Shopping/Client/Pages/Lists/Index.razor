@@ -1,5 +1,17 @@
-﻿<h3>Index</h3>
+﻿@page "/lists"
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
 
+<h3>Shopping lists</h3>
+<hr />
+<div class="row">
+    <div class="col">
+        <button class="btn btn-primary" type="button" @onclick="NavigateToCreatePage">
+            <span class="oi oi-plus" /> Create new
+        </button>
+    </div>
+</div>
+<hr />
 @if (IsLoading)
 {
     <div class="row">
@@ -15,4 +27,9 @@ else
 
 @code {
     private bool IsLoading = false;
+
+    private void NavigateToCreatePage()
+    {
+        NavigationManager.NavigateTo("/lists/create");
+    }
 }
