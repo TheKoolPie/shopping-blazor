@@ -12,6 +12,6 @@ namespace Shopping.Shared.Services.Interfaces
         Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item);
         Task<bool> RemoveItemAsync(string listId, string itemId);
         Task<bool> RemoveItemAsync(string listId, ShoppingListItem item);
-        Task<bool> IsOfUser(ShoppingList list, string userId);
+        Task<bool> IsOfUserAsync(ShoppingList list, string userId);
     }
 }

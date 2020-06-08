@@ -45,7 +45,7 @@ namespace Shopping.Client.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<bool> IsOfUser(ShoppingList list, string userId)
+        public Task<bool> IsOfUserAsync(ShoppingList list, string userId)
         {
             throw new NotImplementedException();
         }

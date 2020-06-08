@@ -55,7 +55,7 @@ namespace Shopping.Server.Controllers
             try
             {
                 list = await _lists.GetAsync(id);
-                if (!(await _lists.IsOfUser(list, user.Id)))
+                if (!(await _lists.IsOfUserAsync(list, user.Id)))
                 {
                     return Unauthorized();
                 }
@@ -101,7 +101,7 @@ namespace Shopping.Server.Controllers
             {
                 return NotFound(e.Message);
             }
-            if (!(await _lists.IsOfUser(list, user.Id)))
+            if (!(await _lists.IsOfUserAsync(list, user.Id)))
             {
                 return Unauthorized();
             }
@@ -131,7 +131,7 @@ namespace Shopping.Server.Controllers
                 var user = await _users.GetUserAsync();
 
                 bool isAdmin = await _users.IsUserAdminAsync();
-                bool isOwner = await _lists.IsOfUser(list, user.Id);
+                bool isOwner = await _lists.IsOfUserAsync(list, user.Id);
 
                 if (isAdmin || isOwner)
                 {

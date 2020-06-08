@@ -14,15 +14,22 @@ namespace Shopping.Server.Services.Implementations
 {
     public class UserGroupRepository : CRUDDbContextBaseImpl<UserGroup>, IUserGroups
     {
+        private readonly IUserGroupShoppingLists _userGroupShoppingLists;
         public UserGroupRepository(ShoppingDbContext context,
-            ILogger<UserGroup> logger)
+            ILogger<UserGroup> logger, IUserGroupShoppingLists userGroupShoppingLists)
             : base(context, logger)
         {
+            _userGroupShoppingLists = userGroupShoppingLists;
         }
 
         public override async Task<List<UserGroup>> GetAllAsync()
         {
-            return await _context.UserGroups.ToListAsync();
+            var groups = await _context.UserGroups.ToListAsync();
+            foreach (var group in groups)
+            {
+                group.ShoppingLists = await _userGroupShoppingLists.GetShoppingListsOfUserGroupAsync(group.Id);
+            }
+            return groups;
         }
 
         public override async Task<UserGroup> GetAsync(string id)
@@ -32,14 +39,14 @@ namespace Shopping.Server.Services.Implementations
             {
                 throw new ItemNotFoundException(typeof(UserGroup), id);
             }
+            userGroup.ShoppingLists = await _userGroupShoppingLists.GetShoppingListsOfUserGroupAsync(userGroup.Id);
+
             return userGroup;
         }
 
         public async Task<List<UserGroup>> GetAllOfUserAsync(string userId)
         {
-            return (await GetAllAsync())
-                .Where(i => i.OwnerId == userId || i.Members.Select(i => i.UserId).Contains(userId))
-                .ToList();
+            return (await GetAllAsync()).Where(i => UserIsInGroup(i, userId)).ToList();
         }
 
         public override bool ItemAlreadyExists(UserGroup item)
@@ -57,6 +64,10 @@ namespace Shopping.Server.Services.Implementations
         {
             var group = await GetAsync(userGroupId);
 
+            return UserIsInGroup(group, userId);
+        }
+        private bool UserIsInGroup(UserGroup group, string userId)
+        {
             bool isOwner = group.OwnerId == userId;
             bool isMember = group.Members.Select(x => x.UserId).Contains(userId);
 

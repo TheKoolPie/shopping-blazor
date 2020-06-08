@@ -34,6 +34,7 @@ namespace Shopping.Server.Services.Implementations
             var lists = await _context.ShoppingLists.ToListAsync();
             foreach (var list in lists)
             {
+                list.UserGroups = await _userGroupShoppingLists.GetUserGroupsOfShoppingListAsync(list.Id);
                 foreach (var item in list.Items)
                 {
                     item.ProductItem = await _products.GetAsync(item.ProductItemId);
@@ -47,8 +48,9 @@ namespace Shopping.Server.Services.Implementations
             var list = await _context.ShoppingLists.FirstOrDefaultAsync(i => i.Id == id);
             if (list == null)
             {
-                throw new ItemNotFoundException();
+                throw new ItemNotFoundException(typeof(ShoppingList),id);
             }
+            list.UserGroups = await _userGroupShoppingLists.GetUserGroupsOfShoppingListAsync(id);
             foreach (var item in list.Items)
             {
                 item.ProductItem = await _products.GetAsync(item.ProductItemId);
@@ -142,7 +144,7 @@ namespace Shopping.Server.Services.Implementations
             {
                 var list = allLists[i];
 
-                if (!(await IsOfUser(allLists[i], userId)))
+                if (!(await IsOfUserAsync(allLists[i], userId)))
                 {
                     allLists.Remove(list);
                 }
@@ -150,7 +152,7 @@ namespace Shopping.Server.Services.Implementations
             return allLists;
         }
 
-        public async Task<bool> IsOfUser(ShoppingList list, string userId)
+        public async Task<bool> IsOfUserAsync(ShoppingList list, string userId)
         {
             bool isListOwner = list.OwnerId == userId;
             if (isListOwner) { return true; }

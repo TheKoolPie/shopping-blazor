@@ -83,6 +83,7 @@ namespace Shopping.Server
             services.AddTransient<IProductCategories, ProductCategoryRepository>();
             services.AddTransient<IProducts, ProductRepository>();
             services.AddTransient<IShoppingLists, ShoppingListRepository>();
+            services.AddTransient<IUserGroupShoppingLists, UserGroupShoppingListRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
