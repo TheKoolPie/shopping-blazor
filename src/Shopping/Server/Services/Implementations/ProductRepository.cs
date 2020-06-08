@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Shopping.Server.Data;
 using Shopping.Shared.Data;
+using Shopping.Shared.Exceptions;
 using Shopping.Shared.Services;
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,10 @@ namespace Shopping.Server.Services.Implementations
         public override async Task<ProductItem> GetAsync(string id)
         {
             var product = await _context.Products.FirstOrDefaultAsync(i => i.Id == id);
+            if (product == null)
+            {
+                throw new ItemNotFoundException();
+            }
             product.Category = await _categories.GetAsync(product.CategoryId);
             return product;
         }

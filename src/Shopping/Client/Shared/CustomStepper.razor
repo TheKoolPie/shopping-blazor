@@ -1,0 +1,84 @@
+﻿
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <button type="button" class="btn btn-primary" @onclick="DecreaseValue">
+            <span class="oi oi-minus"></span>
+        </button>
+    </div>
+    <input id="@_id" type="search" class="form-control text-center" value="@(_value.ToString("F2"))"
+           @onchange="OnValueChanged" />
+    <div class="input-group-append">
+        <button type="button" class="btn btn-primary" @onclick="IncreaseValue">
+            <span class="oi oi-plus"></span>
+        </button>
+    </div>
+</div>
+
+@code {
+
+    private float _value;
+    private float _increment = 1.0f;
+    private string _id = Guid.NewGuid().ToString();
+
+    [Parameter]
+    public float StepperValue { get; set; }
+    [Parameter]
+    public EventCallback<float> StepperValueChanged { get; set; }
+    [Parameter]
+    public float Increment { get; set; }
+    [Parameter]
+    public float Minimum { get; set; }
+    [Parameter]
+    public float Maximum { get; set; }
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string,object> InputAttributes { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _value = StepperValue;
+        _increment = Increment;
+        if (InputAttributes.ContainsKey("id"))
+        {
+            _id = InputAttributes["id"].ToString();
+        }
+    }
+
+    private void IncreaseValue()
+    {
+        var tmp = _value + _increment;
+        if (tmp < Maximum)
+        {
+            _value = _value + _increment;
+            StepperValue = _value;
+            StepperValueChanged.InvokeAsync(StepperValue);
+        }
+    }
+    private void DecreaseValue()
+    {
+        var tmp = _value - _increment;
+        if (tmp > Minimum)
+        {
+            _value = _value - _increment;
+            StepperValue = _value;
+            StepperValueChanged.InvokeAsync(StepperValue);
+        }
+    }
+    private Task OnValueChanged(ChangeEventArgs e)
+    {
+        var stringValue = e.Value.ToString();
+        if (string.IsNullOrEmpty(stringValue))
+        {
+            stringValue = "0";
+        }
+        var success = float.TryParse(stringValue, out float result);
+        if (success)
+        {
+            StepperValue = _value = result;
+            return StepperValueChanged.InvokeAsync(StepperValue);
+        }
+        return Task.FromResult(false);
+    }
+}

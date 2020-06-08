@@ -10,6 +10,7 @@ using Shopping.Client.Services.Interfaces;
 using Shopping.Client.Services.Implementations;
 using Shopping.Shared.Services;
 using Shopping.Shared.Model.Account;
+using Shopping.Shared.Services.Interfaces;
 
 namespace Shopping.Client
 {
@@ -41,6 +42,7 @@ namespace Shopping.Client
 
             builder.Services.AddTransient<IProductCategories, ProductCategoryApiAccess>();
             builder.Services.AddTransient<IProducts, ProductsApiAccess>();
+            builder.Services.AddTransient<IShoppingLists, ShoppingListsApiAccess>();
 
             await builder.Build().RunAsync();
         }

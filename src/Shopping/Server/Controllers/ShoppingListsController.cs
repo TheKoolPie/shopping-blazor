@@ -8,6 +8,7 @@ using Shopping.Server.Services;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
+using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 
 namespace Shopping.Server.Controllers
@@ -21,7 +22,8 @@ namespace Shopping.Server.Controllers
         private readonly IUserProvider _users;
         private readonly ILogger<ShoppingListsController> _logger;
 
-        public ShoppingListsController(IShoppingLists lists, IUserProvider users, ILogger<ShoppingListsController> logger)
+        public ShoppingListsController(IShoppingLists lists, IUserProvider users,
+            ILogger<ShoppingListsController> logger)
         {
             _lists = lists;
             _users = users;
@@ -67,14 +69,10 @@ namespace Shopping.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ShoppingList>> PostList(ShoppingList shoppingList)
+        public async Task<ActionResult<ShoppingList>> CreateList(ShoppingList shoppingList)
         {
             var user = await _users.GetUserAsync();
-            if (user.Id != shoppingList.OwnerId)
-            {
-                return Unauthorized();
-            }
-
+            shoppingList.OwnerId = user.Id;
             ShoppingList item;
             try
             {
@@ -91,16 +89,35 @@ namespace Shopping.Server.Controllers
             return Ok(item);
         }
         [HttpPost("AddItem/{id}")]
-        public async Task<ActionResult<ShoppingList>> AddItemToList(string id, [FromBody] ShoppingListItem item)
+        public async Task<ActionResult<ShoppingListItem>> AddItemToList(string id, [FromBody] ShoppingListItem item)
         {
             var user = await _users.GetUserAsync();
-            var list = await _lists.GetAsync(id);
+            ShoppingList list = null;
+            try
+            {
+                list = await _lists.GetAsync(id);
+            }
+            catch (ItemNotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
             if (!(await _lists.CheckIfListIsFromUser(list, user.Id)))
             {
                 return Unauthorized();
             }
-
-            var createdItem = await _lists.AddOrUpdateItemAsync(list.Id, item);
+            ShoppingListItem createdItem = null;
+            try
+            {
+                createdItem = await _lists.AddOrUpdateItemAsync(list.Id, item);
+            }
+            catch (ItemNotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (PersistencyException e)
+            {
+                return Conflict(e.Message);
+            }
 
             return Ok(createdItem);
         }
@@ -119,7 +136,7 @@ namespace Shopping.Server.Controllers
             return Ok(addedGroup);
         }
 
-        [HttpGet("{id}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> DeleteList(string id)
         {
             try

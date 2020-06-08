@@ -1,25 +1,35 @@
-﻿.product-card {
-    margin: 10px;
-}
-
-    .product-card.done {
-        background-color: #99e699;
-    }
-
-.product-search-content {
+﻿
+.input-search-content {
     background-color: #f6f6f6;
     min-width: 230px;
     border: 1px solid #ddd;
     z-index: 1;
 }
 
-    .product-search-content a {
+    .input-search-content a {
         color: black;
         padding: 12px 16px;
         text-decoration: none;
         display: block;
     }
 
-        .product-search-content a:hover {
+        .input-search-content a:hover {
             background-color: #f1f1f1;
         }
+
+.btn-primary {
+    color: #fff;
+    background-color: rgb(5, 39, 103);
+    border-color: rgb(5, 39, 103);
+}
+
+.list-group-item.active {
+    z-index: 2;
+    color: #fff;
+    background-color: rgb(5, 39, 103);
+    border-color: rgb(5, 39, 103);
+}
+
+.table-check-status {
+    color: forestgreen;
+}

@@ -9,15 +9,16 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
 {
     public class CRUDAccessBaseImpl<T> : ICRUDAccess<T> where T : BaseItem
     {
-        private readonly HttpClient _client;
-        private readonly ILogger _logger;
-        private readonly ITokenProvider _tokenProvider;
+        protected readonly HttpClient _client;
+        protected readonly ILogger _logger;
+        protected readonly ITokenProvider _tokenProvider;
 
         public CRUDAccessBaseImpl(HttpClient httpClient,
             ITokenProvider tokenProvider,
@@ -34,7 +35,7 @@ namespace Shopping.Client.Services.Implementations
         {
             T retVal = null;
 
-            var client = await GetHttpClient();
+            var client = await GetHttpClientAsync();
 
             var response = await client.PostAsJsonAsync<T>(BaseAddress, item);
             if (response.IsSuccessStatusCode)
@@ -55,7 +56,7 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<bool> DeleteByIdAsync(string id)
         {
-            var client = await GetHttpClient();
+            var client = await GetHttpClientAsync();
 
             var response = await client.DeleteAsync($"{BaseAddress}/{id}");
             if (!response.IsSuccessStatusCode)
@@ -68,22 +69,33 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<List<T>> GetAllAsync()
         {
-            var client = await GetHttpClient();
+            var client = await GetHttpClientAsync();
+            List<T> items = null;
 
-            return await client.GetFromJsonAsync<List<T>>(BaseAddress);
+            var response = await client.GetAsync(BaseAddress);
+            if (response.IsSuccessStatusCode)
+            {
+                items = await response.Content.ReadFromJsonAsync<List<T>>();
+            }
+            return items;
         }
 
         public async Task<T> GetAsync(string id)
         {
-            var client = await GetHttpClient();
-
-            return await client.GetFromJsonAsync<T>($"{BaseAddress}/{id}");
+            var client = await GetHttpClientAsync();
+            T item = null;
+            var response = await client.GetAsync($"{BaseAddress}/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                item = await response.Content.ReadFromJsonAsync<T>();
+            }
+            return item;
         }
 
         public async Task<T> UpdateAsync(string id, T item)
         {
             T retVal = null;
-            var client = await GetHttpClient();
+            var client = await GetHttpClientAsync();
 
             var response = await client.PutAsJsonAsync<T>($"{BaseAddress}/{id}", item);
             if (response.IsSuccessStatusCode)
@@ -97,7 +109,7 @@ namespace Shopping.Client.Services.Implementations
             return retVal;
         }
 
-        private async Task<HttpClient> GetHttpClient()
+        protected async Task<HttpClient> GetHttpClientAsync()
         {
             if (_client.DefaultRequestHeaders.Authorization == null)
             {

@@ -1,5 +1,91 @@
-﻿<h3>Create</h3>
+﻿@page "/lists/create"
+@inject IShoppingLists ShoppingListRepo
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+<h3>Create List</h3>
+<p>
+    Create new shopping list.<br />
+</p>
+<hr />
+<div class="row">
+    <div class="col">
+        @if (IsSaving)
+        {
+            <strong>Save data....</strong>
+        }
+        else
+        {
+            <EditForm EditContext="editContext" OnSubmit="HandleSubmit">
+                <ValidationSummary />
+                <DataAnnotationsValidator />
+                <div class="form-group">
+                    <label for="dateInput">Date</label>
+                    <InputDate @bind-Value="list.ListDate" id="dateInput" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="nameInput">Name</label>
+                    <InputText @bind-Value="list.Name" id="nameInput" class="form-control" />
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </EditForm>
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <AlertComponent Model="@AlertData" />
+    </div>
+</div>
+<hr />
+@if (createdItem != null)
+{
+    <div class="row">
+        <div class="col">
+            <p>Created new shopping list. Go to newly created list to fill with content or create additional lists.</p>
+            <button class="btn btn-lg btn-primary" @onclick="NavigateToLastCreatedList">Got to created List</button>
+        </div>
+    </div>
+}
+
 
 @code {
+    private bool IsSaving = false;
+    private AlertComponentModel AlertData;
+    private ShoppingList list = new ShoppingList() { ListDate = DateTime.Now };
+    private EditContext editContext;
 
+    private ShoppingList createdItem;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(list);
+    }
+
+    private async Task HandleSubmit()
+    {
+        AlertData = null;
+        createdItem = null;
+
+        if (editContext.Validate())
+        {
+            IsSaving = true;
+            createdItem = await ShoppingListRepo.CreateAsync(list);
+            if (createdItem == null)
+            {
+                AlertData = AlertComponentModel.CreateErrorAlert("Could not create list", $"This could be because you already have a list called '{list.Name}'");
+            }
+            else
+            {
+                AlertData = AlertComponentModel.CreateSuccessAlert("Created list", "");
+                list = new ShoppingList() { ListDate = DateTime.Now };
+            }
+            IsSaving = false;
+        }
+
+    }
+    private void NavigateToLastCreatedList()
+    {
+        NavigationManager.NavigateTo($"/lists/details/{createdItem.Id}");
+    }
 }

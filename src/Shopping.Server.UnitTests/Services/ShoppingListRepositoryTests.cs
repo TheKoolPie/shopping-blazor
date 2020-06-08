@@ -6,6 +6,7 @@ using Shopping.Server.Services.Implementations;
 using Shopping.Server.UnitTests.Mocks;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
+using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -17,13 +18,23 @@ namespace Shopping.Server.UnitTests.Services
 {
     public class ShoppingListRepositoryTests
     {
+        private IProducts GetMockProductRepoForGetAsync()
+        {
+            var productRepoMock = new Mock<IProducts>();
+            productRepoMock.Setup(p => p.GetAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult(new ProductItem()
+                {
+                    Name = "Test"
+                }));
+            return productRepoMock.Object;
+        }
 
         [Fact]
         public async Task GetAsync_IdNotExisting_ThrowsItemNotFoundException()
         {
             using (var context = DBContextMocks.GetMock())
             {
-                var repo = new ShoppingListRepository(context, null, null);
+                var repo = new ShoppingListRepository(context, null, null, null);
                 await Assert.ThrowsAsync<ItemNotFoundException>(async () =>
                    await repo.GetAsync(DateTime.Now.ToString("ddMMyyyyHHmm")));
             }
@@ -33,7 +44,7 @@ namespace Shopping.Server.UnitTests.Services
         {
             using (var context = DBContextMocks.GetMock())
             {
-                var repo = new ShoppingListRepository(context, null, null);
+                var repo = new ShoppingListRepository(context, null, null, GetMockProductRepoForGetAsync());
 
                 var item = await repo.GetAsync(DataMocks.GetShoppingLists()[0].Id);
 
@@ -47,7 +58,7 @@ namespace Shopping.Server.UnitTests.Services
             using (var context = DBContextMocks.GetMock())
             {
                 var userRepo = GetUserRepoMock(DataMocks.CreatorId);
-                var listRepo = new ShoppingListRepository(context, null, userRepo);
+                var listRepo = new ShoppingListRepository(context, null, userRepo, GetMockProductRepoForGetAsync());
 
                 var lists = await listRepo.GetAllOfUserAsync(DataMocks.CreatorId);
 
@@ -72,7 +83,7 @@ namespace Shopping.Server.UnitTests.Services
         {
             using (var context = DBContextMocks.GetMock())
             {
-                var listRepo = new ShoppingListRepository(context, null, null);
+                var listRepo = new ShoppingListRepository(context, null, null, null);
                 var list = await context.ShoppingLists.FirstOrDefaultAsync();
                 int itemCountBefore = list.Items.Count;
                 list.AddOrUpdateItem(new ShoppingListItem()
@@ -90,7 +101,7 @@ namespace Shopping.Server.UnitTests.Services
         {
             using (var context = DBContextMocks.GetMock())
             {
-                var listRepo = new ShoppingListRepository(context, null, null);
+                var listRepo = new ShoppingListRepository(context, null, null, GetMockProductRepoForGetAsync());
                 var list = await context.ShoppingLists.FirstOrDefaultAsync();
 
                 var listCount = list.Items.Count;
