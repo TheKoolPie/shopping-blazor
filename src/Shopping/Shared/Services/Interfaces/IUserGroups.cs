@@ -1,4 +1,6 @@
 ﻿using Shopping.Shared.Data;
+using Shopping.Shared.Model.Account;
+using Shopping.Shared.Model.Results;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,5 +12,6 @@ namespace Shopping.Shared.Services.Interfaces
     {
         Task<List<UserGroup>> GetAllOfUserAsync(string userId);
         Task<bool> UserIsInGroupAsync(string userGroupId, string userId);
+        Task<UserGroup> AddUserToGroup(string userGroupId, ShoppingUserModel user);
     }
 }

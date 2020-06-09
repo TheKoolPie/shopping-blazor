@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Shopping.Server.Data;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
+using Shopping.Shared.Model.Account;
+using Shopping.Shared.Model.Results;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,10 +17,12 @@ namespace Shopping.Server.Services.Implementations
     public class UserGroupRepository : CRUDDbContextBaseImpl<UserGroup>, IUserGroups
     {
         private readonly IUserGroupShoppingLists _userGroupShoppingLists;
-        public UserGroupRepository(ShoppingDbContext context,
-            ILogger<UserGroup> logger, IUserGroupShoppingLists userGroupShoppingLists)
+        private readonly IUserRepository _userRepository;
+        public UserGroupRepository(ShoppingDbContext context, IUserRepository userRepository,
+            ILogger<UserGroupRepository> logger, IUserGroupShoppingLists userGroupShoppingLists)
             : base(context, logger)
         {
+            _userRepository = userRepository;
             _userGroupShoppingLists = userGroupShoppingLists;
         }
 
@@ -73,6 +77,40 @@ namespace Shopping.Server.Services.Implementations
             bool isMember = group.Members.Select(x => x.UserId).Contains(userId);
 
             return isOwner || isMember;
+        }
+
+        public async Task<UserGroup> AddUserToGroup(string userGroupId, ShoppingUserModel user)
+        {
+            var group = await GetAsync(userGroupId);
+
+            var existingUser = await _userRepository.GetUserAsync(user);
+            if (existingUser == null)
+            {
+                throw new ItemNotFoundException($"No user with provided user data found");
+            }
+
+            if (group.Members.Any(m => m.UserId == existingUser.Id))
+            {
+                throw new ItemAlreadyExistsException($"User with id {existingUser.Id} already exists in group: '{group.Name}'");
+            }
+
+            group.Members.Add(new UserGroupMember()
+            {
+                Id = existingUser.Id
+            });
+
+            _context.UserGroups.Update(group);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception e)
+            {
+                throw new PersistencyException($"Could save adding of user {existingUser.Id} to group '{group.Name}'", e);
+            }
+
+            return group;
         }
     }
 }
