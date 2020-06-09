@@ -1,0 +1,49 @@
+﻿@page "/groups/details/{id}"
+
+@attribute [Authorize]
+
+@inject IUserGroups UserGroups
+
+@if (IsLoading)
+{
+    <div class="row">
+        <div class="col"><strong>Loading...</strong></div>
+    </div>
+}
+else
+{
+    <h3>Details of @userGroup.Name</h3>
+    <hr />
+    <div class="row">
+        <div class="col">
+
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private bool IsLoading;
+    private bool IsSaving;
+
+    private ShoppingUserModel userModel = new ShoppingUserModel();
+    private UserGroup userGroup = null;
+    private EditContext userAddContext;
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        userAddContext = new EditContext(userModel);
+        userGroup = await UserGroups.GetAsync(Id);
+
+        IsLoading = false;
+    }
+
+    private void HandleAddUser()
+    {
+
+    }
+}
