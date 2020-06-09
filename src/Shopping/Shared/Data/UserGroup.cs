@@ -9,6 +9,7 @@ namespace Shopping.Shared.Data
 {
     public class UserGroup : BaseItem
     {
+        [Required(ErrorMessage = "User group name is needed")]
         public string Name { get; set; }
         public string OwnerId { get; set; }
 

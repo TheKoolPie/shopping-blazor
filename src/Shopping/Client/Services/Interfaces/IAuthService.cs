@@ -1,4 +1,5 @@
 ﻿using Shopping.Shared.Model.Account;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Interfaces
@@ -8,5 +9,6 @@ namespace Shopping.Client.Services.Interfaces
         Task<LoginResult> Login(LoginModel model);
         Task Logout();
         Task<RegisterResult> Register(RegisterModel model);
+        Task<HttpClient> GetHttpClientAsync();
     }
 }

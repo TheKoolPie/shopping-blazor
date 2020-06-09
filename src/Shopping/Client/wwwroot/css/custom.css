@@ -33,3 +33,7 @@
 .table-check-status {
     color: forestgreen;
 }
+
+.card {
+    margin: 6px;
+}

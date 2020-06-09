@@ -37,7 +37,7 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<RegisterResult> Register(RegisterModel model)
         {
-            var client = await GetHttpClient();
+            var client = await GetHttpClientAsync();
             var response = await client.PostAsJsonAsync("api/accounts/register", model);
             var result = JsonSerializer.Deserialize<RegisterResult>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -68,7 +68,7 @@ namespace Shopping.Client.Services.Implementations
             _httpClient.DefaultRequestHeaders.Authorization = null;
         }
 
-        protected async Task<HttpClient> GetHttpClient()
+        public async Task<HttpClient> GetHttpClientAsync()
         {
             if (_httpClient.DefaultRequestHeaders.Authorization == null)
             {

@@ -1,9 +1,88 @@
 ﻿@page "/groups/create"
+@page "/groups/create/{ListId}"
 
 @attribute [Authorize]
+@inject IUserGroups UserGroups
+@inject IUserGroupShoppingLists UserGroupsShoppingLists
 
 <h3>Create User group</h3>
-
+<hr />
+@if (IsSaving)
+{
+    <div class="row">
+        <div class="col">
+            <strong>Saving data...</strong>
+        </div>
+    </div>
+}
+else
+{
+<div class="row">
+    <div class="col">
+        <EditForm EditContext="createGroupContext" OnSubmit="HandleSubmit">
+            <ValidationSummary />
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label for="nameInput">Name</label>
+                <InputText @bind-Value="userGroup.Name" id="nameInput" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <AlertComponent Model="@AlertData" />
+    </div>
+</div>
+}
 @code {
+    [Parameter]
+    public string ListId { get; set; }
 
+    private bool IsSaving = false;
+    private AlertComponentModel AlertData;
+
+    private UserGroup userGroup = new UserGroup();
+    private EditContext createGroupContext;
+
+    protected override void OnInitialized()
+    {
+        createGroupContext = new EditContext(userGroup);
+    }
+
+    private async void HandleSubmit()
+    {
+        AlertData = null;
+
+        if (createGroupContext.Validate())
+        {
+            IsSaving = true;
+
+            var createdGroup = await UserGroups.CreateAsync(userGroup);
+            if (createdGroup == null)
+            {
+                AlertData = AlertComponentModel.CreateErrorAlert("Could not create user group", $"Group with name {userGroup.Name} already exists");
+            }
+            else
+            {
+                AlertData = AlertComponentModel.CreateSuccessAlert("Created user group", "");
+                userGroup = new UserGroup();
+                if (!string.IsNullOrEmpty(ListId))
+                {
+                    var result = await UserGroupsShoppingLists.CreateAssignmentAsync(new UserGroupShoppingList()
+                    {
+                        UserGroupId = createdGroup.Id,
+                        ShoppingListId = ListId
+                    });
+                    if (result)
+                    {
+                        AlertData = AlertComponentModel.CreateSuccessAlert("Created user group",
+                            $"Created user group {createdGroup.Name} and assign to list {ListId}");
+                    }
+                }
+            }
+            IsSaving = false;
+        }
+    }
 }

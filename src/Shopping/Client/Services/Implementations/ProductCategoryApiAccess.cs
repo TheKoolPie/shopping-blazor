@@ -8,9 +8,7 @@ namespace Shopping.Client.Services.Implementations
 {
     public class ProductCategoryApiAccess : CRUDApiAccessBaseImpl<ProductCategory>, IProductCategories
     {
-        public ProductCategoryApiAccess(HttpClient httpClient,
-            ITokenProvider tokenProvider,
-            ILogger<ProductCategoryApiAccess> logger) : base(httpClient,tokenProvider, logger)
+        public ProductCategoryApiAccess(IAuthService authService, ILogger<ProductCategoryApiAccess> logger) : base(authService, logger)
         {
             BaseAddress = "api/ProductCategory";
         }

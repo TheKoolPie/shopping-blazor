@@ -14,14 +14,14 @@ namespace Shopping.Client.Services.Implementations
 {
     public class ShoppingListsApiAccess : CRUDApiAccessBaseImpl<ShoppingList>, IShoppingLists
     {
-        public ShoppingListsApiAccess(HttpClient httpClient, ITokenProvider tokenProvider, ILogger<ShoppingListsApiAccess> logger) : base(httpClient, tokenProvider, logger)
+        public ShoppingListsApiAccess(IAuthService authService, ILogger<ShoppingListsApiAccess> logger) : base(authService, logger)
         {
             BaseAddress = "api/ShoppingLists";
         }
 
         public async Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item)
         {
-            var client = await GetHttpClientAsync();
+            var client = await _authService.GetHttpClientAsync();
             ShoppingListItem createdItem = null;
             var response = await client.PostAsJsonAsync<ShoppingListItem>($"{BaseAddress}/AddItem/{listId}", item);
             if (response.IsSuccessStatusCode)

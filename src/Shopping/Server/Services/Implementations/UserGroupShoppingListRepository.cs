@@ -116,7 +116,8 @@ namespace Shopping.Server.Services.Implementations
 
         private bool ItemExists(string userGroupId, string shoppingListId)
         {
-            return _context.UserGroupShoppingLists.Any(s => s.UserGroupId == userGroupId && s.ShoppingListId == shoppingListId);
+            var assignments = _context.UserGroupShoppingLists.ToList();
+            return assignments.Any(s => s.UserGroupId == userGroupId && s.ShoppingListId == shoppingListId);
         }
 
         private async Task<ShoppingList> GetShoppingListAsync(string id)

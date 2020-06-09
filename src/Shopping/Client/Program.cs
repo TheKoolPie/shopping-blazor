@@ -43,6 +43,8 @@ namespace Shopping.Client
             builder.Services.AddTransient<IProductCategories, ProductCategoryApiAccess>();
             builder.Services.AddTransient<IProducts, ProductsApiAccess>();
             builder.Services.AddTransient<IShoppingLists, ShoppingListsApiAccess>();
+            builder.Services.AddTransient<IUserGroups, UserGroupsApiAccess>();
+            builder.Services.AddTransient<IUserGroupShoppingLists, UserGroupsShoppingListsApiAccess>();
 
             await builder.Build().RunAsync();
         }

@@ -51,7 +51,8 @@ namespace Shopping.Server.Services.Implementations
 
         public override bool ItemAlreadyExists(UserGroup item)
         {
-            return _context.UserGroups.Any(i => i.Id == item.Id || i.Name == item.Name);
+            var userGroups = _context.UserGroups.ToList();
+            return userGroups.Any(i => i.Id == item.Id || i.Name == item.Name);
         }
         public override void UpdateExistingItem(UserGroup existing, UserGroup update)
         {

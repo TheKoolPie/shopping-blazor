@@ -16,17 +16,13 @@ namespace Shopping.Client.Services.Implementations
 {
     public class CRUDApiAccessBaseImpl<T> : ICRUDAccess<T> where T : BaseItem
     {
-        protected readonly HttpClient _client;
         protected readonly ILogger _logger;
-        protected readonly ITokenProvider _tokenProvider;
+        protected readonly IAuthService _authService;
 
-        public CRUDApiAccessBaseImpl(HttpClient httpClient,
-            ITokenProvider tokenProvider,
-            ILogger logger)
+        public CRUDApiAccessBaseImpl(IAuthService authService, ILogger logger)
         {
-            _client = httpClient;
+            _authService = authService;
             _logger = logger;
-            _tokenProvider = tokenProvider;
         }
 
         public string BaseAddress { get; protected set; }
@@ -35,7 +31,7 @@ namespace Shopping.Client.Services.Implementations
         {
             T retVal = null;
 
-            var client = await GetHttpClientAsync();
+            var client = await _authService.GetHttpClientAsync();
 
             var response = await client.PostAsJsonAsync<T>(BaseAddress, item);
             if (response.IsSuccessStatusCode)
@@ -56,7 +52,7 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<bool> DeleteByIdAsync(string id)
         {
-            var client = await GetHttpClientAsync();
+            var client = await _authService.GetHttpClientAsync();
 
             var response = await client.DeleteAsync($"{BaseAddress}/{id}");
             if (!response.IsSuccessStatusCode)
@@ -69,7 +65,7 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<List<T>> GetAllAsync()
         {
-            var client = await GetHttpClientAsync();
+            var client = await _authService.GetHttpClientAsync();
             List<T> items = null;
 
             var response = await client.GetAsync(BaseAddress);
@@ -82,7 +78,7 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<T> GetAsync(string id)
         {
-            var client = await GetHttpClientAsync();
+            var client = await _authService.GetHttpClientAsync();
             T item = null;
             var response = await client.GetAsync($"{BaseAddress}/{id}");
             if (response.IsSuccessStatusCode)
@@ -95,7 +91,7 @@ namespace Shopping.Client.Services.Implementations
         public async Task<T> UpdateAsync(string id, T item)
         {
             T retVal = null;
-            var client = await GetHttpClientAsync();
+            var client = await _authService.GetHttpClientAsync();
 
             var response = await client.PutAsJsonAsync<T>($"{BaseAddress}/{id}", item);
             if (response.IsSuccessStatusCode)
@@ -107,20 +103,6 @@ namespace Shopping.Client.Services.Implementations
                 _logger.LogError(response.ReasonPhrase);
             }
             return retVal;
-        }
-
-        protected async Task<HttpClient> GetHttpClientAsync()
-        {
-            if (_client.DefaultRequestHeaders.Authorization == null)
-            {
-                var token = await _tokenProvider.GetTokenAsync();
-                if (string.IsNullOrEmpty(token))
-                {
-                    _logger.LogError($"Could not find access token");
-                }
-                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
-            }
-            return _client;
         }
     }
 }

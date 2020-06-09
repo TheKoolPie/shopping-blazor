@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shopping.Server.Services;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
+using Shopping.Shared.Model.Account;
 using Shopping.Shared.Services.Interfaces;
 
 namespace Shopping.Server.Controllers
