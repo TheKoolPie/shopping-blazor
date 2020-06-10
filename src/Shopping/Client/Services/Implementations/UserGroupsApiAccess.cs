@@ -37,7 +37,7 @@ namespace Shopping.Client.Services.Implementations
                 }
                 else
                 {
-                    return result.UserGroups.FirstOrDefault();
+                    return result.ResultData.FirstOrDefault();
                 }
             }
             return null;
@@ -46,6 +46,26 @@ namespace Shopping.Client.Services.Implementations
         public Task<List<UserGroup>> GetAllOfUserAsync(string userId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<List<ShoppingUserModel>> GetUsersInGroup(string userGroupId)
+        {
+            var client = await _authService.GetHttpClientAsync();
+            var response = await client.GetAsync($"{BaseAddress}/GetUsersInGroup/{userGroupId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ShoppingUserResult>();
+                if (!result.IsSuccessful)
+                {
+                    throw new Exception(result.Message);
+                }
+                else
+                {
+                    return result.ResultData;
+                }
+            }
+            return null;
         }
 
         public Task<bool> UserIsInGroupAsync(string userGroupId, string userId)

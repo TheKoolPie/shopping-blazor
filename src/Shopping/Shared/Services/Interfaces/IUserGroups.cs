@@ -13,5 +13,6 @@ namespace Shopping.Shared.Services.Interfaces
         Task<List<UserGroup>> GetAllOfUserAsync(string userId);
         Task<bool> UserIsInGroupAsync(string userGroupId, string userId);
         Task<UserGroup> AddUserToGroup(string userGroupId, ShoppingUserModel user);
+        Task<List<ShoppingUserModel>> GetUsersInGroup(string userGroupId);
     }
 }

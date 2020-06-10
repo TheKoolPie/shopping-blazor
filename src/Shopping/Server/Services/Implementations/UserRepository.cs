@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Shopping.Server.Models;
+using Shopping.Shared.Data;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Services.Interfaces;
 using System;
@@ -98,7 +99,6 @@ namespace Shopping.Server.Services.Implementations
             }
             return userModel;
         }
-
         private async Task<ShoppingUser> GetDbUserFromModelData(ShoppingUserModel userModel)
         {
             ShoppingUser dbUser = null;

@@ -60,9 +60,9 @@ namespace Shopping.Server.Services.Implementations
         }
         public override void UpdateExistingItem(UserGroup existing, UserGroup update)
         {
-            existing.OwnerId = update.OwnerId;
+            existing.Owner = update.Owner;
             existing.Name = update.Name;
-            existing.Members = new List<UserGroupMember>(update.Members);
+            existing.Members = new List<ShoppingUserModel>(update.Members);
         }
 
         public async Task<bool> UserIsInGroupAsync(string userGroupId, string userId)
@@ -73,8 +73,8 @@ namespace Shopping.Server.Services.Implementations
         }
         private bool UserIsInGroup(UserGroup group, string userId)
         {
-            bool isOwner = group.OwnerId == userId;
-            bool isMember = group.Members.Select(x => x.UserId).Contains(userId);
+            bool isOwner = group.Owner.Id == userId;
+            bool isMember = group.Members.Select(x => x.Id).Contains(userId);
 
             return isOwner || isMember;
         }
@@ -89,12 +89,12 @@ namespace Shopping.Server.Services.Implementations
                 throw new ItemNotFoundException($"No user with provided user data found");
             }
 
-            if (group.Members.Any(m => m.UserId == existingUser.Id))
+            if (group.Members.Any(m => m.Id == existingUser.Id))
             {
                 throw new ItemAlreadyExistsException($"User with id {existingUser.Id} already exists in group: '{group.Name}'");
             }
 
-            group.Members.Add(new UserGroupMember()
+            group.Members.Add(new ShoppingUserModel()
             {
                 Id = existingUser.Id
             });
@@ -105,12 +105,28 @@ namespace Shopping.Server.Services.Implementations
             {
                 await _context.SaveChangesAsync();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new PersistencyException($"Could save adding of user {existingUser.Id} to group '{group.Name}'", e);
             }
 
             return group;
+        }
+
+        public async Task<List<ShoppingUserModel>> GetUsersInGroup(string userGroupId)
+        {
+            var group = await GetAsync(userGroupId);
+            if (group == null)
+            {
+                throw new ItemNotFoundException(typeof(UserGroup), userGroupId);
+            }
+            List<ShoppingUserModel> users = new List<ShoppingUserModel>();
+            foreach (var member in group.Members)
+            {
+                var userData = await _userRepository.GetUserAsync(member);
+                users.Add(userData);
+            }
+            return users;
         }
     }
 }

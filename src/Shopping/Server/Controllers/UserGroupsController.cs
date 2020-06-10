@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shopping.Server.Models;
 using Shopping.Server.Services;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
@@ -62,12 +63,41 @@ namespace Shopping.Server.Controllers
             }
             return Ok(group);
         }
+        [HttpGet("GetUsersInGroup/{id}")]
+        public async Task<ActionResult<ShoppingUserResult>> GetUsersInGroup(string id)
+        {
+            ShoppingUserResult result = new ShoppingUserResult();
+            var user = await _userProvider.GetUserAsync();
+            try
+            {
+                bool isInGroup = await _userGroups.UserIsInGroupAsync(id, user.Id);
+                bool isAdmin = await _userProvider.IsUserAdminAsync();
+
+                if (!isAdmin && !isInGroup)
+                {
+                    return Unauthorized();
+                }
+
+                var usersInGroup = await _userGroups.GetUsersInGroup(id);
+                result.IsSuccessful = true;
+                result.ResultData = usersInGroup;
+            }
+            catch (ItemNotFoundException e)
+            {
+                result.IsSuccessful = false;
+                result.Message = e.Message;
+            }
+            return Ok(result);
+        }
 
         [HttpPost]
         public async Task<ActionResult<UserGroup>> CreateUserGroup(UserGroup group)
         {
             var user = await _userProvider.GetUserAsync();
-            group.OwnerId = user.Id;
+            group.Owner = new ShoppingUserModel()
+            {
+                Id = user.Id,
+            };
 
             UserGroup created = null;
             try
@@ -100,7 +130,7 @@ namespace Shopping.Server.Controllers
             {
                 var group = await _userGroups.AddUserToGroup(id, user);
                 result.IsSuccessful = true;
-                result.UserGroups.Add(group);
+                result.ResultData.Add(group);
             }
             catch (Exception e)
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shopping.Shared.Model.Account;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,22 +12,22 @@ namespace Shopping.Shared.Data
     {
         [Required(ErrorMessage = "User group name is needed")]
         public string Name { get; set; }
-        public string OwnerId { get; set; }
+        public ShoppingUserModel Owner { get; set; }
 
         [NotMapped]
         public List<ShoppingList> ShoppingLists { get; set; }
 
-        public List<UserGroupMember> Members { get; set; }
+        public List<ShoppingUserModel> Members { get; set; }
 
         public UserGroup() : base()
         {
             ShoppingLists = new List<ShoppingList>();
-            Members = new List<UserGroupMember>();
+            Members = new List<ShoppingUserModel>();
         }
         public UserGroup(UserGroup group) : base(group)
         {
-            this.OwnerId = group.OwnerId;
-            this.Members = new List<UserGroupMember>(group.Members ?? new List<UserGroupMember>());
+            this.Owner = group.Owner;
+            this.Members = new List<ShoppingUserModel>(group.Members ?? new List<ShoppingUserModel>());
         }
     }
 }

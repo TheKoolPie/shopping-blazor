@@ -1,11 +1,11 @@
-﻿using Shopping.Shared.Data;
+﻿using Shopping.Shared.Model.Account;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Shopping.Shared.Model.Results
 {
-    public class UserGroupResult : BaseResult<UserGroup>
+    public class ShoppingUserResult : BaseResult<ShoppingUserModel>
     {
     }
 }

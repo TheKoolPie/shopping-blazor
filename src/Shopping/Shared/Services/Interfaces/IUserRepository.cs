@@ -1,4 +1,5 @@
-﻿using Shopping.Shared.Model.Account;
+﻿using Shopping.Shared.Data;
+using Shopping.Shared.Model.Account;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -1,0 +1,76 @@
+﻿@page "/groups"
+
+@attribute [Authorize]
+@inject IUserGroups UserGroups
+@inject NavigationManager NavigationManager
+
+<h3>Overview of my groups</h3>
+<hr />
+<div class="row">
+    <div class="col">
+        <button class="btn btn-primary" type="button" @onclick="OnCreateClicked">
+            <span class="oi oi-plus" /> Create new
+        </button>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        @if (IsLoading)
+        {
+            <strong>Loading...</strong>
+        }
+        else
+        {
+            @if (_userGroups != null && _userGroups.Count > 0)
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Owner</th>
+                            <th>Member Count</th>
+                            <th>List Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var group in _userGroups)
+                        {
+                            <tr @onclick="@(()=>NavigateToGroupDetails(group.Id))">
+                                <th>@group.Name</th>
+                                <th>@(group.Owner.UserName ?? group.Owner.Id)</th>
+                                <th>@group.Members.Count</th>
+                                <th>@group.ShoppingLists.Count</th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <strong>No user groups found</strong>
+            }
+        }
+    </div>
+</div>
+
+
+@code {
+    private bool IsLoading;
+    private List<UserGroup> _userGroups;
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        _userGroups = await UserGroups.GetAllAsync();
+        IsLoading = false;
+    }
+
+    private void OnCreateClicked()
+    {
+        NavigationManager.NavigateTo("/groups/create");
+    }
+    private void NavigateToGroupDetails(string id)
+    {
+        NavigationManager.NavigateTo($"/groups/details/{id}");
+    }
+}

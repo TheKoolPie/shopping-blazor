@@ -30,6 +30,9 @@ namespace Shopping.Server.Data
             modelBuilder
                 .Entity<UserGroup>()
                 .OwnsMany(l => l.Members);
+            modelBuilder
+                .Entity<UserGroup>()
+                .OwnsOne(l => l.Owner);
 
             base.OnModelCreating(modelBuilder);
         }
