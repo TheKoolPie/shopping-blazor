@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Shopping.Server.Services;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Model.Results;
 using Shopping.Shared.Services.Interfaces;
@@ -29,6 +25,18 @@ namespace Shopping.Server.Controllers
             _currentUserProvider = currentUserProvider;
             _userGroupRepository = userGroupRepository;
             _logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<ShoppingUserResult>> GetCurrentUser()
+        {
+            var currentUser = await _currentUserProvider.GetUserAsync();
+            var result = new ShoppingUserResult()
+            {
+                IsSuccessful = true,
+                ResultData = new List<ShoppingUserModel>() { currentUser }
+            };
+            return Ok(result);
         }
 
         [HttpGet("{id}")]

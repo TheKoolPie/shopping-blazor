@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Shopping.Server.Services
+namespace Shopping.Shared.Services.Interfaces
 {
     public interface ICurrentUserProvider
     {

@@ -3,6 +3,8 @@
 @attribute [Authorize]
 
 @inject IUserGroupRepository UserGroups
+@inject IUserRepository UserRepository
+@inject ICurrentUserProvider CurrentUser
 
 @if (IsLoading)
 {
@@ -17,7 +19,15 @@ else
 
     <div class="row">
         <div class="col">
-
+            <EditForm Model="@input" OnSubmit="HandleAddUser">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-group">
+                    <label for="nameInput">Email address or username</label>
+                    <InputText id="nameInput" class="form-control" @bind-Value="input.UserNameOrEmail" />
+                </div>
+                <button class="btn btn-primary">Add User</button>
+            </EditForm>
         </div>
     </div>
 }
@@ -29,22 +39,39 @@ else
     private bool IsLoading;
     private bool IsSaving;
 
-    private ShoppingUserModel userModel = new ShoppingUserModel();
+    private bool IsOwner = false;
+
+    private InputModel input = new InputModel();
     private UserGroup userGroup = null;
-    private EditContext userAddContext;
+
 
     protected async override Task OnInitializedAsync()
     {
         IsLoading = true;
 
-        userAddContext = new EditContext(userModel);
-        userGroup = await UserGroups.GetAsync(Id);
+        try
+        {
+            userGroup = await UserGroups.GetAsync(Id);
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        var currentUser = await CurrentUser.GetUserAsync();
+        IsOwner = userGroup.Owner.Id == currentUser.Id;
 
         IsLoading = false;
     }
 
-    private void HandleAddUser()
+    private async Task HandleAddUser()
     {
 
+    }
+
+    public class InputModel
+    {
+        [System.ComponentModel.DataAnnotations.Required]
+        public string UserNameOrEmail { get; set; }
     }
 }
