@@ -14,10 +14,11 @@ using System.Threading.Tasks;
 
 namespace Shopping.Server.Services.Implementations
 {
-    public class UserGroupRepository : CRUDDbContextBaseImpl<UserGroup>, IUserGroups
+    public class UserGroupRepository : CRUDDbContextBaseImpl<UserGroup>, IUserGroupRepository
     {
         private readonly IUserGroupShoppingLists _userGroupShoppingLists;
         private readonly IUserRepository _userRepository;
+
         public UserGroupRepository(ShoppingDbContext context, IUserRepository userRepository,
             ILogger<UserGroupRepository> logger, IUserGroupShoppingLists userGroupShoppingLists)
             : base(context, logger)
@@ -127,6 +128,20 @@ namespace Shopping.Server.Services.Implementations
                 users.Add(userData);
             }
             return users;
+        }
+
+        public async Task<List<UserGroup>> GetCommonGroupsAsync(string userOneId, string userTwoId)
+        {
+            List<UserGroup> commonLists = new List<UserGroup>();
+
+            var allGroups = await GetAllOfUserAsync(userOneId);
+            if (allGroups.Count > 0)
+            {
+                commonLists
+                    .Where(g => g.Owner.Id == userTwoId || g.Members.Select(x => x.Id).Contains(userTwoId))
+                    .ToList();
+            }
+            return commonLists;
         }
     }
 }

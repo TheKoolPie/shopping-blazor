@@ -79,8 +79,8 @@ namespace Shopping.Server
             services.AddHttpContextAccessor();
 
             services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IUserProvider, UserFromHttpContextProvider>();
-            services.AddTransient<IUserGroups, UserGroupRepository>();
+            services.AddTransient<ICurrentUserProvider, UserFromHttpContextProvider>();
+            services.AddTransient<IUserGroupRepository, UserGroupRepository>();
             services.AddTransient<IProductCategories, ProductCategoryRepository>();
             services.AddTransient<IProducts, ProductRepository>();
             services.AddTransient<IShoppingLists, ShoppingListRepository>();

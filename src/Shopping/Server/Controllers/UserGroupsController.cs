@@ -21,12 +21,14 @@ namespace Shopping.Server.Controllers
     [Authorize]
     public class UserGroupsController : ControllerBase
     {
-        private readonly IUserGroups _userGroups;
-        private readonly IUserProvider _userProvider;
-        public UserGroupsController(IUserGroups userGroups, IUserProvider users)
+        private readonly IUserGroupRepository _userGroups;
+        private readonly ICurrentUserProvider _userProvider;
+        private readonly IUserRepository _userRepository;
+        public UserGroupsController(IUserGroupRepository userGroups, ICurrentUserProvider users, IUserRepository userRepository)
         {
             _userGroups = userGroups;
             _userProvider = users;
+            _userRepository = userRepository;
         }
 
         [HttpGet]
@@ -34,7 +36,10 @@ namespace Shopping.Server.Controllers
         {
             List<UserGroup> groups = new List<UserGroup>();
             var user = await _userProvider.GetUserAsync();
-            if (await _userProvider.IsUserAdminAsync())
+
+            bool isAdmin = await _userProvider.IsUserAdminAsync();
+
+            if (isAdmin)
             {
                 groups = await _userGroups.GetAllAsync();
             }
@@ -42,6 +47,12 @@ namespace Shopping.Server.Controllers
             {
                 groups = await _userGroups.GetAllOfUserAsync(user.Id);
             }
+
+            foreach (var group in groups)
+            {
+                group.Owner = await _userRepository.GetUserByIdAsync(group.Owner.Id);
+            }
+
             return Ok(groups);
         }
         [HttpGet("{id}")]
@@ -52,9 +63,20 @@ namespace Shopping.Server.Controllers
             try
             {
                 group = await _userGroups.GetAsync(id);
-                if (!(await _userGroups.UserIsInGroupAsync(id, user.Id)))
+
+                bool isAdmin = await _userProvider.IsUserAdminAsync();
+                bool isGroupMember = await _userGroups.UserIsInGroupAsync(id, user.Id);
+                if (!(isAdmin || isGroupMember))
                 {
                     return Unauthorized();
+                }
+
+                group.Owner = await _userRepository.GetUserByIdAsync(group.Owner.Id);
+                foreach (var member in group.Members)
+                {
+                    var dbUser = await _userRepository.GetUserByIdAsync(member.Id);
+                    member.UserName = dbUser.UserName;
+                    member.Email = dbUser.Email;
                 }
             }
             catch (ItemNotFoundException e)
@@ -75,7 +97,9 @@ namespace Shopping.Server.Controllers
 
                 if (!isAdmin && !isInGroup)
                 {
-                    return Unauthorized();
+                    result.IsSuccessful = false;
+                    result.Message = "Not authorized";
+                    return Unauthorized(result);
                 }
 
                 var usersInGroup = await _userGroups.GetUsersInGroup(id);
@@ -86,6 +110,7 @@ namespace Shopping.Server.Controllers
             {
                 result.IsSuccessful = false;
                 result.Message = e.Message;
+                return NotFound(result);
             }
             return Ok(result);
         }

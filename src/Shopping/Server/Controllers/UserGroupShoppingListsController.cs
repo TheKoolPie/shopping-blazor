@@ -18,11 +18,11 @@ namespace Shopping.Server.Controllers
     public class UserGroupShoppingListsController : ControllerBase
     {
         private readonly IUserGroupShoppingLists _userGroupShoppingLists;
-        private readonly IUserProvider _users;
+        private readonly ICurrentUserProvider _users;
         private readonly IShoppingLists _shoppingLists;
-        private readonly IUserGroups _userGroups;
-        public UserGroupShoppingListsController(IUserGroupShoppingLists userGroupShoppingLists, IUserProvider users,
-            IShoppingLists shoppingLists, IUserGroups userGroups)
+        private readonly IUserGroupRepository _userGroups;
+        public UserGroupShoppingListsController(IUserGroupShoppingLists userGroupShoppingLists, ICurrentUserProvider users,
+            IShoppingLists shoppingLists, IUserGroupRepository userGroups)
         {
             _userGroupShoppingLists = userGroupShoppingLists;
             _users = users;

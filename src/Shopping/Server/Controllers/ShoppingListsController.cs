@@ -19,10 +19,10 @@ namespace Shopping.Server.Controllers
     public class ShoppingListsController : ControllerBase
     {
         private readonly IShoppingLists _lists;
-        private readonly IUserProvider _users;
+        private readonly ICurrentUserProvider _users;
         private readonly ILogger<ShoppingListsController> _logger;
 
-        public ShoppingListsController(IShoppingLists lists, IUserProvider users,
+        public ShoppingListsController(IShoppingLists lists, ICurrentUserProvider users,
             ILogger<ShoppingListsController> logger)
         {
             _lists = lists;

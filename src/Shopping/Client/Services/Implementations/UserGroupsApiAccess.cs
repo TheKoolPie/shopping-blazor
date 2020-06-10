@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class UserGroupsApiAccess : CRUDApiAccessBaseImpl<UserGroup>, IUserGroups
+    public class UserGroupsApiAccess : CRUDApiAccessBaseImpl<UserGroup>, IUserGroupRepository
     {
         public UserGroupsApiAccess(IAuthService authService, ILogger<UserGroupsApiAccess> logger) : base(authService, logger)
         {
@@ -44,6 +44,11 @@ namespace Shopping.Client.Services.Implementations
         }
 
         public Task<List<UserGroup>> GetAllOfUserAsync(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<UserGroup>> GetCommonGroupsAsync(string userOneId, string userTwoId)
         {
             throw new NotImplementedException();
         }

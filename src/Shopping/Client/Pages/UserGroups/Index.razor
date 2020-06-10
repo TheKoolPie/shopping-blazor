@@ -1,7 +1,7 @@
 ﻿@page "/groups"
 
 @attribute [Authorize]
-@inject IUserGroups UserGroups
+@inject IUserGroupRepository UserGroups
 @inject NavigationManager NavigationManager
 
 <h3>Overview of my groups</h3>
@@ -38,7 +38,7 @@
                         {
                             <tr @onclick="@(()=>NavigateToGroupDetails(group.Id))">
                                 <td>@group.Name</td>
-                                <td>@(group.Owner.UserName ?? group.Owner.Id)</td>
+                                <td>@group.Owner.UserName</td>
                                 <td>@group.Members.Count</td>
                                 <td>@group.ShoppingLists.Count</td>
                             </tr>

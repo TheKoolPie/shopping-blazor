@@ -2,7 +2,7 @@
 
 @attribute [Authorize]
 
-@inject IUserGroups UserGroups
+@inject IUserGroupRepository UserGroups
 
 @if (IsLoading)
 {
@@ -14,6 +14,7 @@ else
 {
     <h3>Details of @userGroup.Name</h3>
     <hr />
+
     <div class="row">
         <div class="col">
 

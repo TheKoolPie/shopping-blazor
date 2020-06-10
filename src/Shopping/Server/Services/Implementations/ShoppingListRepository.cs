@@ -18,10 +18,10 @@ namespace Shopping.Server.Services.Implementations
     {
         private readonly IUserGroupShoppingLists _userGroupShoppingLists;
         private readonly IProducts _products;
-        private readonly IUserGroups _userGroups;
+        private readonly IUserGroupRepository _userGroups;
 
         public ShoppingListRepository(ShoppingDbContext context, ILogger<ShoppingList> logger,
-            IUserGroupShoppingLists userGroupShoppingLists, IProducts products, IUserGroups userGroups)
+            IUserGroupShoppingLists userGroupShoppingLists, IProducts products, IUserGroupRepository userGroups)
             : base(context, logger)
         {
             _userGroupShoppingLists = userGroupShoppingLists;
