@@ -138,5 +138,51 @@ namespace Shopping.Server.Services.Implementations
             }
             return group;
         }
+
+        public async Task<bool> RemoveAssignmentsOfGroupAsync(string userGroupId)
+        {
+            var allAssignments = await _context.UserGroupShoppingLists.ToListAsync();
+            var assignmentsOfGroup = allAssignments.Where(a => a.UserGroupId == userGroupId).ToList();
+            if (assignmentsOfGroup.Count > 0)
+            {
+                foreach (var assignment in assignmentsOfGroup)
+                {
+                    _context.UserGroupShoppingLists.Remove(assignment);
+                }
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                throw new PersistencyException($"Could not delete assignments", e);
+            }
+
+            return true;
+        }
+
+        public async Task<bool> RemoveAssignmentsOfShoppingListAsync(string shoppingListId)
+        {
+            var allAssignments = await _context.UserGroupShoppingLists.ToListAsync();
+            var assignmentsOfList = allAssignments.Where(a => a.ShoppingListId == shoppingListId).ToList();
+            if (assignmentsOfList.Count > 0)
+            {
+                foreach(var assignment in assignmentsOfList)
+                {
+                    _context.UserGroupShoppingLists.Remove(assignment);
+                }
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                throw new PersistencyException($"Could not delete assignments", e);
+            }
+
+            return true;
+        }
     }
 }

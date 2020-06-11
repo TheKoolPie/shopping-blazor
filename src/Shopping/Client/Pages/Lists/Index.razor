@@ -1,5 +1,6 @@
 ﻿@page "/lists"
 @inject NavigationManager NavigationManager
+@inject IShoppingLists ShoppingListRepo
 @attribute [Authorize]
 
 <h3>Shopping lists</h3>
@@ -22,12 +23,52 @@
 }
 else
 {
+    <table class="table table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Item Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (_shoppingLists != null && _shoppingLists.Count > 0)
+            {
+                @foreach (var list in _shoppingLists)
+                {
+                    <tr @onclick="@(()=>NavigateToDetails(list.Id))">
+                        <td>@list.Name</td>
+                        <td>@list.ListDate.ToString("dd.MM.yyyy")</td>
+                        <td>@list.Items.Count</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3">No shopping lists available</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
 }
 
 
 @code {
     private bool IsLoading = false;
+    private List<ShoppingList> _shoppingLists;
 
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        _shoppingLists = await ShoppingListRepo.GetAllAsync();
+        IsLoading = false;
+    }
+    private void NavigateToDetails(string id)
+    {
+        NavigationManager.NavigateTo($"/lists/details/{id}");
+    }
     private void NavigateToCreatePage()
     {
         NavigationManager.NavigateTo("/lists/create");

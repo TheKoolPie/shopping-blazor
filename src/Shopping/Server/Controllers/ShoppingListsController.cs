@@ -20,13 +20,15 @@ namespace Shopping.Server.Controllers
     {
         private readonly IShoppingLists _lists;
         private readonly ICurrentUserProvider _users;
+        private readonly IUserGroupShoppingLists _userGroupShoppingLists;
         private readonly ILogger<ShoppingListsController> _logger;
 
         public ShoppingListsController(IShoppingLists lists, ICurrentUserProvider users,
-            ILogger<ShoppingListsController> logger)
+            ILogger<ShoppingListsController> logger, IUserGroupShoppingLists userGroupShoppingLists)
         {
             _lists = lists;
             _users = users;
+            _userGroupShoppingLists = userGroupShoppingLists;
             _logger = logger;
         }
 
@@ -133,18 +135,18 @@ namespace Shopping.Server.Controllers
                 bool isAdmin = await _users.IsUserAdminAsync();
                 bool isOwner = await _lists.IsOfUserAsync(list, user.Id);
 
-                if (isAdmin || isOwner)
+                if (!(isAdmin || isOwner))
                 {
-                    await _lists.DeleteByIdAsync(id);
+                    return Unauthorized(false);
                 }
-                else
-                {
-                    return Unauthorized();
-                }
+
+                await _userGroupShoppingLists.RemoveAssignmentsOfShoppingListAsync(id);
+
+                await _lists.DeleteByIdAsync(id);
             }
             catch (ItemNotFoundException)
             {
-                return NotFound();
+                return NotFound(false);
             }
             return Ok(true);
         }

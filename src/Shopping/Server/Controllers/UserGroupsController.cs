@@ -24,11 +24,14 @@ namespace Shopping.Server.Controllers
         private readonly IUserGroupRepository _userGroups;
         private readonly ICurrentUserProvider _userProvider;
         private readonly IUserRepository _userRepository;
-        public UserGroupsController(IUserGroupRepository userGroups, ICurrentUserProvider users, IUserRepository userRepository)
+        private readonly IUserGroupShoppingLists _userGroupShoppingListAssignments;
+        public UserGroupsController(IUserGroupRepository userGroups, ICurrentUserProvider users, 
+            IUserRepository userRepository, IUserGroupShoppingLists userGroupShoppingListAssignments)
         {
             _userGroups = userGroups;
             _userProvider = users;
             _userRepository = userRepository;
+            _userGroupShoppingListAssignments = userGroupShoppingListAssignments;
         }
 
         [HttpGet]
@@ -225,6 +228,9 @@ namespace Shopping.Server.Controllers
                 {
                     return Unauthorized();
                 }
+
+                await _userGroupShoppingListAssignments.RemoveAssignmentsOfGroupAsync(id);
+
                 await _userGroups.DeleteByIdAsync(id);
             }
             catch (ItemNotFoundException e)

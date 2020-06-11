@@ -23,18 +23,21 @@ else
     <div class="row">
         <div class="col">
             <div class="list-group list-group-horizontal-md" id="list-tab" role="tablist">
-                <a class="list-group-item list-group-item-action active" id="list-overview-list" 
+                <a class="list-group-item list-group-item-action active" id="list-overview-list"
                    data-toggle="list" href="#list-overview" role="tab" @onclick="OnListTabClicked">
                     <span class="oi oi-list-rich"></span> Overview
                 </a>
-                <a class="list-group-item list-group-item-action" id="list-actions-list" 
+                <a class="list-group-item list-group-item-action" id="list-actions-list"
                    data-toggle="list" href="#list-actions" role="tab" @onclick="OnListTabClicked">
                     <span class="oi oi-code"></span> Actions
                 </a>
-                <a class="list-group-item list-group-item-action" id="list-properties-list" 
-                   data-toggle="list" href="#list-properties" role="tab" @onclick="OnListTabClicked">
-                    <span class="oi oi-cog"></span> Properties
-                </a>
+                @if (IsOwner)
+                {
+                    <a class="list-group-item list-group-item-action" id="list-properties-list"
+                       data-toggle="list" href="#list-properties" role="tab" @onclick="OnListTabClicked">
+                        <span class="oi oi-cog"></span> Properties
+                    </a>
+                }
             </div>
         </div>
     </div>
@@ -45,10 +48,7 @@ else
                 <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
                     <h4>Overview</h4>
                     <hr />
-                    @if (overviewAlert != null)
-                    {
-                        <AlertComponent Model="@overviewAlert" />
-                    }
+                    <AlertComponent Model="@overviewAlert" />
                     <div class="row">
                         <div class="col">
                             <h5>Owner</h5>
@@ -156,18 +156,14 @@ else
                 <div class="tab-pane fade" id="list-actions" role="tabpanel" aria-labelledby="list-actions-list">
                     <h4>Actions</h4>
                     <hr />
-                    @if (actionsAlert != null)
-                    {
-                        <AlertComponent Model="@actionsAlert" />
-                        <hr />
-                    }
+                    <AlertComponent Model="@actionsAlert" />
                     <div class="row">
                         @if (IsOwner)
                         {
                             <div class="col-sm-6">
                                 <div class="card">
                                     <div class="card-body">
-                                        <h5 class="card-title">Add User to List</h5>
+                                        <h5 class="card-title">Add User to Group</h5>
                                         @if (!IsAddingUser)
                                         {
                                             <p class="card-text">Add user to your list to enable the access to all shopping lists in this list</p>
@@ -235,19 +231,63 @@ else
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Delete group</h5>
+                                        <p class="card-text">
+                                            If you delete this group all assignments between shopping lists and this group will be removed.
+                                            Please confirm your decision, as this action is not revokeable
+                                        </p>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" @onchange="(()=>showLeaveButton = !showLeaveButton)" value="" id="deleteCheck">
+                                            <label class="form-check-label" for="deleteCheck">I really want to to delete!</label>
+                                        </div>
+                                        @if (showLeaveButton)
+                                        {
+                                            <hr />
+                                            <button type="button" class="btn btn-danger" @onclick="OnDeleteGroup">
+                                                <span class="oi oi-account-logout" /> Delete group
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
                         }
                         else
                         {
-                            <div class="col">
-                                <strong>Not Authorized</strong>
+                            <div class="col-sm-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Leave group</h5>
+                                        <p class="card-text">
+                                            If you leave this group you loose all access to the shopping lists, assigned to this group.
+                                            Please confirm your choice first to really leave the group, as this action is not revokable.
+                                        </p>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" @onchange="(()=>showLeaveButton = !showLeaveButton)" value="" id="leaveCheck">
+                                            <label class="form-check-label" for="leaveCheck">I really want to leave!</label>
+                                        </div>
+                                        @if (showLeaveButton)
+                                        {
+                                            <hr />
+                                            <button type="button" class="btn btn-danger" @onclick="OnLeaveGroup">
+                                                <span class="oi oi-account-logout" /> Leave group
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
                             </div>
                         }
                     </div>
                 </div>
-                <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
-                    <h4>Properties</h4>
-                    <hr />
-                </div>
+                @if (IsOwner)
+                {
+                    <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
+                        <h4>Properties</h4>
+                        <hr />
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -275,6 +315,8 @@ else
     private ListIdInputModel listIdInput = new ListIdInputModel();
     private EditContext addListContext;
 
+
+    private bool showLeaveButton = false;
 
     private AlertComponentModel actionsAlert;
     private AlertComponentModel overviewAlert;
@@ -377,6 +419,25 @@ else
         AlertComponentModel.CreateErrorAlert("Assignment could not be removed");
 
     }
+
+    private async Task OnLeaveGroup()
+    {
+        await OnRemoveMember(currentUser.Id);
+        Nav.NavigateTo($"/groups");
+    }
+
+    private async Task OnDeleteGroup()
+    {
+        if (await UserGroups.DeleteByIdAsync(GroupId))
+        {
+            Nav.NavigateTo("/groups");
+        }
+        else
+        {
+            actionsAlert = AlertComponentModel.CreateErrorAlert("Could not delete this group");
+        }
+    }
+
     private void NavigateToListCreate()
     {
         Nav.NavigateTo($"/lists/create/{GroupId}");

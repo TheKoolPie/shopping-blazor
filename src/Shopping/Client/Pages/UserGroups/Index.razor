@@ -22,8 +22,7 @@
         }
         else
         {
-            @if (_userGroups != null && _userGroups.Count > 0)
-            {
+
                 <table class="table table-hover">
                     <thead class="thead-light">
                         <tr>
@@ -33,21 +32,25 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var group in _userGroups)
+                        @if (_userGroups != null && _userGroups.Count > 0)
                         {
-                            <tr @onclick="@(()=>NavigateToGroupDetails(group.Id))">
-                                <td>@group.Name</td>
-                                <td>@group.Owner.UserName</td>
-                                <td>@group.Members.Count</td>
+                            @foreach (var group in _userGroups)
+                            {
+                                <tr @onclick="@(() => NavigateToGroupDetails(group.Id))">
+                                    <td>@group.Name</td>
+                                    <td>@group.Owner.UserName</td>
+                                    <td>@group.Members.Count</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3">No user groups available</td>
                             </tr>
                         }
-                    </tbody>
+                        </tbody>
                 </table>
-            }
-            else
-            {
-                <strong>No user groups found</strong>
-            }
         }
     </div>
 </div>
