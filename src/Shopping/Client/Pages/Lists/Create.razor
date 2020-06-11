@@ -48,7 +48,11 @@
 
     private bool IsSaving = false;
     private AlertComponentModel AlertData;
-    private ShoppingList list = new ShoppingList() { ListDate = DateTime.Now };
+    private ShoppingList list = new ShoppingList()
+    {
+        ListDate = DateTime.Now,
+        Name = $"List of {DateTime.Now.ToString("dd.MM.yy")}"
+    };
     private EditContext editContext;
 
     private ShoppingList createdItem;
