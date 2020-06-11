@@ -207,6 +207,32 @@
                     {
                         <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
                             <h4>Properties</h4>
+                            <hr />
+                            <AlertComponent Model="@PropertyAlertModel" />
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Delete list</h5>
+                                            <p class="card-text">
+                                                If you delete this list all items will be deleted with it. Also all assignments to groups will be removed.
+                                                Please confirm your decision, as this action is not revokeable
+                                            </p>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" @onchange="(()=>showDeleteButton = !showDeleteButton)" value="" id="deleteCheck">
+                                                <label class="form-check-label" for="deleteCheck">I really want to to delete!</label>
+                                            </div>
+                                            @if (showDeleteButton)
+                                            {
+                                                <hr />
+                                                <button type="button" class="btn btn-danger" @onclick="OnDeleteList">
+                                                    <span class="oi oi-account-logout" /> Delete group
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     }
                 </div>
@@ -224,12 +250,15 @@
 
     private ShoppingList CurrentList;
 
+    private bool showDeleteButton = false;
+
     private bool IsOwner;
     private ShoppingUserModel currentUser;
 
     #region Alerts
     AlertComponentModel AddItemAlertModel = null;
     AlertComponentModel AccessAlertModel = null;
+    AlertComponentModel PropertyAlertModel = null;
     #endregion
 
     #region AddItem
@@ -268,6 +297,7 @@
     {
         AddItemAlertModel = null;
         AccessAlertModel = null;
+        PropertyAlertModel = null;
     }
 
     private async Task HandleAddItemSubmit()
@@ -281,14 +311,26 @@
         }
         else
         {
-            AddItemAlertModel = AlertComponentModel.CreateSuccessAlert("Saved item",
-                $"{createdItem.Amount} {createdItem.ProductItem.Unit.GetDescription()} of {createdItem.ProductItem.Name} ");
+            AddItemAlertModel = AlertComponentModel.CreateSuccessAlert($"{createdItem.Amount} {createdItem.ProductItem.Unit.GetDescription()} of {createdItem.ProductItem.Name} added");
             CurrentList = await ShoppingListRepo.GetAsync(Id);
             AddItem = new ShoppingListItem();
         }
 
         IsSavingItem = false;
     }
+
+    private async Task OnDeleteList()
+    {
+        if (await ShoppingListRepo.DeleteByIdAsync(Id))
+        {
+            NavigationManager.NavigateTo("/lists");
+        }
+        else
+        {
+            PropertyAlertModel = AlertComponentModel.CreateErrorAlert("Could not delete list");
+        }
+    }
+
     private void CreateAndAssignUserGroup()
     {
         NavigationManager.NavigateTo($"/groups/create/{Id}");
