@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shopping.Shared.Model.Account;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -15,7 +16,7 @@ namespace Shopping.Shared.Data
         public string Name { get; set; }
         [Required]
         public DateTime ListDate { get; set; }
-        public string OwnerId { get; set; }
+        public ShoppingUserModel Owner { get; set; }
 
         [NotMapped]
         public List<UserGroup> UserGroups { get; set; }
@@ -27,6 +28,7 @@ namespace Shopping.Shared.Data
         {
             UserGroups = new List<UserGroup>();
             Items = new List<ShoppingListItem>();
+            Owner = new ShoppingUserModel();
         }
     }
 }

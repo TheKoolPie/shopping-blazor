@@ -91,7 +91,7 @@ namespace Shopping.Server.Services.Implementations
         public override bool ItemAlreadyExists(ShoppingList item)
         {
             var list = _context.ShoppingLists
-                        .FirstOrDefault(i => i.Id == item.Id || (i.OwnerId == item.OwnerId && i.Name == item.Name));
+                        .FirstOrDefault(i => i.Id == item.Id || (i.Owner.Id == item.Owner.Id && i.Name == item.Name));
             return list != null;
         }
 
@@ -130,7 +130,7 @@ namespace Shopping.Server.Services.Implementations
         {
             existing.Name = update.Name;
             existing.ListDate = update.ListDate;
-            existing.OwnerId = update.OwnerId;
+            existing.Owner = update.Owner;
             existing.Items = update.Items;
         }
 
@@ -152,7 +152,7 @@ namespace Shopping.Server.Services.Implementations
 
         public async Task<bool> IsOfUserAsync(ShoppingList list, string userId)
         {
-            bool isListOwner = list.OwnerId == userId;
+            bool isListOwner = list.Owner.Id == userId;
             if (isListOwner) { return true; }
 
             var userGroupsOfList = await _userGroupShoppingLists.GetUserGroupsOfShoppingListAsync(list.Id);

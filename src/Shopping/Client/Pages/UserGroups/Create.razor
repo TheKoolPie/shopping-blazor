@@ -85,7 +85,10 @@ else
                             $"Could not assign newly created group '{createdGroup.Name}' to list '{ListId}'");
                     }
                 }
-                Nav.NavigateTo($"/groups/details/{createdGroup.Id}");
+                else
+                {
+                    Nav.NavigateTo($"/groups/details/{createdGroup.Id}");
+                }
             }
             IsSaving = false;
         }

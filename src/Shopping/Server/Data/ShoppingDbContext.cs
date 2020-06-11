@@ -28,6 +28,9 @@ namespace Shopping.Server.Data
                 .Entity<ShoppingList>()
                 .OwnsMany(l => l.Items);
             modelBuilder
+                .Entity<ShoppingList>()
+                .OwnsOne(l => l.Owner);
+            modelBuilder
                 .Entity<UserGroup>()
                 .OwnsMany(l => l.Members);
             modelBuilder

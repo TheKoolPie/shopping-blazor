@@ -313,7 +313,7 @@
         else
         {
             currentUser = await CurrentUser.GetUserAsync();
-            IsOwner = CurrentList.OwnerId == currentUser.Id;
+            IsOwner = CurrentList.Owner.Id == currentUser.Id;
             if (IsOwner)
             {
                 CurrentList.UserGroups = await UserGroupShoppingListsRepo.GetUserGroupsOfShoppingListAsync(ShoppingListId);
