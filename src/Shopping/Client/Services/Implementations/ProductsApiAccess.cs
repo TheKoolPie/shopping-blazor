@@ -6,12 +6,9 @@ using Shopping.Shared.Services;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class ProductsApiAccess : CRUDAccessBaseImpl<ProductItem>, IProducts
+    public class ProductsApiAccess : CRUDApiAccessBaseImpl<ProductItem>, IProducts
     {
-        public ProductsApiAccess(HttpClient httpClient,
-            ITokenProvider tokenProvider,
-            ILogger<ProductsApiAccess> logger)
-            : base(httpClient, tokenProvider, logger)
+        public ProductsApiAccess(IAuthService authService, ILogger<ProductsApiAccess> logger) : base(authService, logger)
         {
             BaseAddress = "api/Product";
         }

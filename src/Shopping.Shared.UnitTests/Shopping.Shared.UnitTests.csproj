@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Shopping\Shared\Shopping.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>

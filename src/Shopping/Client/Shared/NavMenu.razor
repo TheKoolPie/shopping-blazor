@@ -20,6 +20,9 @@
                     <NavLink class="nav-link text-dark" href="/account/manager" Match="NavLinkMatch.All">
                         <span class="oi oi-spreadsheet" aria-hidden="true"></span> Manage
                     </NavLink>
+                    <NavLink class="nav-link text-dark" href="/groups" Match="NavLinkMatch.Prefix">
+                        <span class="oi oi-people" aria-hidden="true"></span> Groups
+                    </NavLink>
                     <div class="dropdown-divider"></div>
                     <NavLink class="nav-link text-dark" href="/account/logout" Match="NavLinkMatch.All">
                         <span class="oi oi-account-logout" aria-hidden="true"></span> Log out
@@ -43,12 +46,7 @@
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/shopping-list/details/" Match="NavLinkMatch.All">
-                <span class="oi oi-clock" aria-hidden="true"></span> Today
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/shopping-list/" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="/lists" Match="NavLinkMatch.Prefix">
                 <span class="oi oi-list" aria-hidden="true"></span> Lists
             </NavLink>
         </li>
@@ -62,12 +60,6 @@
                 <span class="oi oi-clipboard" aria-hidden="true"></span> Categories
             </NavLink>
         </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="https://github.com/TheKoolPie/shopping-blazor" Match="NavLinkMatch.All">
-                <span class="oi oi-info" aria-hidden="true"></span> About
-            </NavLink>
-        </li>
-
     </ul>
 </div>
 

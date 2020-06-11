@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Shopping.Server.Models;
 using Shopping.Shared.Model.Account;
+using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Shopping.Server.Services
 {
-    public class UserFromHttpContextProvider : IUserProvider
+    public class UserFromHttpContextProvider : ICurrentUserProvider
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<ShoppingUser> _userManager;
@@ -23,17 +24,26 @@ namespace Shopping.Server.Services
             _userManager = userManager;
             _logger = logger;
         }
-        public async Task<ShoppingUser> GetUserAsync()
+        public async Task<ShoppingUserModel> GetUserAsync()
         {
-            ShoppingUser user = null;
+            ShoppingUserModel user = null;
             var name = _httpContextAccessor.HttpContext.User.Identity.Name;
             if (!string.IsNullOrEmpty(name))
             {
                 _logger.LogDebug($"Searching for user with user name or email: {name}");
-                user = await _userManager.FindByNameAsync(name);
-                if (user == null)
+                var dbUser = await _userManager.FindByNameAsync(name);
+                if (dbUser == null)
                 {
-                    user = await _userManager.FindByEmailAsync(name);
+                    dbUser = await _userManager.FindByEmailAsync(name);
+                }
+                if (dbUser != null)
+                {
+                    user = new ShoppingUserModel()
+                    {
+                        Id = dbUser.Id,
+                        Email = dbUser.Email,
+                        UserName = dbUser.UserName
+                    };
                 }
             }
             return user;
@@ -42,23 +52,29 @@ namespace Shopping.Server.Services
         public async Task<List<string>> GetUserRolesAsync()
         {
             var user = await GetUserAsync();
-            return (await _userManager.GetRolesAsync(user)).ToList();
-        }
+            List<string> roles = null;
 
-        public async Task<List<ShoppingUser>> GetUsersInRoleAsync(string role)
-        {
-            return (await _userManager.GetUsersInRoleAsync(role)).ToList();
+            var dbUser = await _userManager.FindByIdAsync(user.Id);
+            if (dbUser != null)
+            {
+                roles = (await _userManager.GetRolesAsync(dbUser)).ToList();
+            }
+
+            return roles;
         }
 
         public async Task<bool> IsUserAdminAsync()
         {
             var user = await GetUserAsync();
-            return await _userManager.IsInRoleAsync(user, ShoppingUserRoles.Admin);
-        }
-        public async Task<bool> IsUserAdminAsync(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            return await _userManager.IsInRoleAsync(user, ShoppingUserRoles.Admin);
+            bool result = false;
+
+            var dbUser = await _userManager.FindByIdAsync(user.Id);
+            if (dbUser != null)
+            {
+                result = await _userManager.IsInRoleAsync(dbUser, ShoppingUserRoles.Admin);
+            }
+
+            return result;
         }
     }
 }

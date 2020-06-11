@@ -19,14 +19,16 @@ namespace Shopping.Server.Controllers
     public class ShoppingListsController : ControllerBase
     {
         private readonly IShoppingLists _lists;
-        private readonly IUserProvider _users;
+        private readonly ICurrentUserProvider _users;
+        private readonly IUserGroupShoppingLists _userGroupShoppingLists;
         private readonly ILogger<ShoppingListsController> _logger;
 
-        public ShoppingListsController(IShoppingLists lists, IUserProvider users,
-            ILogger<ShoppingListsController> logger)
+        public ShoppingListsController(IShoppingLists lists, ICurrentUserProvider users,
+            ILogger<ShoppingListsController> logger, IUserGroupShoppingLists userGroupShoppingLists)
         {
             _lists = lists;
             _users = users;
+            _userGroupShoppingLists = userGroupShoppingLists;
             _logger = logger;
         }
 
@@ -55,7 +57,7 @@ namespace Shopping.Server.Controllers
             try
             {
                 list = await _lists.GetAsync(id);
-                if (!(await _lists.CheckIfListIsFromUser(list, user.Id)))
+                if (!(await _lists.IsOfUserAsync(list, user.Id)))
                 {
                     return Unauthorized();
                 }
@@ -72,7 +74,10 @@ namespace Shopping.Server.Controllers
         public async Task<ActionResult<ShoppingList>> CreateList(ShoppingList shoppingList)
         {
             var user = await _users.GetUserAsync();
-            shoppingList.OwnerId = user.Id;
+            shoppingList.Owner = new ShoppingUserModel()
+            {
+                Id = user.Id
+            };
             ShoppingList item;
             try
             {
@@ -101,7 +106,7 @@ namespace Shopping.Server.Controllers
             {
                 return NotFound(e.Message);
             }
-            if (!(await _lists.CheckIfListIsFromUser(list, user.Id)))
+            if (!(await _lists.IsOfUserAsync(list, user.Id)))
             {
                 return Unauthorized();
             }
@@ -121,20 +126,6 @@ namespace Shopping.Server.Controllers
 
             return Ok(createdItem);
         }
-        [HttpPost("AddUserGroup/{id}")]
-        public async Task<ActionResult<UserGroup>> AddGroupToList(string id, [FromBody] string userGroupId)
-        {
-            var user = await _users.GetUserAsync();
-            var list = await _lists.GetAsync(id);
-            if (!(await _lists.CheckIfListIsFromUser(list, user.Id)))
-            {
-                return Unauthorized();
-            }
-
-            var addedGroup = await _lists.AddUserGroupAsync(list.Id, userGroupId);
-
-            return Ok(addedGroup);
-        }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> DeleteList(string id)
@@ -145,16 +136,20 @@ namespace Shopping.Server.Controllers
                 var user = await _users.GetUserAsync();
 
                 bool isAdmin = await _users.IsUserAdminAsync();
-                bool isOwner = await _lists.CheckIfListIsFromUser(list, user.Id);
+                bool isOwner = await _lists.IsOfUserAsync(list, user.Id);
 
-                if (isAdmin || isOwner)
+                if (!(isAdmin || isOwner))
                 {
-                    await _lists.DeleteByIdAsync(id);
+                    return Unauthorized(false);
                 }
+
+                await _userGroupShoppingLists.RemoveAssignmentsOfShoppingListAsync(id);
+
+                await _lists.DeleteByIdAsync(id);
             }
             catch (ItemNotFoundException)
             {
-                return NotFound();
+                return NotFound(false);
             }
             return Ok(true);
         }

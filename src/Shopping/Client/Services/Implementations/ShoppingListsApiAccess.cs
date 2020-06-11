@@ -12,16 +12,16 @@ using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class ShoppingListsApiAccess : CRUDAccessBaseImpl<ShoppingList>, IShoppingLists
+    public class ShoppingListsApiAccess : CRUDApiAccessBaseImpl<ShoppingList>, IShoppingLists
     {
-        public ShoppingListsApiAccess(HttpClient httpClient, ITokenProvider tokenProvider, ILogger<ShoppingListsApiAccess> logger) : base(httpClient, tokenProvider, logger)
+        public ShoppingListsApiAccess(IAuthService authService, ILogger<ShoppingListsApiAccess> logger) : base(authService, logger)
         {
             BaseAddress = "api/ShoppingLists";
         }
 
         public async Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item)
         {
-            var client = await GetHttpClientAsync();
+            var client = await _authService.GetHttpClientAsync();
             ShoppingListItem createdItem = null;
             var response = await client.PostAsJsonAsync<ShoppingListItem>($"{BaseAddress}/AddItem/{listId}", item);
             if (response.IsSuccessStatusCode)
@@ -40,12 +40,17 @@ namespace Shopping.Client.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<bool> CheckIfListIsFromUser(ShoppingList list, string userId)
+        public Task<List<ShoppingList>> GetAllOfUserAsync(string userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<ShoppingList>> GetAllOfUserAsync(string userId)
+        public Task<bool> IsOfUserAsync(ShoppingList list, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsOfUserAsync(string listId, string userId)
         {
             throw new NotImplementedException();
         }
@@ -56,11 +61,6 @@ namespace Shopping.Client.Services.Implementations
         }
 
         public Task<bool> RemoveItemAsync(string listId, ShoppingListItem item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> RemoveUserGroupAsync(string listId, string userGroupId)
         {
             throw new NotImplementedException();
         }

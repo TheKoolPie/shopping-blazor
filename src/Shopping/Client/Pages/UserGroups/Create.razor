@@ -1,0 +1,96 @@
+﻿@page "/groups/create"
+@page "/groups/create/{ListId}"
+
+@attribute [Authorize]
+@inject IUserGroupRepository UserGroups
+@inject IUserGroupShoppingLists UserGroupsShoppingLists
+@inject NavigationManager Nav
+
+<h3>Create User group</h3>
+<hr />
+@if (IsSaving)
+{
+    <div class="row">
+        <div class="col">
+            <strong>Saving data...</strong>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col">
+            <EditForm EditContext="createGroupContext" OnSubmit="HandleSubmit">
+                <ValidationSummary />
+                <DataAnnotationsValidator />
+                <div class="form-group">
+                    <label for="nameInput">Name</label>
+                    <InputText @bind-Value="_userGroup.Name" id="nameInput" class="form-control" />
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </EditForm>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <AlertComponent Model="@AlertData" />
+        </div>
+    </div>
+}
+@code {
+    [Parameter]
+    public string ListId { get; set; }
+
+    private bool IsSaving = false;
+    private AlertComponentModel AlertData;
+
+    private UserGroup _userGroup = new UserGroup();
+    private EditContext createGroupContext;
+
+    protected override void OnInitialized()
+    {
+        _userGroup = new UserGroup();
+        createGroupContext = new EditContext(_userGroup);
+    }
+
+    private async Task HandleSubmit()
+    {
+        AlertData = null;
+
+        if (createGroupContext.Validate())
+        {
+            IsSaving = true;
+
+            var createdGroup = await UserGroups.CreateAsync(_userGroup);
+            if (createdGroup == null)
+            {
+
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(ListId))
+                {
+                    var result = await UserGroupsShoppingLists.CreateAssignmentAsync(new UserGroupShoppingList()
+                    {
+                        UserGroupId = createdGroup.Id,
+                        ShoppingListId = ListId
+                    });
+                    if (result)
+                    {
+                        Nav.NavigateTo($"/lists/details/{ListId}");
+                    }
+                    else
+                    {
+                        AlertData = AlertComponentModel.CreateErrorAlert("Auto assignment failed",
+                            $"Could not assign newly created group '{createdGroup.Name}' to list '{ListId}'");
+                    }
+                }
+                else
+                {
+                    Nav.NavigateTo($"/groups/details/{createdGroup.Id}");
+                }
+            }
+            IsSaving = false;
+        }
+    }
+}

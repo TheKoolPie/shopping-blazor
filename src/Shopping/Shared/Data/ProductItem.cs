@@ -30,17 +30,5 @@ namespace Shopping.Shared.Data
             this.Category = new ProductCategory(item.Category ?? new ProductCategory());
         }
 
-        public override bool Equals(object obj)
-        {
-            return obj is ProductItem item &&
-                   Name == item.Name &&
-                   Unit == item.Unit &&
-                   CategoryId == item.CategoryId;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Name, Unit, CategoryId);
-        }
     }
 }

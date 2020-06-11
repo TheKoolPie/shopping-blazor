@@ -1,4 +1,4 @@
-﻿<input type="search" class="form-control" id="@_id"
+﻿<input type="search" class="form-control" id="@_id" autocomplete="off"
        placeholder="@Placeholder" @bind="@SearchValue" @bind:event="oninput" />
 @if (_localValueOptions != null && _localValueOptions.Keys.Count > 0)
 {
@@ -53,7 +53,10 @@
     private Task OnItemSelected(string id)
     {
         SelectedValue = id;
-        _searchValue = _localValueOptions[id];
+        if (!string.IsNullOrEmpty(id))
+        {
+            _searchValue = _localValueOptions[id];
+        }
         _localValueOptions = null;
         return SelectedValueChanged.InvokeAsync(SelectedValue);
     }
@@ -67,6 +70,10 @@
             _localValueOptions = _localValueOptions
             .Where(k => k.Value.Contains(_searchValue, StringComparison.InvariantCultureIgnoreCase))
             .ToDictionary(x => x.Key, v => v.Value);
+        }
+        else
+        {
+            SelectedValue = "";
         }
     }
 }

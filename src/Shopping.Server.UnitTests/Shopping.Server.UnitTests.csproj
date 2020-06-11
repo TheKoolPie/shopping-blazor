@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Shopping\Server\Shopping.Server.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

@@ -35,6 +35,7 @@ namespace Shopping.Client
                 o.AddPolicy(ShoppingUserPolicies.IsUserRoleManager, ShoppingUserPolicies.IsUserRoleManagerPolicy());
                 o.AddPolicy(ShoppingUserPolicies.IsDatabaseManager, ShoppingUserPolicies.IsDatabaseManagerPolicy());
             });
+
             builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
 
@@ -43,6 +44,11 @@ namespace Shopping.Client
             builder.Services.AddTransient<IProductCategories, ProductCategoryApiAccess>();
             builder.Services.AddTransient<IProducts, ProductsApiAccess>();
             builder.Services.AddTransient<IShoppingLists, ShoppingListsApiAccess>();
+            builder.Services.AddTransient<IUserGroupRepository, UserGroupsApiAccess>();
+            builder.Services.AddTransient<IUserGroupShoppingLists, UserGroupsShoppingListsApiAccess>();
+
+            builder.Services.AddTransient<IUserRepository, UserRepositoryApiAccess>();
+            builder.Services.AddTransient<ICurrentUserProvider, CurrentUserApiAccess>();
 
             await builder.Build().RunAsync();
         }

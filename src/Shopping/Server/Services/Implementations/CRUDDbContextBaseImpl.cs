@@ -14,8 +14,8 @@ namespace Shopping.Server.Services.Implementations
     public abstract class CRUDDbContextBaseImpl<T> : ICRUDAccess<T> where T : BaseItem
     {
         protected readonly ShoppingDbContext _context;
-        protected readonly ILogger<T> _logger;
-        public CRUDDbContextBaseImpl(ShoppingDbContext context, ILogger<T> logger)
+        protected readonly ILogger _logger;
+        public CRUDDbContextBaseImpl(ShoppingDbContext context, ILogger logger)
         {
             _context = context;
             _logger = logger;

@@ -1,0 +1,78 @@
+﻿@page "/groups"
+
+@attribute [Authorize]
+@inject IUserGroupRepository UserGroups
+@inject NavigationManager NavigationManager
+
+<h3>Overview of my groups</h3>
+<hr />
+<div class="row">
+    <div class="col">
+        <button class="btn btn-primary" type="button" @onclick="OnCreateClicked">
+            <span class="oi oi-plus" /> Create new
+        </button>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        @if (IsLoading)
+        {
+            <strong>Loading...</strong>
+        }
+        else
+        {
+
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Owner</th>
+                            <th>Member Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (_userGroups != null && _userGroups.Count > 0)
+                        {
+                            @foreach (var group in _userGroups)
+                            {
+                                <tr @onclick="@(() => NavigateToGroupDetails(group.Id))">
+                                    <td>@group.Name</td>
+                                    <td>@group.Owner.UserName</td>
+                                    <td>@group.Members.Count</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3">No user groups available</td>
+                            </tr>
+                        }
+                        </tbody>
+                </table>
+        }
+    </div>
+</div>
+
+
+@code {
+    private bool IsLoading;
+    private List<UserGroup> _userGroups;
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        _userGroups = await UserGroups.GetAllAsync();
+        IsLoading = false;
+    }
+
+    private void OnCreateClicked()
+    {
+        NavigationManager.NavigateTo("/groups/create");
+    }
+    private void NavigateToGroupDetails(string id)
+    {
+        NavigationManager.NavigateTo($"/groups/details/{id}");
+    }
+}

@@ -78,11 +78,13 @@ namespace Shopping.Server
             services.AddRazorPages();
             services.AddHttpContextAccessor();
 
-            services.AddTransient<IUserProvider, UserFromHttpContextProvider>();
-            services.AddTransient<IUserGroups, UserGroupRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<ICurrentUserProvider, UserFromHttpContextProvider>();
+            services.AddTransient<IUserGroupRepository, UserGroupRepository>();
             services.AddTransient<IProductCategories, ProductCategoryRepository>();
             services.AddTransient<IProducts, ProductRepository>();
             services.AddTransient<IShoppingLists, ShoppingListRepository>();
+            services.AddTransient<IUserGroupShoppingLists, UserGroupShoppingListRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
