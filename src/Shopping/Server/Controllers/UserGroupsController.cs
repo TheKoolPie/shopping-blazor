@@ -121,7 +121,14 @@ namespace Shopping.Server.Controllers
             var user = await _userProvider.GetUserAsync();
             group.Owner = new ShoppingUserModel()
             {
-                Id = user.Id,
+                Id = user.Id
+            };
+            group.Members = new List<ShoppingUserModel>()
+            {
+                new ShoppingUserModel()
+                {
+                    Id = user.Id
+                }
             };
 
             UserGroup created = null;
@@ -154,6 +161,14 @@ namespace Shopping.Server.Controllers
             try
             {
                 var group = await _userGroups.AddUserToGroup(id, user);
+                group.Owner = await _userRepository.GetUserByIdAsync(group.Owner.Id);
+                foreach (var member in group.Members)
+                {
+                    var dbUser = await _userRepository.GetUserByIdAsync(member.Id);
+                    member.UserName = dbUser.UserName;
+                    member.Email = dbUser.Email;
+                }
+
                 result.IsSuccessful = true;
                 result.ResultData.Add(group);
             }

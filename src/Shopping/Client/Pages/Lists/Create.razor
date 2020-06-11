@@ -1,4 +1,6 @@
 ﻿@page "/lists/create"
+@page "/lists/create/{groupid}"
+
 @inject IShoppingLists ShoppingListRepo
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
@@ -50,6 +52,9 @@
 
 
 @code {
+    [Parameter]
+    public string GroupId { get; set; }
+
     private bool IsSaving = false;
     private AlertComponentModel AlertData;
     private ShoppingList list = new ShoppingList() { ListDate = DateTime.Now };

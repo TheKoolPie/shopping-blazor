@@ -30,10 +30,6 @@ namespace Shopping.Server.Services.Implementations
         public override async Task<List<UserGroup>> GetAllAsync()
         {
             var groups = await _context.UserGroups.ToListAsync();
-            foreach (var group in groups)
-            {
-                group.ShoppingLists = await _userGroupShoppingLists.GetShoppingListsOfUserGroupAsync(group.Id);
-            }
             return groups;
         }
 
@@ -44,8 +40,6 @@ namespace Shopping.Server.Services.Implementations
             {
                 throw new ItemNotFoundException(typeof(UserGroup), id);
             }
-            userGroup.ShoppingLists = await _userGroupShoppingLists.GetShoppingListsOfUserGroupAsync(userGroup.Id);
-
             return userGroup;
         }
 

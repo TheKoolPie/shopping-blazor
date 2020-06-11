@@ -4,6 +4,8 @@
 @inject NavigationManager NavigationManager
 @inject IShoppingLists ShoppingListRepo
 @inject IProducts ProductRepo
+@inject IUserGroupShoppingLists UserGroupShoppingListsRepo
+@inject ICurrentUserProvider CurrentUser
 
 <AlertComponent Model="@LoadingAlertModel" />
 @if (LoadingAlertModel == null)
@@ -108,7 +110,7 @@
                                     <label for="product-search">Product</label>
                                     <SearchableInput id="product-search"
                                                      ValueOptions="Products.ToDictionary(x => x.Id, x => x.Name)"
-                                                     Label="Product" @bind-SelectedValue="AddItem.ProductItemId"
+                                                     @bind-SelectedValue="AddItem.ProductItemId"
                                                      Placeholder="Search Products..." />
                                 </div>
                                 @if (!string.IsNullOrEmpty(AddItem.ProductItemId))
@@ -138,56 +140,67 @@
                     <div class="tab-pane fade" id="list-access" role="tabpanel" aria-labelledby="list-access-list">
                         <h4>Access</h4>
                         <hr />
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Create new</h5>
-                                        <p class="card-text">Create a new user group and automatically assign it to this list.</p>
-                                        <button class="btn btn-primary" type="button" @onclick="CreateAndAssignUserGroup">Create</button>
+                        @if (IsOwner)
+                        {
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Create new</h5>
+                                            <p class="card-text">Create a new user group and automatically assign it to this list.</p>
+                                            <button class="btn btn-primary" type="button" @onclick="CreateAndAssignUserGroup">Create</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Search existing</h5>
+                                            <p class="card-text">Search for already existing groups, which belong to you.</p>
+                                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Search existing</h5>
-                                        <p class="card-text">Search for already existing groups, which belong to you.</p>
-                                        <a href="#" class="btn btn-primary">Go somewhere</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-                        <h6>Assigned groups</h6>
-                        <div class="row">
-                            <div class="col">
-                                @if (CurrentList.UserGroups != null && CurrentList.UserGroups.Count > 0)
-                                {
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var group in CurrentList.UserGroups)
-                                            {
+                            <hr />
+                            <h6>Assigned groups</h6>
+                            <div class="row">
+                                <div class="col">
+                                    @if (CurrentList.UserGroups != null && CurrentList.UserGroups.Count > 0)
+                                    {
+                                        <table class="table table-hover">
+                                            <thead>
                                                 <tr>
-                                                    <td @onclick="@(()=>NavigateToUserGroupDetails(group.Id))">@group.Name</td>
-                                                    <td></td>
+                                                    <th>Name</th>
+                                                    <th></th>
                                                 </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                }
-                                else
-                                {
-                                    <strong>No user groups assigned</strong>
-                                }
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var group in CurrentList.UserGroups)
+                                                {
+                                                    <tr>
+                                                        <td @onclick="@(() => NavigateToUserGroupDetails(group.Id))">@group.Name</td>
+                                                        <td></td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <strong>No user groups assigned</strong>
+                                    }
+                                </div>
                             </div>
-                        </div>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <div class="col">
+                                    <strong>Not authorized</strong>
+                                </div>
+                            </div>
+                        }
                     </div>
                     <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
                         <h4>Properties</h4>
@@ -206,6 +219,9 @@
     private bool IsLoading { get; set; }
 
     private ShoppingList CurrentList;
+
+    private bool IsOwner;
+    private ShoppingUserModel currentUser;
 
     #region AddItem
     private ShoppingListItem AddItem = new ShoppingListItem();
@@ -227,6 +243,12 @@
         }
         else
         {
+            currentUser = await CurrentUser.GetUserAsync();
+            IsOwner = CurrentList.OwnerId == currentUser.Id;
+            if (IsOwner)
+            {
+                CurrentList.UserGroups = await UserGroupShoppingListsRepo.GetUserGroupsOfShoppingListAsync(Id);
+            }
             Products = await ProductRepo.GetAllAsync();
             AddItemEditContext = new EditContext(AddItem);
         }
