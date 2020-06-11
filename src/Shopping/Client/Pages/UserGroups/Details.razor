@@ -20,190 +20,235 @@ else
 {
     <h3>Details of @userGroup.Name</h3>
     <hr />
-
     <div class="row">
         <div class="col">
             <div class="list-group list-group-horizontal-md" id="list-tab" role="tablist">
+                <a class="list-group-item list-group-item-action active" id="list-overview-list" 
+                   data-toggle="list" href="#list-overview" role="tab" @onclick="OnListTabClicked">
+                    <span class="oi oi-list-rich"></span> Overview
+                </a>
+                <a class="list-group-item list-group-item-action" id="list-actions-list" 
+                   data-toggle="list" href="#list-actions" role="tab" @onclick="OnListTabClicked">
+                    <span class="oi oi-code"></span> Actions
+                </a>
+                <a class="list-group-item list-group-item-action" id="list-properties-list" 
+                   data-toggle="list" href="#list-properties" role="tab" @onclick="OnListTabClicked">
+                    <span class="oi oi-cog"></span> Properties
+                </a>
             </div>
         </div>
     </div>
-
-
-    @if (IsOwner)
-    {
-
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Add User to List</h5>
-                        @if (!IsAddingUser)
-                        {
-                            <p class="card-text">Add user to your list to enable the access to all shopping lists in this list</p>
-                            <EditForm EditContext="addMemberContext" OnSubmit="OnAddMember">
-                                <DataAnnotationsValidator />
-                                <ValidationSummary />
-                                <div class="form-group">
-                                    <label for="nameInput">Email address or username</label>
-                                    <InputText id="nameInput" class="form-control" @bind-Value="memberInput.UserNameOrEmail" />
-                                </div>
-                                <button class="btn btn-primary">
-                                    <span class="oi oi-plus" /> Add user
-                                </button>
-                            </EditForm>
-                        }
-                        else
-                        {
-                            <p class="card-text"><strong>Adding user...</strong></p>
-                        }
-                    </div>
-                </div>
-            </div>
-            @if (availableLists != null && availableLists.Count > 0)
-            {
-                <div class="col-sm-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Add List to Group</h5>
-
-                            @if (!IsAddingList)
-                            {
-                                <p class="card-text">Add a already existing shopping list to this group. With that you grant all members of the group access to the list</p>
-                                <EditForm EditContext="addListContext" OnSubmit="OnAddList">
-                                    <DataAnnotationsValidator />
-                                    <ValidationSummary />
+    <hr />
+    <div class="row">
+        <div class="col">
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
+                    <h4>Overview</h4>
+                    <hr />
+                    @if (overviewAlert != null)
+                    {
+                        <AlertComponent Model="@overviewAlert" />
+                    }
+                    <div class="row">
+                        <div class="col">
+                            <h5>Owner</h5>
+                            <div class="row">
+                                <div class="col-md">
                                     <div class="form-group">
-                                        <label for="list-search">Available lists</label>
-                                        <SearchableInput id="list-search" ValueOptions="availableLists.ToDictionary(x => x.Id, x => x.Name)"
-                                                         @bind-SelectedValue="listIdInput.ListId" Placeholder="Search shopping list..." />
+                                        <label for="ownerNameInput">Username</label>
+                                        <input id="ownerNameInput" disabled class="form-control" value="@userGroup.Owner.UserName" />
                                     </div>
-                                    @if (!string.IsNullOrEmpty(listIdInput.ListId))
-                                    {
-                                        <button type="submit" class="btn btn-primary">
-                                            <span class="oi oi-plus" /> Assign list
-                                        </button>
-                                    }
-                                </EditForm>
-                            }
-                            else
-                            {
-                                <p class="card-text"><strong>Assigning list...</strong></p>
-                            }
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="ownerMailInput">Email</label>
+                                        <input id="ownerMailInput" disabled class="form-control" value="@userGroup.Owner.Email" />
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <h5>Shopping lists</h5>
+                            <div class="row">
+                                <div class="col">
+                                    <table class="table table-hover">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Date</th>
+                                                <th>Item Count</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (userGroup.ShoppingLists != null && userGroup.ShoppingLists.Count > 0)
+                                            {
+                                                @foreach (var list in userGroup.ShoppingLists)
+                                                {
+                                                    <tr>
+                                                        <td @onclick="@(()=>NavigateToListDetails(list.Id))">@list.Name</td>
+                                                        <td @onclick="@(()=>NavigateToListDetails(list.Id))">@list.ListDate.ToString("dd.MM.yyyy")</td>
+                                                        <td @onclick="@(()=>NavigateToListDetails(list.Id))">@list.Items.Count</td>
+                                                        <td>
+                                                            @if (IsOwner)
+                                                            {
+                                                                <button type="button" class="btn btn-danger" @onclick="@(() => OnRemoveList(list.Id))">
+                                                                    <span class="oi oi-trash" />
+                                                                </button>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td class="text-center" colspan="4">No shopping lists assigned</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <hr />
+                            <h5>Members</h5>
+                            <div class="row">
+                                <div class="col">
+                                    <table class="table">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Username</th>
+                                                <th>Email</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (userGroup.Members != null && userGroup.Members.Count > 0)
+                                            {
+                                                @foreach (var member in userGroup.Members)
+                                                {
+                                                    <tr>
+                                                        <td>@member.UserName</td>
+                                                        <td>@member.Email</td>
+                                                        <td>
+                                                            @if (IsOwner && member.Id != userGroup.Owner.Id)
+                                                            {
+                                                                <button type="button" class="btn btn-danger" @onclick="@(() => OnRemoveMember(member.Id))">
+                                                                    <span class="oi oi-trash" />
+                                                                </button>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td class="text-center" colspan="4">No members in group</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            }
-            <div class="col-sm-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Create new List and add to Group</h5>
-                        <p class="card-text">Click the button to create a new shopping list and automatically assign it to this group</p>
-                        <button type="button" class="btn btn-primary" @onclick="NavigateToListCreate">
-                            <span class="oi oi-plus" /> Create &amp; assign list
-                        </button>
+                <div class="tab-pane fade" id="list-actions" role="tabpanel" aria-labelledby="list-actions-list">
+                    <h4>Actions</h4>
+                    <hr />
+                    @if (actionsAlert != null)
+                    {
+                        <AlertComponent Model="@actionsAlert" />
+                        <hr />
+                    }
+                    <div class="row">
+                        @if (IsOwner)
+                        {
+                            <div class="col-sm-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Add User to List</h5>
+                                        @if (!IsAddingUser)
+                                        {
+                                            <p class="card-text">Add user to your list to enable the access to all shopping lists in this list</p>
+                                            <EditForm EditContext="addMemberContext" OnSubmit="OnAddMember">
+                                                <DataAnnotationsValidator />
+                                                <ValidationSummary />
+                                                <div class="form-group">
+                                                    <label for="nameInput">Email address or username</label>
+                                                    <InputText id="nameInput" class="form-control" @bind-Value="memberInput.UserNameOrEmail" />
+                                                </div>
+                                                <button class="btn btn-primary">
+                                                    <span class="oi oi-plus" /> Add user
+                                                </button>
+                                            </EditForm>
+                                        }
+                                        else
+                                        {
+                                            <p class="card-text"><strong>Adding user...</strong></p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            @if (availableLists != null && availableLists.Count > 0)
+                            {
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Add List to Group</h5>
+
+                                            @if (!IsAddingList)
+                                            {
+                                                <p class="card-text">Add a already existing shopping list to this group. With that you grant all members of the group access to the list</p>
+                                                <EditForm EditContext="addListContext" OnSubmit="OnAddList">
+                                                    <DataAnnotationsValidator />
+                                                    <ValidationSummary />
+                                                    <div class="form-group">
+                                                        <label for="list-search">Available lists</label>
+                                                        <SearchableInput id="list-search" ValueOptions="availableLists.ToDictionary(x => x.Id, x => x.Name)"
+                                                                         @bind-SelectedValue="listIdInput.ListId" Placeholder="Search shopping list..." />
+                                                    </div>
+                                                    @if (!string.IsNullOrEmpty(listIdInput.ListId))
+                                                    {
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <span class="oi oi-plus" /> Assign list
+                                                        </button>
+                                                    }
+                                                </EditForm>
+                                            }
+                                            else
+                                            {
+                                                <p class="card-text"><strong>Assigning list...</strong></p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="col-sm-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Create new List and add to Group</h5>
+                                        <p class="card-text">Click the button to create a new shopping list and automatically assign it to this group</p>
+                                        <button type="button" class="btn btn-primary" @onclick="NavigateToListCreate">
+                                            <span class="oi oi-plus" /> Create &amp; assign list
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col">
+                                <strong>Not Authorized</strong>
+                            </div>
+                        }
                     </div>
                 </div>
+                <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
+                    <h4>Properties</h4>
+                    <hr />
+                </div>
             </div>
-        </div>
-        <hr />
-    }
-    <h5>Owner</h5>
-    <div class="row">
-        <div class="col-md">
-            <div class="form-group">
-                <label for="ownerNameInput">Username</label>
-                <input id="ownerNameInput" disabled class="form-control" value="@userGroup.Owner.UserName" />
-            </div>
-        </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="ownerMailInput">Email</label>
-                <input id="ownerMailInput" disabled class="form-control" value="@userGroup.Owner.Email" />
-            </div>
-        </div>
-    </div>
-    <hr />
-    <h5>Shopping lists</h5>
-    <div class="row">
-        <div class="col">
-            <table class="table table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Item Count</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (userGroup.ShoppingLists != null && userGroup.ShoppingLists.Count > 0)
-                    {
-                        @foreach (var list in userGroup.ShoppingLists)
-                        {
-                            <tr>
-                                <td @onclick="@(()=>NavigateToListDetails(list.Id))">@list.Name</td>
-                                <td @onclick="@(()=>NavigateToListDetails(list.Id))">@list.ListDate.ToString("dd.MM.yyyy")</td>
-                                <td @onclick="@(()=>NavigateToListDetails(list.Id))">@list.Items.Count</td>
-                                <td>
-                                    @if (IsOwner)
-                                    {
-                                        <button type="button" class="btn btn-danger" @onclick="@(() => OnRemoveList(list.Id))">
-                                            <span class="oi oi-trash" />
-                                        </button>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td class="text-center" colspan="4">No shopping lists assigned</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <hr />
-    <h5>Members</h5>
-    <div class="row">
-        <div class="col">
-            <table class="table">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (userGroup.Members != null && userGroup.Members.Count > 0)
-                    {
-                        @foreach (var member in userGroup.Members)
-                        {
-                            <tr>
-                                <td>@member.UserName</td>
-                                <td>@member.Email</td>
-                                <td>
-                                    @if (IsOwner && member.Id != userGroup.Owner.Id)
-                                    {
-                                        <button type="button" class="btn btn-danger" @onclick="@(() => OnRemoveMember(member.Id))">
-                                            <span class="oi oi-trash" />
-                                        </button>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td class="text-center" colspan="4">No members in group</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
         </div>
     </div>
 }
@@ -230,6 +275,10 @@ else
     private ListIdInputModel listIdInput = new ListIdInputModel();
     private EditContext addListContext;
 
+
+    private AlertComponentModel actionsAlert;
+    private AlertComponentModel overviewAlert;
+
     protected async override Task OnInitializedAsync()
     {
         IsLoading = true;
@@ -237,8 +286,7 @@ else
         addMemberContext = new EditContext(memberInput);
         addListContext = new EditContext(listIdInput);
 
-        userGroup = await UserGroups.GetAsync(GroupId);
-        userGroup.ShoppingLists = await UserGroupShoppingLists.GetShoppingListsOfUserGroupAsync(GroupId);
+        await InitGroup();
         availableLists = await ShoppingLists.GetAllAsync();
 
         currentUser = await CurrentUser.GetUserAsync();
@@ -247,28 +295,29 @@ else
         IsLoading = false;
     }
 
+    private void OnListTabClicked()
+    {
+        overviewAlert = null;
+        actionsAlert = null;
+    }
+
     private async Task OnAddMember()
     {
         if (addMemberContext.Validate())
         {
             IsAddingUser = true;
-            var userModel = new ShoppingUserModel();
-            if (new EmailAddressAttribute().IsValid(memberInput.UserNameOrEmail))
-            {
-                userModel.Email = memberInput.UserNameOrEmail;
-            }
-            else
-            {
-                userModel.UserName = memberInput.UserNameOrEmail;
-            }
+
             try
             {
-                userGroup = await UserGroups.AddUserToGroup(GroupId, userModel);
+                var userModel = memberInput.CreateUserModel();
+                await UserGroups.AddUserToGroup(GroupId, userModel);
+                await InitGroup();
+                actionsAlert = AlertComponentModel.CreateSuccessAlert($"Member '{memberInput.UserNameOrEmail}' added");
                 memberInput = new MemberInputModel();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                actionsAlert = AlertComponentModel.CreateErrorAlert("Could not add member", $"{e.Message}");
             }
             IsAddingUser = false;
         }
@@ -276,6 +325,7 @@ else
 
     private async Task OnAddList()
     {
+        actionsAlert = null;
         if (addListContext.Validate())
         {
             IsAddingList = true;
@@ -287,10 +337,10 @@ else
             };
 
             var result = await UserGroupShoppingLists.CreateAssignmentAsync(assignment);
-            if (!result)
-            {
+            await InitGroup();
+            actionsAlert = result ? AlertComponentModel.CreateSuccessAlert("Assignment successful") :
+            AlertComponentModel.CreateErrorAlert("Assignment failed");
 
-            }
             listIdInput = new ListIdInputModel();
 
             IsAddingList = false;
@@ -299,10 +349,32 @@ else
 
     private async Task OnRemoveMember(string id)
     {
-
+        overviewAlert = null;
+        try
+        {
+            var userModel = memberInput.CreateUserModel();
+            await UserGroups.RemoveUserFromGroup(GroupId, new ShoppingUserModel() { Id = id });
+            await InitGroup();
+            overviewAlert = AlertComponentModel.CreateSuccessAlert("Member removed");
+        }
+        catch (Exception e)
+        {
+            overviewAlert = AlertComponentModel.CreateErrorAlert("Member could not be removed", e.Message);
+        }
     }
     private async Task OnRemoveList(string id)
     {
+        overviewAlert = null;
+        var assignment = new UserGroupShoppingList()
+        {
+            ShoppingListId = id,
+            UserGroupId = GroupId
+        };
+
+        var result = await UserGroupShoppingLists.RemoveAssignmentAsync(assignment);
+        await InitGroup();
+        overviewAlert = result ? AlertComponentModel.CreateSuccessAlert("Assignment removed") :
+        AlertComponentModel.CreateErrorAlert("Assignment could not be removed");
 
     }
     private void NavigateToListCreate()
@@ -313,14 +385,9 @@ else
     {
         Nav.NavigateTo($"/lists/details/{id}");
     }
-    public class MemberInputModel
+    private async Task InitGroup()
     {
-        [Required(ErrorMessage = "Username or Email required")]
-        public string UserNameOrEmail { get; set; }
-    }
-    public class ListIdInputModel
-    {
-        [Required(ErrorMessage = "List id is required")]
-        public string ListId { get; set; }
+        userGroup = await UserGroups.GetAsync(GroupId);
+        userGroup.ShoppingLists = await UserGroupShoppingLists.GetShoppingListsOfUserGroupAsync(GroupId);
     }
 }

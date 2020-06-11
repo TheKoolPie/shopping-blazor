@@ -86,7 +86,7 @@ namespace Shopping.Server.Services.Implementations
 
             if (group.Members.Any(m => m.Id == existingUser.Id))
             {
-                throw new ItemAlreadyExistsException($"User with id {existingUser.Id} already exists in group: '{group.Name}'");
+                throw new ItemAlreadyExistsException($"User with '{existingUser.UserName} already exists in group: '{group.Name}'");
             }
 
             group.Members.Add(new ShoppingUserModel()
@@ -106,6 +106,40 @@ namespace Shopping.Server.Services.Implementations
             }
 
             return group;
+        }
+        public async Task<UserGroup> RemoveUserFromGroup(string userGroupId, ShoppingUserModel user)
+        {
+            var group = await GetAsync(userGroupId);
+
+            var existingUser = await _userRepository.GetUserAsync(user);
+            if (existingUser == null)
+            {
+                throw new ItemNotFoundException($"No user with provided user data found");
+            }
+            var groupMember = group.Members.FirstOrDefault(m => m.Id == existingUser.Id);
+            if (groupMember == null)
+            {
+                throw new ItemNotFoundException($"User not in group: '{group.Name}'");
+            }
+
+            if (!group.Members.Remove(groupMember))
+            {
+                throw new Exception("Could not remove member");
+            }
+
+            _context.UserGroups.Update(group);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                throw new PersistencyException($"Could save adding of user {existingUser.Id} to group '{group.Name}'", e);
+            }
+
+            return group;
+
         }
 
         public async Task<List<ShoppingUserModel>> GetUsersInGroup(string userGroupId)
@@ -137,5 +171,7 @@ namespace Shopping.Server.Services.Implementations
             }
             return commonLists;
         }
+
+
     }
 }

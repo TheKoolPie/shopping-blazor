@@ -21,7 +21,10 @@ namespace Shopping.Shared.Model
             Message = message;
             AlertType = alertType;
         }
-
+        public static AlertComponentModel CreateSuccessAlert(string title)
+        {
+            return CreateSuccessAlert(title, "");
+        }
         public static AlertComponentModel CreateSuccessAlert(string title, string message)
         {
             return new AlertComponentModel
@@ -30,6 +33,10 @@ namespace Shopping.Shared.Model
                 Message = message,
                 AlertType = AlertType.Success
             };
+        }
+        public static AlertComponentModel CreateErrorAlert(string title)
+        {
+            return CreateErrorAlert(title, "");
         }
         public static AlertComponentModel CreateErrorAlert(string title, string message)
         {

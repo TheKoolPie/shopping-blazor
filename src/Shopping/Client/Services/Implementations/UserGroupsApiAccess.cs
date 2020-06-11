@@ -73,6 +73,27 @@ namespace Shopping.Client.Services.Implementations
             return null;
         }
 
+        public async Task<UserGroup> RemoveUserFromGroup(string userGroupId, ShoppingUserModel user)
+        {
+            var client = await _authService.GetHttpClientAsync();
+
+            var content = new StringContent(JsonConvert.SerializeObject(user), System.Text.Encoding.UTF8, "application/json");
+            var response = await client.PutAsync($"{BaseAddress}/RemoveUser/{userGroupId}", content);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<UserGroupResult>();
+                if (!result.IsSuccessful)
+                {
+                    throw new Exception(result.Message);
+                }
+                else
+                {
+                    return result.ResultData.FirstOrDefault();
+                }
+            }
+            return null;
+        }
+
         public Task<bool> UserIsInGroupAsync(string userGroupId, string userId)
         {
             throw new NotImplementedException();

@@ -263,7 +263,7 @@
         var createdItem = await ShoppingListRepo.AddOrUpdateItemAsync(CurrentList.Id, AddItem);
         if (createdItem == null)
         {
-            AddItemAlertModel = AlertComponentModel.CreateErrorAlert("Error with adding", "Could not add item to list");
+            AddItemAlertModel = AlertComponentModel.CreateErrorAlert("Could not add item to list");
         }
         else
         {

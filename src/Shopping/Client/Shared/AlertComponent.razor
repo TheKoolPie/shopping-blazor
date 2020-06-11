@@ -4,8 +4,14 @@
 {
     <div class="@cssClass" role="alert" style="margin:12px 0px 12px 0px">
         <h6>@_model.Title</h6>
-        <hr />
-        <p>@_model.Message</p>
+        @if (!string.IsNullOrEmpty(_model.Message))
+        {
+            <hr />
+            <p>@_model.Message</p>
+        }
+        <button type="button" class="close" aria-label="close" @onclick="OnDismiss">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 }
 @code {
@@ -27,4 +33,8 @@
     }
     private string cssClass { get; set; }
 
+    private void OnDismiss()
+    {
+        _model = null;
+    }
 }

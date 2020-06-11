@@ -156,11 +156,45 @@ namespace Shopping.Server.Controllers
             var currentUser = await _userProvider.GetUserAsync();
             if (!(await _userGroups.UserIsInGroupAsync(id, currentUser.Id)))
             {
-                return Unauthorized();
+                result.IsSuccessful = false;
+                result.Message = "Not authorized";
+                return Unauthorized(result);
             }
             try
             {
                 var group = await _userGroups.AddUserToGroup(id, user);
+                group.Owner = await _userRepository.GetUserByIdAsync(group.Owner.Id);
+                foreach (var member in group.Members)
+                {
+                    var dbUser = await _userRepository.GetUserByIdAsync(member.Id);
+                    member.UserName = dbUser.UserName;
+                    member.Email = dbUser.Email;
+                }
+
+                result.IsSuccessful = true;
+                result.ResultData.Add(group);
+            }
+            catch (Exception e)
+            {
+                result.IsSuccessful = false;
+                result.Message = e.Message;
+            }
+            return Ok(result);
+        }
+        [HttpPut("RemoveUser/{id}")]
+        public async Task<ActionResult<UserGroupResult>> RemoveUserFromGroup(string id, [FromBody] ShoppingUserModel user)
+        {
+            var result = new UserGroupResult();
+            var currentUser = await _userProvider.GetUserAsync();
+            if (!(await _userGroups.UserIsInGroupAsync(id, currentUser.Id)))
+            {
+                result.IsSuccessful = false;
+                result.Message = "Not authorized";
+                return Unauthorized(result);
+            }
+            try
+            {
+                var group = await _userGroups.RemoveUserFromGroup(id, user);
                 group.Owner = await _userRepository.GetUserByIdAsync(group.Owner.Id);
                 foreach (var member in group.Members)
                 {
