@@ -3,6 +3,7 @@
 
 @inject IShoppingLists ShoppingListRepo
 @inject NavigationManager NavigationManager
+@inject IUserGroupShoppingLists GroupListAssignments
 @attribute [Authorize]
 
 <h3>Create List</h3>
@@ -39,16 +40,6 @@
         <AlertComponent Model="@AlertData" />
     </div>
 </div>
-<hr />
-@if (createdItem != null)
-{
-    <div class="row">
-        <div class="col">
-            <p>Created new shopping list. Go to newly created list to fill with content or create additional lists.</p>
-            <button class="btn btn-lg btn-primary" @onclick="NavigateToLastCreatedList">Got to created List</button>
-        </div>
-    </div>
-}
 
 
 @code {
@@ -82,8 +73,15 @@
             }
             else
             {
-                AlertData = AlertComponentModel.CreateSuccessAlert("Created list", "");
-                list = new ShoppingList() { ListDate = DateTime.Now };
+                if (!string.IsNullOrEmpty(GroupId))
+                {
+                    var result = await GroupListAssignments.CreateAssignmentAsync(new UserGroupShoppingList()
+                    {
+                        ShoppingListId = createdItem.Id,
+                        UserGroupId = GroupId
+                    });
+                }
+                NavigateToLastCreatedList();
             }
             IsSaving = false;
         }
