@@ -1,9 +1,10 @@
-﻿@page "/lists/details/{id}"
+﻿@page "/lists/details/{shoppingListId}"
 
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IShoppingLists ShoppingListRepo
 @inject IProducts ProductRepo
+@inject IUserGroupRepository UserGroupRepo
 @inject IUserGroupShoppingLists UserGroupShoppingListsRepo
 @inject ICurrentUserProvider CurrentUser
 
@@ -116,7 +117,7 @@
                                 <div class="form-group">
                                     <label for="product-search">Product</label>
                                     <SearchableInput id="product-search"
-                                                     ValueOptions="Products.ToDictionary(x => x.Id, x => x.Name)"
+                                                     ValueOptions="_availableProducts.ToDictionary(x => x.Id, x => x.Name)"
                                                      @bind-SelectedValue="AddItem.ProductItemId"
                                                      Placeholder="Search Products..." />
                                 </div>
@@ -133,7 +134,7 @@
                                         </div>
                                         <div class="col-4">
                                             <span class="input-group-text">
-                                                @(Products.FirstOrDefault(p => p.Id == AddItem.ProductItemId)?.Unit.GetDescription() ?? "")
+                                                @(_availableProducts.FirstOrDefault(p => p.Id == AddItem.ProductItemId)?.Unit.GetDescription() ?? "")
                                             </span>
                                         </div>
                                     </div>
@@ -164,9 +165,30 @@
                                 <div class="col-sm-6">
                                     <div class="card">
                                         <div class="card-body">
-                                            <h5 class="card-title">Search existing</h5>
-                                            <p class="card-text">Search for already existing groups, which belong to you.</p>
-                                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                                            <h5 class="card-title">Add Group to List</h5>
+                                            @if (!IsAddingGroup)
+                                            {
+                                                <p class="card-text">Search for already existing groups, which belong to you.</p>
+                                                <EditForm EditContext="addGroupContext" OnSubmit="OnAddGroup">
+                                                    <DataAnnotationsValidator />
+                                                    <ValidationSummary />
+                                                    <div class="form-group">
+                                                        <label for="list-search">Available lists</label>
+                                                        <SearchableInput id="list-search" ValueOptions="_availableGroups.ToDictionary(x => x.Id, x => x.Name)"
+                                                                         @bind-SelectedValue="groupIdInput.GroupId" Placeholder="Search user group..." />
+                                                    </div>
+                                                    @if (!string.IsNullOrEmpty(groupIdInput.GroupId))
+                                                    {
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <span class="oi oi-plus" /> Assign group
+                                                        </button>
+                                                    }
+                                                </EditForm>
+                                            }
+                                            else
+                                            {
+
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -189,7 +211,11 @@
                                                 {
                                                     <tr>
                                                         <td @onclick="@(() => NavigateToUserGroupDetails(group.Id))">@group.Name</td>
-                                                        <td></td>
+                                                        <td>
+                                                            <button class="btn btn-danger" type="button" @onclick="@(()=>OnRemoveGroup(group.Id))">
+                                                                <span class="oi oi-trash" />
+                                                            </button>
+                                                        </td>
                                                     </tr>
                                                 }
                                             </tbody>
@@ -243,9 +269,9 @@
 
 @code {
     [Parameter]
-    public string Id { get; set; }
+    public string ShoppingListId { get; set; }
 
-    AlertComponentModel LoadingAlertModel = null;
+    private bool IsAddingGroup;
     private bool IsLoading { get; set; }
 
     private ShoppingList CurrentList;
@@ -255,7 +281,14 @@
     private bool IsOwner;
     private ShoppingUserModel currentUser;
 
+    private List<UserGroup> _availableGroups;
+    private List<ProductItem> _availableProducts = new List<ProductItem>();
+
+    private GroupIdInputModel groupIdInput = new GroupIdInputModel();
+    private EditContext addGroupContext;
+
     #region Alerts
+    AlertComponentModel LoadingAlertModel = null;
     AlertComponentModel AddItemAlertModel = null;
     AlertComponentModel AccessAlertModel = null;
     AlertComponentModel PropertyAlertModel = null;
@@ -265,18 +298,17 @@
     private ShoppingListItem AddItem = new ShoppingListItem();
     private EditContext AddItemEditContext;
     private bool IsSavingItem = false;
-    private List<ProductItem> Products = new List<ProductItem>();
     #endregion
 
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
         LoadingAlertModel = null;
-        CurrentList = await ShoppingListRepo.GetAsync(Id);
+        CurrentList = await ShoppingListRepo.GetAsync(ShoppingListId);
         if (CurrentList == null)
         {
             LoadingAlertModel = AlertComponentModel.CreateErrorAlert("Error loading list",
-                $"List with id {Id} does not exist or it does not belong to you.");
+                $"List with id {ShoppingListId} does not exist or it does not belong to you.");
         }
         else
         {
@@ -284,9 +316,12 @@
             IsOwner = CurrentList.OwnerId == currentUser.Id;
             if (IsOwner)
             {
-                CurrentList.UserGroups = await UserGroupShoppingListsRepo.GetUserGroupsOfShoppingListAsync(Id);
+                CurrentList.UserGroups = await UserGroupShoppingListsRepo.GetUserGroupsOfShoppingListAsync(ShoppingListId);
             }
-            Products = await ProductRepo.GetAllAsync();
+            _availableProducts = await ProductRepo.GetAllAsync();
+            _availableGroups = await UserGroupRepo.GetAllAsync();
+
+            addGroupContext = new EditContext(groupIdInput);
             AddItemEditContext = new EditContext(AddItem);
         }
 
@@ -312,16 +347,58 @@
         else
         {
             AddItemAlertModel = AlertComponentModel.CreateSuccessAlert($"{createdItem.Amount} {createdItem.ProductItem.Unit.GetDescription()} of {createdItem.ProductItem.Name} added");
-            CurrentList = await ShoppingListRepo.GetAsync(Id);
+            CurrentList = await ShoppingListRepo.GetAsync(ShoppingListId);
             AddItem = new ShoppingListItem();
         }
 
         IsSavingItem = false;
     }
 
+    private async Task OnAddGroup()
+    {
+        AccessAlertModel = null;
+        if (addGroupContext.Validate())
+        {
+            IsAddingGroup = true;
+
+            var assignment = new UserGroupShoppingList()
+            {
+                ShoppingListId = ShoppingListId,
+                UserGroupId = groupIdInput.GroupId
+            };
+
+            var result = await UserGroupShoppingListsRepo.CreateAssignmentAsync(assignment);
+
+            CurrentList.UserGroups = await UserGroupShoppingListsRepo.GetUserGroupsOfShoppingListAsync(ShoppingListId);
+
+            AccessAlertModel = result ? AlertComponentModel.CreateSuccessAlert("Assignment successful") :
+                AlertComponentModel.CreateErrorAlert("Assignment failed");
+
+            groupIdInput = new GroupIdInputModel();
+
+            IsAddingGroup = false;
+        }
+    }
+    private async Task OnRemoveGroup(string groupId)
+    {
+        AccessAlertModel = null;
+        var assignment = new UserGroupShoppingList()
+        {
+            ShoppingListId = ShoppingListId,
+            UserGroupId = groupId
+        };
+
+        var result = await UserGroupShoppingListsRepo.RemoveAssignmentAsync(assignment);
+        CurrentList.UserGroups = await UserGroupShoppingListsRepo.GetUserGroupsOfShoppingListAsync(ShoppingListId);
+
+        AccessAlertModel = result ? AlertComponentModel.CreateSuccessAlert("Assignment removed") :
+            AlertComponentModel.CreateErrorAlert("Assignment could not be removed");
+
+    }
+
     private async Task OnDeleteList()
     {
-        if (await ShoppingListRepo.DeleteByIdAsync(Id))
+        if (await ShoppingListRepo.DeleteByIdAsync(ShoppingListId))
         {
             NavigationManager.NavigateTo("/lists");
         }
@@ -333,7 +410,7 @@
 
     private void CreateAndAssignUserGroup()
     {
-        NavigationManager.NavigateTo($"/groups/create/{Id}");
+        NavigationManager.NavigateTo($"/groups/create/{ShoppingListId}");
     }
     private void NavigateToUserGroupDetails(string userGroupId)
     {
