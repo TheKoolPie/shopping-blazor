@@ -197,12 +197,15 @@ else
                                             {
                                                 <p class="card-text">Add a already existing shopping list to this group. With that you grant all members of the group access to the list</p>
                                                 <EditForm EditContext="addListContext" OnSubmit="OnAddList">
-                                                    <DataAnnotationsValidator />
-                                                    <ValidationSummary />
                                                     <div class="form-group">
                                                         <label for="list-search">Available lists</label>
-                                                        <SearchableInput id="list-search" ValueOptions="availableLists.ToDictionary(x => x.Id, x => x.Name)"
-                                                                         @bind-SelectedValue="listIdInput.ListId" Placeholder="Search shopping list..." />
+                                                        <InputSelect id="list-search" @bind-Value="listIdInput.ListId" class="form-control">
+                                                            <option value="">Choose List...</option>
+                                                            @foreach(var list in availableLists)
+                                                            {
+                                                                <option value="@list.Id">@list.Name</option>
+                                                            }
+                                                        </InputSelect>
                                                     </div>
                                                     @if (!string.IsNullOrEmpty(listIdInput.ListId))
                                                     {
@@ -294,8 +297,8 @@ else
 }
 
 @code {
-    [Parameter]
-    public string GroupId { get; set; }
+        [Parameter]
+        public string GroupId { get; set; }
 
     private bool IsLoading;
     private bool IsSaving;
@@ -329,7 +332,6 @@ else
         addListContext = new EditContext(listIdInput);
 
         await InitGroup();
-        availableLists = await ShoppingLists.GetAllAsync();
 
         currentUser = await CurrentUser.GetUserAsync();
         IsOwner = userGroup.Owner.Id == currentUser.Id;
@@ -450,5 +452,11 @@ else
     {
         userGroup = await UserGroups.GetAsync(GroupId);
         userGroup.ShoppingLists = await UserGroupShoppingLists.GetShoppingListsOfUserGroupAsync(GroupId);
+
+        var userGroupListsId = userGroup.ShoppingLists.Select(x => x.Id).ToList();
+
+        availableLists = (await ShoppingLists.GetAllAsync())
+            .Where(l => !userGroupListsId.Contains(l.Id))
+            .ToList();
     }
 }

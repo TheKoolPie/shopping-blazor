@@ -53,7 +53,7 @@ else
                             <div class="form-group">
                                 <label for="group-select">User Group</label>
                                 <InputSelect id="group-select" class="form-control" @bind-Value="@_addGroupId">
-                                    <option value="">Choose Group....</option>
+                                    <option value="">Choose Group...</option>
                                     @foreach (var group in _availableUserGroups)
                                                     {
                                         <option value="@group.Id">@group.Name</option>
