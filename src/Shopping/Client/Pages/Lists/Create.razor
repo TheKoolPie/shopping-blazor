@@ -4,6 +4,7 @@
 @inject IShoppingLists ShoppingListRepo
 @inject NavigationManager NavigationManager
 @inject IUserGroupShoppingLists GroupListAssignments
+@inject IUserGroupRepository UserGroupRepo
 @attribute [Authorize]
 
 <h3>Create List</h3>
@@ -11,35 +12,62 @@
     Create new shopping list.<br />
 </p>
 <hr />
-<div class="row">
-    <div class="col">
-        @if (IsSaving)
-        {
-            <strong>Save data....</strong>
-        }
-        else
-        {
-            <EditForm EditContext="editContext" OnSubmit="HandleSubmit">
-                <ValidationSummary />
-                <DataAnnotationsValidator />
-                <div class="form-group">
-                    <label for="dateInput">Date</label>
-                    <InputDate @bind-Value="list.ListDate" id="dateInput" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label for="nameInput">Name</label>
-                    <InputText @bind-Value="list.Name" id="nameInput" class="form-control" />
-                </div>
-                <button type="submit" class="btn btn-primary">Create</button>
-            </EditForm>
-        }
+@if (IsLoading)
+{
+    <div class="row">
+        <div class="col">
+            <p>Loading ...</p>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col">
-        <AlertComponent Model="@AlertData" />
+}
+else
+{
+    <div class="row">
+        <div class="col">
+            <AlertComponent Model="@AlertData" />
+        </div>
     </div>
-</div>
+    <div class="row">
+        <div class="col">
+            @if (IsSaving)
+            {
+                <strong>Save data....</strong>
+            }
+            else
+            {
+                <EditForm EditContext="editContext" OnSubmit="HandleSubmit">
+                    <ValidationSummary />
+                    <DataAnnotationsValidator />
+                    <div class="form-group">
+                        <label for="dateInput">Date</label>
+                        <InputDate @bind-Value="list.ListDate" id="dateInput" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="nameInput">Name</label>
+                        <InputText @bind-Value="list.Name" id="nameInput" class="form-control" />
+                    </div>
+                    @if (string.IsNullOrEmpty(GroupId))
+                    {
+                        @if (_availableUserGroups != null && _availableUserGroups.Count > 0)
+                        {
+                            <div class="form-group">
+                                <label for="group-select">User Group</label>
+                                <InputSelect id="group-select" class="form-control" @bind-Value="@_addGroupId">
+                                    <option value="">Choose Group....</option>
+                                    @foreach (var group in _availableUserGroups)
+                                                    {
+                                        <option value="@group.Id">@group.Name</option>
+                                                    }
+                                </InputSelect>
+                            </div>
+                        }
+                    }
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </EditForm>
+            }
+        </div>
+    </div>
+}
 
 
 @code {
@@ -47,6 +75,9 @@
     public string GroupId { get; set; }
 
     private bool IsSaving = false;
+    private bool IsLoading = false;
+
+
     private AlertComponentModel AlertData;
     private ShoppingList list = new ShoppingList()
     {
@@ -57,9 +88,20 @@
 
     private ShoppingList createdItem;
 
-    protected override void OnInitialized()
+    private List<UserGroup> _availableUserGroups;
+
+    private string _addGroupId;
+
+    protected async override Task OnInitializedAsync()
     {
+        IsLoading = true;
+        _addGroupId = GroupId;
         editContext = new EditContext(list);
+        if (string.IsNullOrEmpty(_addGroupId))
+        {
+            _availableUserGroups = await UserGroupRepo.GetAllAsync();
+        }
+        IsLoading = false;
     }
 
     private async Task HandleSubmit()
@@ -77,12 +119,12 @@
             }
             else
             {
-                if (!string.IsNullOrEmpty(GroupId))
+                if (!string.IsNullOrEmpty(_addGroupId))
                 {
                     var result = await GroupListAssignments.CreateAssignmentAsync(new UserGroupShoppingList()
                     {
                         ShoppingListId = createdItem.Id,
-                        UserGroupId = GroupId
+                        UserGroupId = _addGroupId
                     });
                 }
                 NavigateToLastCreatedList();
