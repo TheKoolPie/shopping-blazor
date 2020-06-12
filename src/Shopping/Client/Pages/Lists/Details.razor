@@ -84,7 +84,7 @@
                                                         <td @onclick="(()=>item.Done = !item.Done)"> @item.Amount </td>
                                                         <td @onclick="(()=>item.Done = !item.Done)"> @item.ProductItem.Unit.GetDescription()</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-danger">
+                                                            <button type="button" class="btn btn-sm btn-danger" @onclick="@(()=>RemoveListItem(item.Id))">
                                                                 <span class="oi oi-trash" />
                                                             </button>
                                                         </td>
@@ -130,7 +130,9 @@
                                     </div>
                                     <div class="form-row">
                                         <div class="col">
-                                            <CustomStepper id="product-amount" @bind-StepperValue="@AddItem.Amount" Label="Amount" Increment="0.1f" Minimum="0" Maximum="(float.MaxValue)" />
+                                            <CustomStepper id="product-amount" @bind-StepperValue="@AddItem.Amount" 
+                                                           Label="Amount" Increment="@(_availableProducts.FirstOrDefault(p => p.Id == AddItem.ProductItemId)?.Unit.GetStepperIncrement() ?? 0.1f)" 
+                                                           Minimum="0" Maximum="(float.MaxValue)" />
                                         </div>
                                         <div class="col-4">
                                             <span class="input-group-text">
@@ -286,6 +288,7 @@
 
     private bool IsOwner;
     private ShoppingUserModel currentUser;
+    private bool CurrentListHasChanged = false;
 
     private List<UserGroup> _availableGroups;
     private List<ProductItem> _availableProducts = new List<ProductItem>();
@@ -332,6 +335,20 @@
         }
 
         IsLoading = false;
+    }
+
+    private void RemoveListItem(string id)
+    {
+        var remItem = CurrentList.Items.FirstOrDefault(i => i.Id == id);
+        if (remItem != null)
+        {
+            CurrentList.Items.Remove(remItem);
+            CurrentListHasChanged = true;
+        }
+    }
+    private async Task OnSaveListChanges()
+    {
+
     }
 
     private async Task InitAvailableProducts()
