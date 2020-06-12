@@ -30,5 +30,38 @@ namespace Shopping.Shared.Data
             Items = new List<ShoppingListItem>();
             Owner = new ShoppingUserModel();
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ShoppingList list &&
+                   Name == list.Name &&
+                   ListDate == list.ListDate &&
+                   Owner.Equals(list.Owner) &&
+                   ItemsEqual(list.Items);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name, ListDate, Owner, Items);
+        }
+
+        private bool ItemsEqual(List<ShoppingListItem> items)
+        {
+            if (Items.Count != items.Count)
+            {
+                return false;
+            }
+            var local = Items.OrderBy(x => x.Id).ToList();
+            var compare = items.OrderBy(x => x.Id).ToList();
+
+            for (int i = 0; i < local.Count; i++)
+            {
+                if (!local[i].Equals(compare[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

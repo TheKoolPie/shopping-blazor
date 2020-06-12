@@ -54,7 +54,7 @@ namespace Shopping.Server.Services.Implementations
                 {
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateException e)
+                catch (Exception e)
                 {
                     throw new PersistencyException("Could not update item", e);
                 }

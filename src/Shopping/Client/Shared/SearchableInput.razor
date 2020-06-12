@@ -74,6 +74,7 @@
         else
         {
             SelectedValue = "";
+            SelectedValueChanged.InvokeAsync(SelectedValue).Wait();
         }
     }
 }

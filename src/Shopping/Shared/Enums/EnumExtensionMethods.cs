@@ -21,5 +21,29 @@ namespace Shopping.Shared.Enums
             return GenericEnum.ToString();
         }
 
+        public static float GetStepperIncrement(this ProductUnit unit)
+        {
+            float stepperValue = 0.1f;
+            switch (unit)
+            {
+                case ProductUnit.KiloGramm:
+                case ProductUnit.Liter:
+                    stepperValue = .5f;
+                    break;
+                case ProductUnit.Piece:
+                case ProductUnit.Package:
+                case ProductUnit.Can:
+                case ProductUnit.Glas:
+                case ProductUnit.Bottle:
+                    stepperValue = 1;
+                    break;
+                case ProductUnit.Gramm:
+                case ProductUnit.MilliLiter:
+                    stepperValue = 50f;
+                    break;
+            }
+            return stepperValue;
+        }
+
     }
 }
