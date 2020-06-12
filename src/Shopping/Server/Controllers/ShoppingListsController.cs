@@ -127,6 +127,31 @@ namespace Shopping.Server.Controllers
             return Ok(createdItem);
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ShoppingList>> UpdateList(string id, ShoppingList list)
+        {
+            if (id != list.Id)
+            {
+                return BadRequest();
+            }
+
+            ShoppingList updatedList = null;
+            try
+            {
+                updatedList = await _lists.UpdateAsync(id, list);
+            }
+            catch (ItemNotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (PersistencyException e)
+            {
+                return Conflict(e.Message);
+            }
+
+            return Ok(updatedList);
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> DeleteList(string id)
         {

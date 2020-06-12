@@ -27,5 +27,18 @@ namespace Shopping.Shared.Data
             this.Amount = item.Amount;
             this.Done = item.Done;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ShoppingListItem item &&
+                   ProductItemId == item.ProductItemId &&
+                   Amount == item.Amount &&
+                   Done == item.Done;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ProductItemId, Amount, Done);
+        }
     }
 }

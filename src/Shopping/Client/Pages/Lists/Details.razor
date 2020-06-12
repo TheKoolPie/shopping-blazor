@@ -54,7 +54,20 @@
             <div class="col">
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
-                        <h4>Overview</h4>
+                        <div class="row">
+                            <div class="col-auto mr-auto">
+                                <h4>Overview</h4>
+                            </div>
+                            @if (CurrentListHasChanged)
+                            {
+                                <div class="col-auto">
+                                    <button class="btn btn-primary" @onclick="OnSaveListChanges">
+                                        <span class="oi oi-circle-check" /> Save
+                                    </button>
+                                </div>
+                            }
+                        </div>
+
                         <hr />
                         @if (CurrentList != null)
                         {
@@ -77,12 +90,12 @@
                                                 {
                                                     var opacity = item.Done ? "1" : "0";
                                                     <tr>
-                                                        <td @onclick="(()=>item.Done = !item.Done)">
+                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))">
                                                             <span style="opacity:@opacity" class="oi oi-circle-check table-check-status"></span>
                                                         </td>
-                                                        <td @onclick="(()=>item.Done = !item.Done)"> @item.ProductItem.Name </td>
-                                                        <td @onclick="(()=>item.Done = !item.Done)"> @item.Amount </td>
-                                                        <td @onclick="(()=>item.Done = !item.Done)"> @item.ProductItem.Unit.GetDescription()</td>
+                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Name </td>
+                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.Amount </td>
+                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Unit.GetDescription()</td>
                                                         <td>
                                                             <button type="button" class="btn btn-sm btn-danger" @onclick="@(()=>RemoveListItem(item.Id))">
                                                                 <span class="oi oi-trash" />
@@ -130,8 +143,8 @@
                                     </div>
                                     <div class="form-row">
                                         <div class="col">
-                                            <CustomStepper id="product-amount" @bind-StepperValue="@AddItem.Amount" 
-                                                           Label="Amount" Increment="@(_availableProducts.FirstOrDefault(p => p.Id == AddItem.ProductItemId)?.Unit.GetStepperIncrement() ?? 0.1f)" 
+                                            <CustomStepper id="product-amount" @bind-StepperValue="@AddItem.Amount"
+                                                           Label="Amount" Increment="@(_availableProducts.FirstOrDefault(p => p.Id == AddItem.ProductItemId)?.Unit.GetStepperIncrement() ?? 0.1f)"
                                                            Minimum="0" Maximum="(float.MaxValue)" />
                                         </div>
                                         <div class="col-4">
@@ -178,10 +191,10 @@
                                                             <label for="group-search">Available lists</label>
                                                             <InputSelect class="form-control" id="group-search" @bind-Value="groupIdInput.GroupId">
                                                                 <option value="">Choose Group...</option>
-                                                                @foreach(var list in _availableGroups)
-                                                                {
+                                                                @foreach (var list in _availableGroups)
+                                                                                    {
                                                                     <option value="@list.Id">@list.Name</option>
-                                                                }
+                                                                                    }
                                                             </InputSelect>
                                                         </div>
                                                         @if (!string.IsNullOrEmpty(groupIdInput.GroupId))
@@ -346,9 +359,22 @@
             CurrentListHasChanged = true;
         }
     }
+    private void ToggleDoneStateOfItem(string id)
+    {
+        var toggleItem = CurrentList.Items.FirstOrDefault(i => i.Id == id);
+        if (toggleItem != null)
+        {
+            toggleItem.Done = !toggleItem.Done;
+            CurrentListHasChanged = true;
+        }
+    }
     private async Task OnSaveListChanges()
     {
-
+        var result = await ShoppingListRepo.UpdateAsync(CurrentList.Id, CurrentList);
+        if(result != null)
+        {
+            CurrentListHasChanged = false;
+        }
     }
 
     private async Task InitAvailableProducts()

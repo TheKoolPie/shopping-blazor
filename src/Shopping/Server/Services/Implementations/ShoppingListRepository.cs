@@ -47,7 +47,7 @@ namespace Shopping.Server.Services.Implementations
             var list = await _context.ShoppingLists.FirstOrDefaultAsync(i => i.Id == id);
             if (list == null)
             {
-                throw new ItemNotFoundException(typeof(ShoppingList),id);
+                throw new ItemNotFoundException(typeof(ShoppingList), id);
             }
             foreach (var item in list.Items)
             {
@@ -131,7 +131,34 @@ namespace Shopping.Server.Services.Implementations
             existing.Name = update.Name;
             existing.ListDate = update.ListDate;
             existing.Owner = update.Owner;
-            existing.Items = update.Items;
+
+            var deleteItems = existing.Items
+                .Where(i => !update.Items.Any(j => j.ProductItemId == i.ProductItemId))
+                .Select(i => i.Id)
+                .ToList();
+            foreach (var id in deleteItems)
+            {
+                var delete = existing.Items.FirstOrDefault(i => i.Id == id);
+                if (delete != null)
+                {
+                    existing.Items.Remove(delete);
+                }
+            }
+
+
+            foreach (var updateItem in update.Items)
+            {
+                var existingItem = existing.Items.FirstOrDefault(i => i.Id == updateItem.Id);
+                if (existing == null)
+                {
+                    existing.Items.Add(updateItem);
+                }
+                else
+                {
+                    existingItem.Amount = updateItem.Amount;
+                    existingItem.Done = updateItem.Done;
+                }
+            }
         }
 
         public async Task<List<ShoppingList>> GetAllOfUserAsync(string userId)
@@ -158,7 +185,7 @@ namespace Shopping.Server.Services.Implementations
             var userGroupsOfList = await _userGroupShoppingLists.GetUserGroupsOfShoppingListAsync(list.Id);
             foreach (var group in userGroupsOfList)
             {
-                if(await _userGroups.UserIsInGroupAsync(group.Id, userId))
+                if (await _userGroups.UserIsInGroupAsync(group.Id, userId))
                 {
                     return true;
                 }
