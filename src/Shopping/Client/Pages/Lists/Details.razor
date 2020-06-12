@@ -384,6 +384,7 @@
         {
             AddItemAlertModel = AlertComponentModel.CreateSuccessAlert($"{createdItem.Amount} {createdItem.ProductItem.Unit.GetDescription()} of {createdItem.ProductItem.Name} added");
             CurrentList = await ShoppingListRepo.GetAsync(ShoppingListId);
+            await InitAvailableGroups();
             AddItem = new ShoppingListItem();
         }
 
