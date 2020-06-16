@@ -4,27 +4,11 @@
 <h3>Home</h3>
 <div class="row">
     <div class="col">
-        <ContextMenu>
-            <ContextMenuItem OnClickCallback="@(()=>OnMenuItemClicked("Item1"))">
-                Item1
-            </ContextMenuItem>
-            <ContextMenuItem OnClickCallback="@(()=>OnMenuItemClicked("Item2"))">
-                Item2
-            </ContextMenuItem>
-        </ContextMenu>
+
     </div>
 </div>
-<div class="row">
-    <div class="col">
-        @activeText
-    </div>
-</div>
+
 
 @code {
-    private string activeText;
 
-    private void OnMenuItemClicked(string text)
-    {
-        activeText = text;
-    }
 }

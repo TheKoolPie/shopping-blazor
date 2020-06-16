@@ -109,9 +109,11 @@
                                                         <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.Amount </td>
                                                         <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Unit.GetDescription()</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-danger" @onclick="@(()=>RemoveListItem(item.Id))">
-                                                                <span class="oi oi-trash" />
-                                                            </button>
+                                                            <ContextMenu>
+                                                                <ContextMenuItem OnClickCallback="@(()=>RemoveListItem(item.Id))">
+                                                                    Delete
+                                                                </ContextMenuItem>
+                                                            </ContextMenu>
                                                         </td>
                                                     </tr>
                                                 }
@@ -259,9 +261,11 @@
                                                             <tr>
                                                                 <td @onclick="@(() => NavigateToUserGroupDetails(group.Id))">@group.Name</td>
                                                                 <td>
-                                                                    <button class="btn btn-danger" type="button" @onclick="@(() => OnRemoveGroup(group.Id))">
-                                                                        <span class="oi oi-trash" />
-                                                                    </button>
+                                                                    <ContextMenu>
+                                                                        <ContextMenuItem OnClickCallback="@(() => OnRemoveGroup(group.Id))">
+                                                                            Delete
+                                                                        </ContextMenuItem>
+                                                                    </ContextMenu>
                                                                 </td>
                                                             </tr>
                                                         }
