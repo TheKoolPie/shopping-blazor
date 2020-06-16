@@ -103,9 +103,14 @@ else
                                     <td style="border-left: @borderContent">@category.Name</td>
                                     <td>
                                         <AuthorizeView>
-                                            <button class="btn btn-danger" @onclick="@(() => DeleteCategory(category.Id))">
-                                                <span class="oi oi-trash" />
-                                            </button>
+                                            <ContextMenu>
+                                                <ContextMenuItem>
+                                                    <span class="oi oi-pencil" /> Edit
+                                                </ContextMenuItem>
+                                                <ContextMenuItem OnClickCallback="@(() => DeleteCategory(category.Id))">
+                                                    <span class="oi oi-trash" /> Delete
+                                                </ContextMenuItem>
+                                            </ContextMenu>
                                         </AuthorizeView>
                                     </td>
                                 </tr>
