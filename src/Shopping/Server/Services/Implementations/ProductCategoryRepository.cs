@@ -44,7 +44,8 @@ namespace Shopping.Server.Services.Implementations
 
         public override bool ItemAlreadyExists(ProductCategory item)
         {
-            return _context.Categories.Any(i => i.Id == item.Id ||
+            var categories = _context.Categories.ToList();
+            return categories.Any(i => i.Id == item.Id ||
             i.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase) ||
             i.ColorCode == item.ColorCode);
         }
