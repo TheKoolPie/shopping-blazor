@@ -1,0 +1,52 @@
+﻿<style>
+    .context-menu-container {
+        position: relative;
+    }
+
+    .context-menu {
+        visibility: hidden;
+        position: absolute;
+        left: -60px;
+    }
+
+        .context-menu > ul > li {
+            cursor: pointer;
+        }
+
+    .context-menu-btn {
+        border: none;
+        padding: 2px;
+        background-color: transparent;
+        border-radius: 5px;
+    }
+
+        .context-menu-btn:focus,
+        .context-menu-btn:hover {
+            background-color: #e6e6e6;
+            outline: none;
+        }
+
+        .context-menu-btn > span {
+            transform: rotate(90deg);
+        }
+
+        .context-menu-btn + .context-menu:active,
+        .context-menu-btn:focus + .context-menu {
+            visibility: visible;
+        }
+</style>
+<div class="context-menu-container">
+    <button class="context-menu-btn">
+        <span class="oi oi-ellipses"></span>
+    </button>
+    <div class="context-menu">
+        <ul class="list-group">
+            @ChildContent
+        </ul>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

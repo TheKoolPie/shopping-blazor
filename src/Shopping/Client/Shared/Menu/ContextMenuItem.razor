@@ -1,0 +1,11 @@
+﻿
+<li class="list-group-item list-group-item-action" @onclick="OnClickCallback">
+    @ChildContent
+</li>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public EventCallback OnClickCallback { get; set; }
+}
