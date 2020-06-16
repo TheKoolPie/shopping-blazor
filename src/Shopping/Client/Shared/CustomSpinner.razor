@@ -1,0 +1,12 @@
+﻿
+<div class="d-flex justify-content-center">
+    <div class="spinner-border text-primary" style="margin-right:10px" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+    <div>@ChildContent</div>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

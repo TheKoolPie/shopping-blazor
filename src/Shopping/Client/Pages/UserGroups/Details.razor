@@ -13,7 +13,9 @@
 @if (IsLoading)
 {
     <div class="row">
-        <div class="col"><strong>Loading...</strong></div>
+        <CustomSpinner>
+            Loading user group...
+        </CustomSpinner>
     </div>
 }
 else
@@ -51,105 +53,120 @@ else
                     <AlertComponent Model="@overviewAlert" />
                     <div class="row">
                         <div class="col">
-                            <h5>Owner</h5>
-                            <div class="row">
-                                <div class="col-md">
-                                    <div class="form-group">
-                                        <label for="ownerNameInput">Username</label>
-                                        <input id="ownerNameInput" disabled class="form-control" value="@userGroup.Owner.UserName" />
+                            @if (IsRemovingList)
+                            {
+                                <CustomSpinner>
+                                    Removing shopping list...
+                                </CustomSpinner>
+                            }
+                            else if (IsRemovingUser)
+                            {
+                                <CustomSpinner>
+                                    Removing user...
+                                </CustomSpinner>
+                            }
+                            else
+                            {
+                                <h5>Owner</h5>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="form-group">
+                                            <label for="ownerNameInput">Username</label>
+                                            <input id="ownerNameInput" disabled class="form-control" value="@userGroup.Owner.UserName" />
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="ownerMailInput">Email</label>
+                                            <input id="ownerMailInput" disabled class="form-control" value="@userGroup.Owner.Email" />
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col">
-                                    <div class="form-group">
-                                        <label for="ownerMailInput">Email</label>
-                                        <input id="ownerMailInput" disabled class="form-control" value="@userGroup.Owner.Email" />
+                                <hr />
+                                <h5>Shopping lists</h5>
+                                <div class="row">
+                                    <div class="col">
+                                        <table class="table table-hover">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Date</th>
+                                                    <th>Item Count</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (userGroup.ShoppingLists != null && userGroup.ShoppingLists.Count > 0)
+                                                {
+                                                    @foreach (var list in userGroup.ShoppingLists)
+                                                    {
+                                                        <tr>
+                                                            <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.Name</td>
+                                                            <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.ListDate.ToString("dd.MM.yyyy")</td>
+                                                            <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.Items.Count</td>
+                                                            <td>
+                                                                @if (IsOwner)
+                                                                {
+                                                                    <button type="button" class="btn btn-danger" @onclick="@(() => OnRemoveList(list.Id))">
+                                                                        <span class="oi oi-trash" />
+                                                                    </button>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td class="text-center" colspan="4">No shopping lists assigned</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
-                            </div>
-                            <hr />
-                            <h5>Shopping lists</h5>
-                            <div class="row">
-                                <div class="col">
-                                    <table class="table table-hover">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Date</th>
-                                                <th>Item Count</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @if (userGroup.ShoppingLists != null && userGroup.ShoppingLists.Count > 0)
-                                            {
-                                                @foreach (var list in userGroup.ShoppingLists)
+                                <hr />
+                                <h5>Members</h5>
+                                <div class="row">
+                                    <div class="col">
+                                        <table class="table">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Username</th>
+                                                    <th>Email</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (userGroup.Members != null && userGroup.Members.Count > 0)
+                                                {
+                                                    @foreach (var member in userGroup.Members)
+                                                    {
+                                                        <tr>
+                                                            <td>@member.UserName</td>
+                                                            <td>@member.Email</td>
+                                                            <td>
+                                                                @if (IsOwner && member.Id != userGroup.Owner.Id)
+                                                                {
+                                                                    <button type="button" class="btn btn-danger" @onclick="@(() => OnRemoveMember(member.Id))">
+                                                                        <span class="oi oi-trash" />
+                                                                    </button>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
                                                 {
                                                     <tr>
-                                                        <td @onclick="@(()=>NavigateToListDetails(list.Id))">@list.Name</td>
-                                                        <td @onclick="@(()=>NavigateToListDetails(list.Id))">@list.ListDate.ToString("dd.MM.yyyy")</td>
-                                                        <td @onclick="@(()=>NavigateToListDetails(list.Id))">@list.Items.Count</td>
-                                                        <td>
-                                                            @if (IsOwner)
-                                                            {
-                                                                <button type="button" class="btn btn-danger" @onclick="@(() => OnRemoveList(list.Id))">
-                                                                    <span class="oi oi-trash" />
-                                                                </button>
-                                                            }
-                                                        </td>
+                                                        <td class="text-center" colspan="4">No members in group</td>
                                                     </tr>
                                                 }
-                                            }
-                                            else
-                                            {
-                                                <tr>
-                                                    <td class="text-center" colspan="4">No shopping lists assigned</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
-                            <hr />
-                            <h5>Members</h5>
-                            <div class="row">
-                                <div class="col">
-                                    <table class="table">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>Username</th>
-                                                <th>Email</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @if (userGroup.Members != null && userGroup.Members.Count > 0)
-                                            {
-                                                @foreach (var member in userGroup.Members)
-                                                {
-                                                    <tr>
-                                                        <td>@member.UserName</td>
-                                                        <td>@member.Email</td>
-                                                        <td>
-                                                            @if (IsOwner && member.Id != userGroup.Owner.Id)
-                                                            {
-                                                                <button type="button" class="btn btn-danger" @onclick="@(() => OnRemoveMember(member.Id))">
-                                                                    <span class="oi oi-trash" />
-                                                                </button>
-                                                            }
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <tr>
-                                                    <td class="text-center" colspan="4">No members in group</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -181,7 +198,11 @@ else
                                         }
                                         else
                                         {
-                                            <p class="card-text"><strong>Adding user...</strong></p>
+                                            <p class="card-text">
+                                                <CustomSpinner>
+                                                    Adding user...
+                                                </CustomSpinner>
+                                            </p>
                                         }
                                     </div>
                                 </div>
@@ -201,10 +222,10 @@ else
                                                         <label for="list-search">Available lists</label>
                                                         <InputSelect id="list-search" @bind-Value="listIdInput.ListId" class="form-control">
                                                             <option value="">Choose List...</option>
-                                                            @foreach(var list in availableLists)
-                                                            {
+                                                            @foreach (var list in availableLists)
+                                                                            {
                                                                 <option value="@list.Id">@list.Name</option>
-                                                            }
+                                                                            }
                                                         </InputSelect>
                                                     </div>
                                                     @if (!string.IsNullOrEmpty(listIdInput.ListId))
@@ -217,7 +238,11 @@ else
                                             }
                                             else
                                             {
-                                                <p class="card-text"><strong>Assigning list...</strong></p>
+                                                <p class="card-text">
+                                                    <CustomSpinner>
+                                                        Assigning list...
+                                                    </CustomSpinner>
+                                                </p>
                                             }
                                         </div>
                                     </div>
@@ -297,13 +322,14 @@ else
 }
 
 @code {
-        [Parameter]
-        public string GroupId { get; set; }
+    [Parameter]
+    public string GroupId { get; set; }
 
     private bool IsLoading;
-    private bool IsSaving;
     private bool IsAddingUser;
     private bool IsAddingList;
+    private bool IsRemovingList;
+    private bool IsRemovingUser;
 
     private bool IsOwner = false;
 
@@ -393,6 +419,7 @@ else
 
     private async Task OnRemoveMember(string id)
     {
+        IsRemovingUser = true;
         overviewAlert = null;
         try
         {
@@ -405,10 +432,12 @@ else
         {
             overviewAlert = AlertComponentModel.CreateErrorAlert("Member could not be removed", e.Message);
         }
+        IsRemovingUser = false;
     }
     private async Task OnRemoveList(string id)
     {
         overviewAlert = null;
+        IsRemovingList = true;
         var assignment = new UserGroupShoppingList()
         {
             ShoppingListId = id,
@@ -419,7 +448,7 @@ else
         await InitGroup();
         overviewAlert = result ? AlertComponentModel.CreateSuccessAlert("Assignment removed") :
         AlertComponentModel.CreateErrorAlert("Assignment could not be removed");
-
+        IsRemovingList = false;
     }
 
     private async Task OnLeaveGroup()
