@@ -328,7 +328,7 @@
     private bool IsRemovingGroup;
     private bool IsLoading;
     private bool IsSavingList;
-    private bool IsAddingItem;
+    private bool IsSavingItem;
 
     private ShoppingList CurrentList;
 
@@ -354,7 +354,7 @@
     #region AddItem
     private ShoppingListItem AddItem = new ShoppingListItem();
     private EditContext AddItemEditContext;
-    private bool IsSavingItem = false;
+
     #endregion
 
     protected override async Task OnInitializedAsync()
