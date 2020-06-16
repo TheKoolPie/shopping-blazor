@@ -15,7 +15,9 @@
     {
         <div class="row">
             <div class="col">
-                <strong>Loading data...</strong>
+                <CustomSpinner>
+                    Loading shopping list...
+                </CustomSpinner>
             </div>
         </div>
     }
@@ -62,7 +64,17 @@
                             {
                                 <div class="col-auto">
                                     <button class="btn btn-primary" @onclick="OnSaveListChanges">
-                                        <span class="oi oi-circle-check" /> Save
+                                        @if (IsSavingList)
+                                        {
+                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            @("Saving list...")
+
+                                        }
+                                        else
+                                        {
+                                            <span class="oi oi-circle-check" />
+                                            @("Save list")
+                                        }
                                     </button>
                                 </div>
                             }
@@ -106,6 +118,10 @@
                                             </tbody>
                                         </table>
                                     }
+                                    else
+                                    {
+                                        <p>No items added to list</p>
+                                    }
                                 </div>
                             </div>
                         }
@@ -118,7 +134,9 @@
                         {
                             <div class="row">
                                 <div class="col">
-                                    <strong>Is saving...</strong>
+                                    <CustomSpinner>
+                                        Adding product...
+                                    </CustomSpinner>
                                 </div>
                             </div>
                         }
@@ -165,26 +183,37 @@
                         <div class="tab-pane fade" id="list-access" role="tabpanel" aria-labelledby="list-access-list">
                             <h4>Access</h4>
                             <hr />
-                            <AlertComponent Model="@AccessAlertModel" />
-
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Create new</h5>
-                                            <p class="card-text">Create a new user group and automatically assign it to this list.</p>
-                                            <button class="btn btn-primary" type="button" @onclick="CreateAndAssignUserGroup">Create</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                @if (_availableGroups != null && _availableGroups.Count > 0)
-                                {
+                            @if (IsRemovingGroup)
+                            {
+                                <CustomSpinner>
+                                    Removing user group...
+                                </CustomSpinner>
+                            }
+                            else if (IsAddingGroup)
+                            {
+                                <CustomSpinner>
+                                    Adding user group...
+                                </CustomSpinner>
+                            }
+                            else
+                            {
+                                <AlertComponent Model="@AccessAlertModel" />
+                                <div class="row">
                                     <div class="col-sm-6">
                                         <div class="card">
                                             <div class="card-body">
-                                                <h5 class="card-title">Add Group to List</h5>
-                                                @if (!IsAddingGroup)
-                                                {
+                                                <h5 class="card-title">Create new</h5>
+                                                <p class="card-text">Create a new user group and automatically assign it to this list.</p>
+                                                <button class="btn btn-primary" type="button" @onclick="CreateAndAssignUserGroup">Create</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if (_availableGroups != null && _availableGroups.Count > 0)
+                                    {
+                                        <div class="col-sm-6">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">Add Group to List</h5>
                                                     <p class="card-text">Search for already existing groups, which belong to you.</p>
                                                     <EditForm EditContext="addGroupContext" OnSubmit="OnAddGroup">
                                                         <div class="form-group">
@@ -204,50 +233,53 @@
                                                             </button>
                                                         }
                                                     </EditForm>
-                                                }
-                                                else
-                                                {
-
-                                                }
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                }
-                            </div>
-                            <hr />
-                            <h6>Assigned groups</h6>
-                            <div class="row">
-                                <div class="col">
-                                    @if (CurrentList.UserGroups != null && CurrentList.UserGroups.Count > 0)
-                                    {
-                                        <table class="table table-hover">
-                                            <thead class="thead-light">
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach (var group in CurrentList.UserGroups)
-                                                {
-                                                    <tr>
-                                                        <td @onclick="@(() => NavigateToUserGroupDetails(group.Id))">@group.Name</td>
-                                                        <td>
-                                                            <button class="btn btn-danger" type="button" @onclick="@(()=>OnRemoveGroup(group.Id))">
-                                                                <span class="oi oi-trash" />
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                    }
-                                    else
-                                    {
-                                        <strong>No user groups assigned</strong>
                                     }
                                 </div>
-                            </div>
+                                <hr />
+                                <h6>Assigned groups</h6>
+                                <div class="row">
+                                    <div class="col">
+                                        @if (CurrentList.UserGroups != null)
+                                        {
+                                            <table class="table table-hover">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (CurrentList.UserGroups.Count > 0)
+                                                    {
+                                                        @foreach (var group in CurrentList.UserGroups)
+                                                        {
+                                                            <tr>
+                                                                <td @onclick="@(() => NavigateToUserGroupDetails(group.Id))">@group.Name</td>
+                                                                <td>
+                                                                    <button class="btn btn-danger" type="button" @onclick="@(() => OnRemoveGroup(group.Id))">
+                                                                        <span class="oi oi-trash" />
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td colspan="2" class="text-center">
+                                                                No User Groups assigned
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        }
+                                    </div>
+                                </div>
+                            }
                         </div>
                     }
                     @if (IsOwner)
@@ -293,7 +325,10 @@
     public string ShoppingListId { get; set; }
 
     private bool IsAddingGroup;
-    private bool IsLoading { get; set; }
+    private bool IsRemovingGroup;
+    private bool IsLoading;
+    private bool IsSavingList;
+    private bool IsAddingItem;
 
     private ShoppingList CurrentList;
 
@@ -370,11 +405,13 @@
     }
     private async Task OnSaveListChanges()
     {
+        IsSavingList = true;
         var result = await ShoppingListRepo.UpdateAsync(CurrentList.Id, CurrentList);
-        if(result != null)
+        if (result != null)
         {
             CurrentListHasChanged = false;
         }
+        IsSavingList = false;
     }
 
     private async Task InitAvailableProducts()
@@ -444,6 +481,7 @@
     }
     private async Task OnRemoveGroup(string groupId)
     {
+        IsRemovingGroup = true;
         AccessAlertModel = null;
         var assignment = new UserGroupShoppingList()
         {
@@ -457,7 +495,7 @@
 
         AccessAlertModel = result ? AlertComponentModel.CreateSuccessAlert("Assignment removed") :
             AlertComponentModel.CreateErrorAlert("Assignment could not be removed");
-
+        IsRemovingGroup = false;
     }
 
     private async Task OnDeleteList()

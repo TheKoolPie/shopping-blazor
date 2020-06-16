@@ -24,6 +24,10 @@
     border-color: rgb(5, 39, 103);
 }
 
+.text-primary {
+    color: rgb(5, 39, 103) !important;
+}
+
 .list-group-item.active {
     z-index: 2;
     color: #fff;
@@ -38,3 +42,4 @@
 .card {
     margin: 6px;
 }
+

@@ -5,118 +5,127 @@
 
 <h3>Product categories</h3>
 
-<AuthorizeView Context="Auth" Policy="@ShoppingUserPolicies.IsProductCategoryModifier">
-    <div class="row">
-        <div class="col">
-            @if (IsSaving)
-            {
-                <strong>Save data....</strong>
-            }
-            else
-            {
-                <EditForm EditContext="@editContext" OnSubmit="HandleSubmit">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-                    <div class="row">
-                        <div class="col">
-                            <label>
-                                Name
-                                <InputText class="form-control" @bind-Value="category.Name" />
-                            </label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <label>
-                                Color
-                                <input class="form-control" type="color" @bind-value="category.ColorCode" />
-                            </label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <button class="btn btn-primary" type="submit">
-                                <span class="oi oi-task" /> Save
-                            </button>
-                        </div>
-                    </div>
-                </EditForm>
-            }
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <AlertComponent Model="@AlertData" />
-        </div>
-    </div>
-    <hr />
-</AuthorizeView>
-@if (categories != null)
+@if (IsLoading)
 {
-
     <div class="row">
         <div class="col">
-            <input type="search" class="form-control"
-                   @bind="SearchInput" @bind:event="oninput"
-                   placeholder="Search for category..." />
-        </div>
-        <div class="col">
-            <button class="btn btn-light" @onclick="LoadProductCategories">
-                <span class="oi oi-reload" />
-            </button>
+            <CustomSpinner>
+                Loading categories...
+            </CustomSpinner>
         </div>
     </div>
-    @if (categories.Count > 0)
-    {
-        <div class="row" style="margin-top:24px">
-            <div class="col">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th @onclick="OnTableColumnClicked">
-                                Name
-                                <span class="@SortingData.Icon" />
-                            </th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var category in categories)
-                        {
-                            string borderContent = $"15px solid {category.ColorCode}";
-                            <tr>
-                                <td style="border-left: @borderContent">@category.Name</td>
-                                <td>
-                                    <AuthorizeView>
-                                        <button class="btn btn-danger" @onclick="@(() => DeleteCategory(category.Id))">
-                                            <span class="oi oi-trash" />
-                                        </button>
-                                    </AuthorizeView>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    }
-    else
-    {
-        <hr />
-        <div class="row">
-            <div class="col">
-                <strong>No categories found</strong>
-            </div>
-        </div>
-    }
 }
 else
 {
-    <div class="row">
-        <div class="col">
-            Loading data ...
+
+
+    <AuthorizeView Context="Auth" Policy="@ShoppingUserPolicies.IsProductCategoryModifier">
+        <div class="row">
+            <div class="col">
+                @if (IsSaving)
+                {
+                    <CustomSpinner>
+                        Saving category...
+                    </CustomSpinner>
+                }
+                else
+                {
+                    <EditForm EditContext="@editContext" OnSubmit="HandleSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="row">
+                            <div class="col">
+                                <label>
+                                    Name
+                                    <InputText class="form-control" @bind-Value="category.Name" />
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label>
+                                    Color
+                                    <input class="form-control" type="color" @bind-value="category.ColorCode" />
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-primary" type="submit">
+                                    <span class="oi oi-task" /> Save
+                                </button>
+                            </div>
+                        </div>
+                    </EditForm>
+                }
+            </div>
         </div>
-    </div>
+        <div class="row">
+            <div class="col">
+                <AlertComponent Model="@AlertData" />
+            </div>
+        </div>
+        <hr />
+    </AuthorizeView>
+    @if (categories != null)
+    {
+        <div class="row">
+            <div class="col">
+                <input type="search" class="form-control"
+                       @bind="SearchInput" @bind:event="oninput"
+                       placeholder="Search for category..." />
+            </div>
+            <div class="col">
+                <button class="btn btn-light" @onclick="LoadProductCategories">
+                    <span class="oi oi-reload" />
+                </button>
+            </div>
+        </div>
+        @if (categories.Count > 0)
+        {
+            <div class="row" style="margin-top:24px">
+                <div class="col">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th @onclick="OnTableColumnClicked">
+                                    Name
+                                    <span class="@SortingData.Icon" />
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var category in categories)
+                            {
+                                string borderContent = $"15px solid {category.ColorCode}";
+                                <tr>
+                                    <td style="border-left: @borderContent">@category.Name</td>
+                                    <td>
+                                        <AuthorizeView>
+                                            <button class="btn btn-danger" @onclick="@(() => DeleteCategory(category.Id))">
+                                                <span class="oi oi-trash" />
+                                            </button>
+                                        </AuthorizeView>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <strong>No categories found</strong>
+                </div>
+            </div>
+        }
+    }
+
 }
 
 
@@ -127,6 +136,7 @@ else
     private SortingModel SortingData = new SortingModel();
 
     private bool IsSaving = false;
+    private bool IsLoading = false;
 
     private string searchInput;
     public string SearchInput
@@ -148,9 +158,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         editContext = new EditContext(category);
+
+        IsLoading = true;
+
         await LoadProductCategories();
 
         SortTable();
+
+        IsLoading = false;
     }
 
     private async Task HandleSubmit()

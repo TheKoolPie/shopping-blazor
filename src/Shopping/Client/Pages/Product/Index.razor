@@ -9,7 +9,9 @@
 {
     <div class="row">
         <div class="col">
-            <strong>Loading...</strong>
+            <CustomSpinner>
+                Loading products...
+            </CustomSpinner>
         </div>
     </div>
 }
@@ -20,7 +22,9 @@ else
             <div class="col">
                 @if (IsSaving)
                 {
-                    <strong>Speichere Daten....</strong>
+                    <CustomSpinner>
+                        Saving product...
+                    </CustomSpinner>
                 }
                 else
                 {
