@@ -213,7 +213,7 @@ else
     {
         AlertData = null;
         var isValid = editContext.Validate();
-        var productExists = localBackup.Any(c => c.Name.Equals(product.Name, StringComparison.InvariantCultureIgnoreCase) || c.Id != product.Id);
+        var productExists = localBackup.Any(c => c.Name.Equals(product.Name, StringComparison.InvariantCultureIgnoreCase) || c.Id == product.Id);
         var category = categories.FirstOrDefault(c => c.Id.Equals(product.CategoryId));
 
         if (isValid)

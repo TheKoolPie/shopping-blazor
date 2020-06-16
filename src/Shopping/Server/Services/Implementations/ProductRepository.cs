@@ -50,7 +50,8 @@ namespace Shopping.Server.Services.Implementations
 
         public override bool ItemAlreadyExists(ProductItem item)
         {
-            return _context.Products.Any(i => i.Id == item.Id || i.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase));
+            var products = _context.Products.ToList();
+            return products.Any(i => i.Id == item.Id || i.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public override void UpdateExistingItem(ProductItem existing, ProductItem update)
