@@ -1,11 +1,31 @@
 ﻿
-<li class="list-group-item list-group-item-action" @onclick="OnClickCallback">
+<style>
+    .context-menu-item {
+        cursor: pointer;
+        padding: 8px 10px 8px 8px;
+    }
+
+        .context-menu-item:hover {
+            background-color: #F5F5F5;
+        }
+</style>
+
+<div class="context-menu-item" @onmousedown="InvokeCallback">
     @ChildContent
-</li>
+</div>
 
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
     [Parameter]
     public EventCallback OnClickCallback { get; set; }
+
+    [CascadingParameter]
+    protected ContextMenu Parent { get; set; }
+
+    private async Task InvokeCallback()
+    {
+        await OnClickCallback.InvokeAsync(this);
+        Parent.ChildUsed();
+    }
 }
