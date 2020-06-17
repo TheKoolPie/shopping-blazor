@@ -5,24 +5,18 @@
 
     .context-menu {
         position: absolute;
-        left: -80px;
+        top: -1px;
+        left: -65px;
         z-index: 5;
+        border: 1px solid #CECECE;
+        border-radius: 4px;
+        background-color: #ffffff;
     }
-
-        .context-menu > ul > li {
-            cursor: pointer;
-        }
 
     .context-menu-btn {
-        border: none;
-        padding: 2px;
-        background-color: transparent;
-        border-radius: 5px;
     }
 
-        .context-menu-btn:focus,
-        .context-menu-btn:hover {
-            background-color: #e6e6e6;
+        .context-menu-btn:focus {
             outline: none;
         }
 
@@ -31,15 +25,15 @@
         }
 </style>
 <div class="context-menu-container">
-    <button class="context-menu-btn" type="button" @onclick="OnContextBtnClicked" @onfocusout="HideMenu">
+    <button class="btn context-menu-btn" type="button" @onclick="OnContextBtnClicked" @onblur="HideMenu">
         <span class="oi oi-ellipses"></span>
     </button>
-    @if (ShowMenu)
+    @if (IsShowingMenu)
     {
-        <div class="context-menu">
-            <ul class="list-group">
-                @ChildContent
-            </ul>
+        <div class="context-menu" >
+                <CascadingValue Value="this">
+                    @ChildContent
+                </CascadingValue>
         </div>
     }
 </div>
@@ -48,7 +42,7 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    private bool ShowMenu { get; set; }
+    private bool IsShowingMenu { get; set; }
 
     protected override void OnInitialized()
     {
@@ -56,10 +50,14 @@
     }
     private void HideMenu()
     {
-        ShowMenu = false;
+        IsShowingMenu = false;
     }
     private void OnContextBtnClicked()
     {
-        ShowMenu = !ShowMenu;
+        IsShowingMenu = !IsShowingMenu;
+    }
+    public void ChildUsed()
+    {
+        HideMenu();
     }
 }
