@@ -105,7 +105,7 @@ else
                                     <td>
                                         <AuthorizeView>
                                             <ContextMenu>
-                                                <ContextMenuItem>
+                                                <ContextMenuItem OnClickCallback="@(()=> OnEditCategory(category.Id,category.Name,category.ColorCode))">
                                                     Edit
                                                 </ContextMenuItem>
                                                 <ContextMenuItem OnClickCallback="@(() => OnDeleteCategory(category.Id,category.Name))">
@@ -190,10 +190,9 @@ else
 
                 if (savedEntity != null)
                 {
-                    localBackup.Add(savedEntity);
-                    categories.Add(savedEntity);
+                    AddOrUpdateEntityInLists(savedEntity);
                     category = new ProductCategory();
-                    AlertData = AlertComponentModel.CreateSuccessAlert("Saving successful", "");
+                    AlertData = AlertComponentModel.CreateSuccessAlert("Saving successful");
                 }
                 else
                 {
@@ -207,6 +206,43 @@ else
             {
                 SavingFailureAlert("Category name or color already exists");
             }
+        }
+    }
+
+    private void AddOrUpdateEntityInLists(ProductCategory entity)
+    {
+        var backupListItem = localBackup.FirstOrDefault(c => c.Id == entity.Id);
+        if (backupListItem == null)
+        {
+            localBackup.Add(entity);
+        }
+        else
+        {
+            backupListItem.Name = entity.Name;
+            backupListItem.ColorCode = entity.ColorCode;
+        }
+        var workListItem = categories.FirstOrDefault(c => c.Id == entity.Id);
+        if (workListItem == null)
+        {
+            categories.Add(entity);
+        }
+        else
+        {
+            workListItem.Name = entity.Name;
+            workListItem.ColorCode = entity.ColorCode;
+        }
+    }
+    private void DeleteEntityInLists(string id)
+    {
+        var backupListItem = localBackup.FirstOrDefault(c => c.Id == id);
+        if (backupListItem != null)
+        {
+            localBackup.Remove(backupListItem);
+        }
+        var workListItem = categories.FirstOrDefault(c => c.Id == id);
+        if (workListItem != null)
+        {
+            categories.Remove(workListItem);
         }
     }
 
@@ -235,7 +271,30 @@ else
             {
                 DeleteFailureAlert();
             }
-            await LoadProductCategories();
+            DeleteEntityInLists(id);
+        }
+    }
+    private async Task OnEditCategory(string id, string name, string colorcode)
+    {
+        var modalParams = new ModalParameters();
+        modalParams.Add(nameof(EditCategory.CategoryId), id);
+        modalParams.Add(nameof(EditCategory.CategoryName), name);
+        modalParams.Add(nameof(EditCategory.CategoryColorCode), colorcode);
+
+        var editModal = Modal.Show<EditCategory>("Edit category", modalParams);
+        var result = await editModal.Result;
+        if (!result.Cancelled)
+        {
+            var resultData = (ProductCategory)result.Data;
+            if(resultData == null)
+            {
+                AlertData = AlertComponentModel.CreateErrorAlert($"Could not change category '{name}'");
+            }
+            else
+            {
+                AlertData = AlertComponentModel.CreateSuccessAlert($"Successfully changed", $"Name {name} -> {resultData.Name}, Color {colorcode} -> {resultData.ColorCode}");
+                AddOrUpdateEntityInLists(resultData);
+            }
         }
     }
 
@@ -276,4 +335,5 @@ else
     {
         AlertData = AlertComponentModel.CreateErrorAlert("Error with deletion", resultMsg);
     }
+
 }

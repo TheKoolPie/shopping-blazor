@@ -69,6 +69,32 @@ namespace Shopping.Server.Controllers
             return Ok(createdCategory);
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProductCategory>> UpdateProductCategory(string id, [FromBody] ProductCategory category)
+        {
+            if (id != category.Id)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                await _categories.UpdateAsync(id, category);
+            }
+            catch (ItemNotFoundException)
+            {
+                return NotFound($"Could not find category with id {id}");
+            }
+            catch (ItemAlreadyExistsException)
+            {
+                return Conflict();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return Ok(category);
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProductCategory(string id)
         {

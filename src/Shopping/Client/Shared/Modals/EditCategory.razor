@@ -1,0 +1,77 @@
+﻿@inject IModalService ModalService
+@inject IProductCategories ProductCategories
+
+<div class="row">
+    <div class="col">
+        <EditForm EditContext="@editContext" OnSubmit="OnUpdateCategory">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="row">
+                <div class="col">
+                    <label>
+                        Name
+                        <InputText class="form-control" @bind-Value="_category.Name" />
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label>
+                        Color
+                        <input class="form-control" type="color" @bind-value="_category.ColorCode" />
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-primary" type="submit">
+                        Update
+                    </button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-secondary" type="button" @onclick="BlazoredModal.Cancel">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+
+@code {
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; }
+
+    [Parameter]
+    public string CategoryId { get; set; }
+    [Parameter]
+    public string CategoryName { get; set; }
+    [Parameter]
+    public string CategoryColorCode { get; set; }
+
+    private ProductCategory _category;
+    private EditContext editContext;
+
+    private bool IsSaving;
+
+    protected override void OnInitialized()
+    {
+        _category = new ProductCategory()
+        {
+            Id = CategoryId,
+            Name = CategoryName,
+            ColorCode = CategoryColorCode
+        };
+        editContext = new EditContext(_category);
+    }
+
+    private async Task OnUpdateCategory()
+    {
+        if (editContext.Validate())
+        {
+            var result = await ProductCategories.UpdateAsync(CategoryId, _category);
+            BlazoredModal.Close(ModalResult.Ok<ProductCategory>(result));
+        }
+    }
+}
