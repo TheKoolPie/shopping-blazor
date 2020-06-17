@@ -2,6 +2,7 @@
 
 @inject ILogger<Category> Logger
 @inject IProductCategories CategoryRepo
+@inject IModalService Modal
 
 <h3>Product categories</h3>
 
@@ -107,7 +108,7 @@ else
                                                 <ContextMenuItem>
                                                     Edit
                                                 </ContextMenuItem>
-                                                <ContextMenuItem OnClickCallback="@(() => DeleteCategory(category.Id))">
+                                                <ContextMenuItem OnClickCallback="@(() => OnDeleteCategory(category.Id,category.Name))">
                                                     Delete
                                                 </ContextMenuItem>
                                             </ContextMenu>
@@ -221,13 +222,21 @@ else
         SearchInput = null;
     }
 
-    private async Task DeleteCategory(string id)
+    private async Task OnDeleteCategory(string id, string name)
     {
-        if (!(await CategoryRepo.DeleteByIdAsync(id)))
+        var modalParams = new ModalParameters();
+        modalParams.Add(nameof(DeleteCategory.CategoryName), name);
+        var deleteCategoryModal = Modal.Show<DeleteCategory>("Delete category", modalParams);
+        var result = await deleteCategoryModal.Result;
+
+        if (!result.Cancelled)
         {
-            DeleteFailureAlert();
+            if (!(await CategoryRepo.DeleteByIdAsync(id)))
+            {
+                DeleteFailureAlert();
+            }
+            await LoadProductCategories();
         }
-        await LoadProductCategories();
     }
 
     private void OnSearchInputChanged()

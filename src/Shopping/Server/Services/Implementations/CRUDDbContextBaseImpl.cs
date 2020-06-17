@@ -62,12 +62,7 @@ namespace Shopping.Server.Services.Implementations
             return item;
         }
 
-        public async Task<bool> DeleteAsync(T item)
-        {
-            return await DeleteByIdAsync(item.Id);
-        }
-
-        public async Task<bool> DeleteByIdAsync(string id)
+        public virtual async Task<bool> DeleteByIdAsync(string id)
         {
             var item = await _context.FindAsync<T>(id);
             if (item == null)
@@ -76,9 +71,20 @@ namespace Shopping.Server.Services.Implementations
             }
 
             _context.Remove<T>(item);
-            await _context.SaveChangesAsync();
 
-            return true;
+            bool result = false;
+            try
+            {
+                await _context.SaveChangesAsync();
+                result = true;
+            }
+            catch(Exception e)
+            {
+                result = false;
+                _logger.LogError($"Could not delete item {id}", e);
+            }
+
+            return result;
         }
 
         public abstract Task<List<T>> GetAllAsync();

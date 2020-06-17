@@ -1,0 +1,74 @@
+﻿@inject IModalService ModalService
+
+
+<div class="row">
+    <div class="col-sm-1">
+        <span class="oi oi-warning" style="color:#F7CA35;font-size:32pt;" />
+    </div>
+    <div class="col">
+        <h4>Are you sure you want to delete the category <strong>@CategoryName</strong>?</h4>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <p>
+            Be aware this action will also:
+        </p>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <ul>
+            <li>Delete all products of this category</li>
+            <li>Delete all shopping list items with products of this category</li>
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <h5>This process cannot be reverted.</h5>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" @onchange="@(()=>IsDeleteActive = !IsDeleteActive)"
+                   id="categoryDeleteCheck">
+            <label class="form-check-label" for="categoryDeleteCheck">I am sure.</label>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        @if (IsDeleteActive)
+        {
+            <button class="btn btn-danger" type="button" @onclick="OnDeleteClick">
+                <span class="oi oi-trash" /> Delete
+            </button>
+        }
+    </div>
+    <div class="col">
+        <button class="btn btn-secondary" type="button" @onclick="BlazoredModal.Cancel">
+            Cancel
+        </button>
+    </div>
+</div>
+
+
+
+@code {
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; }
+
+    [Parameter]
+    public string CategoryName { get; set; }
+
+    private bool IsDeleteActive = false;
+
+    private void OnDeleteClick()
+    {
+        BlazoredModal.Close(ModalResult.Ok<bool>(true));
+    }
+}

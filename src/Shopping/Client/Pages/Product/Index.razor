@@ -2,6 +2,8 @@
 
 @inject IProductCategories CategoryRepo
 @inject IProducts ProductRepo
+@inject IModalService Modal
+
 
 <h3>Produkte</h3>
 
@@ -137,7 +139,7 @@ else
                                                 <ContextMenuItem>
                                                     Edit
                                                 </ContextMenuItem>
-                                                <ContextMenuItem OnClickCallback="@(() => DeleteProduct(product.Id))">
+                                                <ContextMenuItem OnClickCallback="@(() => OnDeleteProduct(product.Id,product.Name))">
                                                     Delete
                                                 </ContextMenuItem>
                                             </ContextMenu>
@@ -268,13 +270,21 @@ else
     }
 
 
-    private async Task DeleteProduct(string id)
+    private async Task OnDeleteProduct(string id, string name)
     {
-        if (!(await ProductRepo.DeleteByIdAsync(id)))
+        var modalParams = new ModalParameters();
+        modalParams.Add(nameof(DeleteProduct.ProductName), name);
+        var deleteProductModal = Modal.Show<DeleteProduct>("Delete product", modalParams);
+        var result = await deleteProductModal.Result;
+
+        if (!result.Cancelled)
         {
-            DeleteFailureAlert();
+            if (!(await ProductRepo.DeleteByIdAsync(id)))
+            {
+                DeleteFailureAlert();
+            }
+            await LoadProductItems();
         }
-        await LoadProductItems();
     }
 
     private void OnNameColumnClicked()

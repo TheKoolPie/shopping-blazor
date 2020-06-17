@@ -45,11 +45,6 @@ namespace Shopping.Client.Services.Implementations
             return retVal;
         }
 
-        public async Task<bool> DeleteAsync(T item)
-        {
-            return await DeleteByIdAsync(item.Id);
-        }
-
         public async Task<bool> DeleteByIdAsync(string id)
         {
             var client = await _authService.GetHttpClientAsync();
