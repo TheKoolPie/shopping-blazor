@@ -48,6 +48,24 @@ namespace Shopping.Server.Services.Implementations
             return product;
         }
 
+        public override async Task<bool> DeleteByIdAsync(string id)
+        {
+            var shoppinglists = await GetShoppingListsWithProduct(id);
+            if (shoppinglists.Count > 0)
+            {
+                foreach (var list in shoppinglists)
+                {
+                    var deleteItem = list.Items.FirstOrDefault(i => i.ProductItemId == id);
+                    if (deleteItem != null)
+                    {
+                        list.Items.Remove(deleteItem);
+                    }
+                }
+            }
+
+            return await base.DeleteByIdAsync(id);
+        }
+
         public override bool ItemAlreadyExists(ProductItem item)
         {
             var products = _context.Products.ToList();
@@ -60,6 +78,15 @@ namespace Shopping.Server.Services.Implementations
             existing.Unit = update.Unit;
             existing.CategoryId = update.CategoryId;
             existing.Category = update.Category;
+        }
+
+        private async Task<List<ShoppingList>> GetShoppingListsWithProduct(string productItemId)
+        {
+            var shoppinglist = await _context.ShoppingLists.ToListAsync();
+            shoppinglist = shoppinglist
+                .Where(i => i.Items.Any(p => p.ProductItemId == productItemId))
+                .ToList();
+            return shoppinglist;
         }
     }
 }
