@@ -1,23 +1,35 @@
 ﻿<style>
     .context-menu-container {
         position: relative;
+        display: inline-block;
+        float: right;
     }
 
     .context-menu {
+        display: none;
         position: absolute;
-        top: -1px;
-        left: -65px;
-        z-index: 5;
-        border: 1px solid #CECECE;
-        border-radius: 4px;
-        background-color: #ffffff;
+        background-color: #f1f1f1;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        right: 0;
     }
+
+        .context-menu.show {
+            display: block;
+        }
 
     .context-menu-btn {
+        color: #F5F5F5;
+        padding: 16px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
     }
 
-        .context-menu-btn:focus {
+        .context-menu-btn:focus, .context-menu-btn:hover {
             outline: none;
+            color: #767676;
         }
 
         .context-menu-btn > span {
@@ -25,17 +37,15 @@
         }
 </style>
 <div class="context-menu-container">
-    <button class="btn context-menu-btn" type="button" @onclick="OnContextBtnClicked" @onblur="HideMenu">
-        <span class="oi oi-ellipses"></span>
+    <button class="btn context-menu-btn" type="button" @onclick="OnContextBtnClicked">
+        <span class="context-menu-btn-icon oi oi-ellipses"></span>
     </button>
-    @if (IsShowingMenu)
-    {
-        <div class="context-menu" >
-                <CascadingValue Value="this">
-                    @ChildContent
-                </CascadingValue>
-        </div>
-    }
+    <div class="context-menu @(IsShowingMenu? "show":"")">
+        <CascadingValue Value="this">
+            @ChildContent
+        </CascadingValue>
+    </div>
+
 </div>
 
 @code {
