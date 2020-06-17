@@ -2,6 +2,7 @@
 
 @inject ILogger<Category> Logger
 @inject IProductCategories CategoryRepo
+@inject IModalService Modal
 
 <h3>Product categories</h3>
 
@@ -223,11 +224,17 @@ else
 
     private async Task DeleteCategory(string id)
     {
-        if (!(await CategoryRepo.DeleteByIdAsync(id)))
+        var deleteCategoryModal = Modal.Show<DeleteCategory>("Delete category");
+        var result = await deleteCategoryModal.Result;
+
+        if (!result.Cancelled)
         {
-            DeleteFailureAlert();
+            if (!(await CategoryRepo.DeleteByIdAsync(id)))
+            {
+                DeleteFailureAlert();
+            }
+            await LoadProductCategories();
         }
-        await LoadProductCategories();
     }
 
     private void OnSearchInputChanged()
