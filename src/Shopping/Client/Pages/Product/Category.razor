@@ -108,7 +108,7 @@ else
                                                 <ContextMenuItem>
                                                     Edit
                                                 </ContextMenuItem>
-                                                <ContextMenuItem OnClickCallback="@(() => DeleteCategory(category.Id))">
+                                                <ContextMenuItem OnClickCallback="@(() => OnDeleteCategory(category.Id,category.Name))">
                                                     Delete
                                                 </ContextMenuItem>
                                             </ContextMenu>
@@ -222,9 +222,11 @@ else
         SearchInput = null;
     }
 
-    private async Task DeleteCategory(string id)
+    private async Task OnDeleteCategory(string id, string name)
     {
-        var deleteCategoryModal = Modal.Show<DeleteCategory>("Delete category");
+        var modalParams = new ModalParameters();
+        modalParams.Add(nameof(DeleteCategory.CategoryName), name);
+        var deleteCategoryModal = Modal.Show<DeleteCategory>("Delete category", modalParams);
         var result = await deleteCategoryModal.Result;
 
         if (!result.Cancelled)

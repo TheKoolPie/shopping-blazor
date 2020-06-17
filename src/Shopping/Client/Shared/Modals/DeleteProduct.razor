@@ -6,7 +6,7 @@
         <span class="oi oi-warning" style="color:#F7CA35;font-size:32pt;" />
     </div>
     <div class="col">
-        <h4>Are you sure you want to delete the category <strong>@CategoryName</strong>?</h4>
+        <h4>Are you sure you want to delete the product <strong>@ProductName</strong>?</h4>
     </div>
 </div>
 
@@ -20,8 +20,7 @@
 <div class="row">
     <div class="col">
         <ul>
-            <li>Delete all products of this category</li>
-            <li>Delete all shopping list items with products of this category</li>
+            <li>Delete all shopping list items with this product</li>
         </ul>
     </div>
 </div>
@@ -35,8 +34,8 @@
     <div class="col">
         <div class="form-check">
             <input type="checkbox" class="form-check-input" @onchange="@(()=>IsDeleteActive = !IsDeleteActive)"
-                   id="categoryDeleteCheck">
-            <label class="form-check-label" for="categoryDeleteCheck">I am sure.</label>
+                   id="productDeleteCheck">
+            <label class="form-check-label" for="productDeleteCheck">I am sure.</label>
         </div>
     </div>
 </div>
@@ -63,7 +62,7 @@
     BlazoredModalInstance BlazoredModal { get; set; }
 
     [Parameter]
-    public string CategoryName { get; set; }
+    public string ProductName { get; set; }
 
     private bool IsDeleteActive = false;
 
