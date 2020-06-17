@@ -107,9 +107,11 @@ else
                                                             <td>
                                                                 @if (IsOwner)
                                                                 {
-                                                                    <button type="button" class="btn btn-danger" @onclick="@(() => OnRemoveList(list.Id))">
-                                                                        <span class="oi oi-trash" />
-                                                                    </button>
+                                                                    <ContextMenu>
+                                                                        <ContextMenuItem OnClickCallback="@(() => OnRemoveList(list.Id))">
+                                                                            Delete
+                                                                        </ContextMenuItem>
+                                                                    </ContextMenu>
                                                                 }
                                                             </td>
                                                         </tr>
@@ -148,9 +150,11 @@ else
                                                             <td>
                                                                 @if (IsOwner && member.Id != userGroup.Owner.Id)
                                                                 {
-                                                                    <button type="button" class="btn btn-danger" @onclick="@(() => OnRemoveMember(member.Id))">
-                                                                        <span class="oi oi-trash" />
-                                                                    </button>
+                                                                    <ContextMenu>
+                                                                        <ContextMenuItem OnClickCallback="@(() => OnRemoveMember(member.Id))">
+                                                                            Remove
+                                                                        </ContextMenuItem>
+                                                                    </ContextMenu>
                                                                 }
                                                             </td>
                                                         </tr>
