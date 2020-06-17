@@ -4,7 +4,6 @@
     }
 
     .context-menu {
-        visibility: hidden;
         position: absolute;
         left: -80px;
         z-index: 5;
@@ -30,24 +29,37 @@
         .context-menu-btn > span {
             transform: rotate(90deg);
         }
-
-        .context-menu-btn + .context-menu:active,
-        .context-menu-btn:focus + .context-menu {
-            visibility: visible;
-        }
 </style>
 <div class="context-menu-container">
-    <button class="context-menu-btn">
+    <button class="context-menu-btn" type="button" @onclick="OnContextBtnClicked" @onfocusout="HideMenu">
         <span class="oi oi-ellipses"></span>
     </button>
-    <div class="context-menu">
-        <ul class="list-group">
-            @ChildContent
-        </ul>
-    </div>
+    @if (ShowMenu)
+    {
+        <div class="context-menu">
+            <ul class="list-group">
+                @ChildContent
+            </ul>
+        </div>
+    }
 </div>
 
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+
+    private bool ShowMenu { get; set; }
+
+    protected override void OnInitialized()
+    {
+        HideMenu();
+    }
+    private void HideMenu()
+    {
+        ShowMenu = false;
+    }
+    private void OnContextBtnClicked()
+    {
+        ShowMenu = !ShowMenu;
+    }
 }
