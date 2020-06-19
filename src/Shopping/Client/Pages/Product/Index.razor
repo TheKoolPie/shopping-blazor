@@ -103,29 +103,29 @@ else
                 </button>
             </div>
         </div>
-        @if (products.Count > 0)
-        {
-            <div class="row" style="margin-top:24px">
-                <div class="col">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th @onclick="OnNameColumnClicked">
-                                    Name
-                                    <span class="@NameSortingData.Icon" />
-                                </th>
-                                <th @onclick="OnUnitColumnClicked">
-                                    Einheit
-                                    <span class="@UnitSortingData.Icon" />
-                                </th>
-                                <th @onclick="OnCategoryColumnClicked">
-                                    Kategorie
-                                    <span class="@CategorySortingData.Icon" />
-                                </th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
+        <div class="row" style="margin-top:24px">
+            <div class="col">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th @onclick="OnNameColumnClicked">
+                                Name
+                                <span class="@NameSortingData.Icon" />
+                            </th>
+                            <th @onclick="OnUnitColumnClicked">
+                                Einheit
+                                <span class="@UnitSortingData.Icon" />
+                            </th>
+                            <th @onclick="OnCategoryColumnClicked">
+                                Kategorie
+                                <span class="@CategorySortingData.Icon" />
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (products.Count > 0)
+                        {
                             @foreach (var product in products)
                             {
                                 string borderContent = $"15px solid {product.Category.ColorCode}";
@@ -136,10 +136,10 @@ else
                                     <td>
                                         <AuthorizeView>
                                             <ContextMenu>
-                                                <ContextMenuItem OnClickCallback="@(() => OnEditProduct(product.Id,product.Name,product.Unit,product.CategoryId))">
+                                                <ContextMenuItem OnClickCallback="@(() => OnEditProduct(product.Id, product.Name, product.Unit, product.CategoryId))">
                                                     Edit
                                                 </ContextMenuItem>
-                                                <ContextMenuItem OnClickCallback="@(() => OnDeleteProduct(product.Id,product.Name))">
+                                                <ContextMenuItem OnClickCallback="@(() => OnDeleteProduct(product.Id, product.Name))">
                                                     Delete
                                                 </ContextMenuItem>
                                             </ContextMenu>
@@ -147,20 +147,17 @@ else
                                     </td>
                                 </tr>
                             }
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4">No products found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-        }
-        else
-        {
-            <hr />
-            <div class="row">
-                <div class="col">
-                    <strong>No products found</strong>
-                </div>
-            </div>
-        }
+        </div>
     }
 }
 @code {
