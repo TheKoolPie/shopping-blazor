@@ -8,20 +8,21 @@
             <ValidationSummary />
             <div class="row">
                 <div class="col">
-                    <label>
-                        Name
-                        <InputText class="form-control" @bind-Value="_category.Name" />
-                    </label>
+                    <div class="form-group">
+                        <label for="editCategoryName">Name</label>
+                        <InputText id="editCategoryName" class="form-control" @bind-Value="_category.Name" />
+                    </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
-                    <label>
-                        Color
-                        <input class="form-control" type="color" @bind-value="_category.ColorCode" />
-                    </label>
+                    <div class="form-group">
+                        <label for="editCategoryColor">Color</label>
+                        <input id="editCategoryColor" class="form-control" type="color" @bind-value="_category.ColorCode" />
+                    </div>
                 </div>
             </div>
+            <hr />
             <div class="row">
                 <div class="col">
                     <button class="btn btn-primary" type="submit">

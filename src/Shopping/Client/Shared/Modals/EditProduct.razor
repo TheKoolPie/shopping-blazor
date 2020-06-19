@@ -1,0 +1,111 @@
+﻿@inject IModalService ModalService
+@inject IProducts ProductRepo
+@inject IProductCategories CategoryRepo
+
+<div class="row">
+    <div class="col">
+        @if (_product != null)
+        {
+            <EditForm EditContext="@editContext" OnSubmit="OnUpdateProduct">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="editCategoryName">Name</label>
+                            <InputText id="editCategoryName" class="form-control" @bind-Value="_product.Name" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Unit</label>
+                            <InputSelect class="form-control" @bind-Value="_product.Unit">
+                                <option value="0">Choose Unit...</option>
+                                @foreach (var unit in Enum.GetValues(typeof(ProductUnit)).Cast<ProductUnit>())
+                                    {
+                                    <option value="@unit" selected=@(unit == _product.Unit)>@unit.GetDescription()</option>
+                                    }
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <InputSelect class="form-control" @bind-Value="_product.CategoryId">
+                                <option value="">Choose Category...</option>
+                                @foreach (var category in _categories)
+                                    {
+                                    <option value="@category.Id" selected=@(category.Id == _product.CategoryId)>
+                                        @category.Name
+                                    </option>
+                                    }
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-primary" type="submit">
+                            Update
+                        </button>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-secondary" type="button" @onclick="BlazoredModal.Cancel">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+
+@code {
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; }
+
+    [Parameter]
+    public string ProductId { get; set; }
+    [Parameter]
+    public string ProductName { get; set; }
+    [Parameter]
+    public ProductUnit ProductUnit { get; set; }
+    [Parameter]
+    public string ProductCategoryId { get; set; }
+
+    private ProductItem _product = new ProductItem();
+    private EditContext editContext;
+
+    private List<ProductCategory> _categories = new List<ProductCategory>();
+
+    private bool IsSaving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _product = new ProductItem()
+        {
+            Id = ProductId,
+            Name = ProductName,
+            Unit = ProductUnit,
+            CategoryId = ProductCategoryId
+        };
+        editContext = new EditContext(_product);
+        _categories = await CategoryRepo.GetAllAsync();
+    }
+
+    private async Task OnUpdateProduct()
+    {
+        if (editContext.Validate())
+        {
+            _product.Category = await CategoryRepo.GetAsync(_product.CategoryId);
+            var result = await ProductRepo.UpdateAsync(ProductId, _product);
+            BlazoredModal.Close(ModalResult.Ok<ProductItem>(result));
+        }
+    }
+}

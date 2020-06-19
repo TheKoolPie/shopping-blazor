@@ -211,41 +211,15 @@ else
 
     private void AddOrUpdateEntityInLists(ProductCategory entity)
     {
-        var backupListItem = localBackup.FirstOrDefault(c => c.Id == entity.Id);
-        if (backupListItem == null)
-        {
-            localBackup.Add(entity);
-        }
-        else
-        {
-            backupListItem.Name = entity.Name;
-            backupListItem.ColorCode = entity.ColorCode;
-        }
-        var workListItem = categories.FirstOrDefault(c => c.Id == entity.Id);
-        if (workListItem == null)
-        {
-            categories.Add(entity);
-        }
-        else
-        {
-            workListItem.Name = entity.Name;
-            workListItem.ColorCode = entity.ColorCode;
-        }
-    }
-    private void DeleteEntityInLists(string id)
-    {
-        var backupListItem = localBackup.FirstOrDefault(c => c.Id == id);
-        if (backupListItem != null)
-        {
-            localBackup.Remove(backupListItem);
-        }
-        var workListItem = categories.FirstOrDefault(c => c.Id == id);
-        if (workListItem != null)
-        {
-            categories.Remove(workListItem);
-        }
+        localBackup.AddOrUpdate(entity);
+        categories.AddOrUpdate(entity);
     }
 
+    private void DeleteEntityInLists(string id)
+    {
+        localBackup.RemoveIfExists(id);
+        categories.RemoveIfExists(id);
+    }
 
     private async Task LoadProductCategories()
     {
@@ -286,7 +260,7 @@ else
         if (!result.Cancelled)
         {
             var resultData = (ProductCategory)result.Data;
-            if(resultData == null)
+            if (resultData == null)
             {
                 AlertData = AlertComponentModel.CreateErrorAlert($"Could not change category '{name}'");
             }
