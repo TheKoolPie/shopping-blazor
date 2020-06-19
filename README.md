@@ -22,4 +22,4 @@ Main Features:
 - [Pomelo Ef Core MySql](https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql)
 ## Client
 - [Blazored.LocalStorage](https://github.com/Blazored/LocalStorage)
-
+- [Blazored.Modal](https://github.com/Blazored/Modal)
