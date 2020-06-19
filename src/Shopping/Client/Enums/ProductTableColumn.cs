@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Shopping.Shared.Enums
+namespace Shopping.Client.Enums
 {
     public enum ProductTableColumn
     {

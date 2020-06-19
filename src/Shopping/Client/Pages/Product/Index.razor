@@ -35,40 +35,44 @@ else
                         <ValidationSummary />
                         <div class="row">
                             <div class="col">
-                                <label>
-                                    Name
-                                    <InputText class="form-control" @bind-Value="product.Name" />
-                                </label>
+                                <div class="form-group">
+                                    <label for="productNameInput">Name</label>
+                                    <InputText id="productNameInput" class="form-control" @bind-Value="product.Name" />
+                                </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col">
-                                <label>
-                                    Unit
-                                    <InputSelect class="form-control" @bind-Value="product.Unit">
+                                <div class="form-group">
+                                    <label for="productUnitInput">Unit</label>
+                                    <InputSelect id="productUnitInput" class="form-control" @bind-Value="product.Unit">
                                         <option value="0">Choose Unit...</option>
                                         @foreach (var unit in Enum.GetValues(typeof(ProductUnit)).Cast<ProductUnit>())
                                                 {
-                                            <option value="@unit">@unit.GetDescription()</option>
+                                            <option value="@unit">
+                                                @unit.GetDescription() @($"[{unit.GetDisplayName()}]")
+                                            </option>
                                                 }
                                     </InputSelect>
-                                </label>
+                                </div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col">
-                                <label>
-                                    Category
-                                    <InputSelect class="form-control" @bind-Value="product.CategoryId">
+                                <div class="form-group">
+                                    <label for="productCategoryInput">Category</label>
+                                    <InputSelect id="productCategoryInput" class="form-control" @bind-Value="product.CategoryId">
                                         <option value="" selected>Choose Category...</option>
                                         @foreach (var category in categories)
                                                 {
                                                     string borderContent = $"15px solid {category.ColorCode}";
-                                            <option style="border-left: @borderContent" value="@category.Id">@category.Name</option>
+                                            <option style="border-left: @borderContent" value="@category.Id">
+                                                @category.Name
+                                            </option>
                                                 }
                                     </InputSelect>
-                                </label>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
@@ -106,8 +110,8 @@ else
         <div class="row" style="margin-top:24px">
             <div class="col">
                 <table class="table table-sm">
-                    <thead>
-                        <tr>
+                    <thead class="thead-light" >
+                        <tr class="selectable-row">
                             <th @onclick="OnNameColumnClicked">
                                 Name
                                 <span class="@NameSortingData.Icon" />
@@ -131,9 +135,9 @@ else
                                 string borderContent = $"15px solid {product.Category.ColorCode}";
                                 <tr>
                                     <td>@product.Name</td>
-                                    <td>@product.Unit.GetDescription()</td>
+                                    <td>@product.Unit.GetDisplayName()</td>
                                     <td style="border-left: @borderContent">@product.Category.Name</td>
-                                    <td>
+                                    <td class="d-flex justify-content-start">
                                         <AuthorizeView>
                                             <ContextMenu>
                                                 <ContextMenuItem OnClickCallback="@(() => OnEditProduct(product.Id, product.Name, product.Unit, product.CategoryId))">

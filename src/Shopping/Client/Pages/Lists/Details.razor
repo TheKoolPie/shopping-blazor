@@ -85,45 +85,52 @@
                         {
                             <div class="row">
                                 <div class="col">
-                                    @if (CurrentList.Items.Count > 0)
-                                    {
-                                        <table class="table table-sm">
-                                            <thead class="thead-light">
-                                                <tr>
-                                                    <th></th>
-                                                    <th>Name</th>
-                                                    <th>Amount</th>
-                                                    <th>Unit</th>
-                                                    <th></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+
+                                    <table class="table table-sm">
+                                        <thead class="thead-light">
+                                            <tr class="selectable-row">
+                                                <th @onclick="(()=>SortTableByColumn(ShoppingListOverviewTableColumn.Done))">
+                                                    <span class="oi oi-circle-check" />
+                                                    <span class="@DoneSorting.Icon" />
+                                                </th>
+                                                <th @onclick="(()=>SortTableByColumn(ShoppingListOverviewTableColumn.Name))">
+                                                    Name
+                                                    <span class="@NameSorting.Icon" />
+                                                </th>
+                                                <th>Amount</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (CurrentList.Items.Count > 0)
+                                            {
                                                 @foreach (var item in CurrentList.Items)
                                                 {
                                                     var opacity = item.Done ? "1" : "0";
-                                                    <tr>
-                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))">
+                                                    <tr class="selectable-row">
+                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))">
                                                             <span style="opacity:@opacity" class="oi oi-circle-check table-check-status"></span>
                                                         </td>
-                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Name </td>
-                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.Amount </td>
-                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Unit.GetDescription()</td>
-                                                        <td>
+                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Name </td>
+                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))"> @item.Amount @item.ProductItem.Unit.GetDisplayName()</td>
+                                                        <td class="d-flex justify-content-start">
                                                             <ContextMenu>
-                                                                <ContextMenuItem OnClickCallback="@(()=>RemoveListItem(item.Id))">
+                                                                <ContextMenuItem OnClickCallback="@(() => RemoveListItem(item.Id))">
                                                                     Delete
                                                                 </ContextMenuItem>
                                                             </ContextMenu>
                                                         </td>
                                                     </tr>
                                                 }
-                                            </tbody>
-                                        </table>
-                                    }
-                                    else
-                                    {
-                                        <p>No items added to list</p>
-                                    }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="5" class="text-center">No items added</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         }
@@ -328,8 +335,6 @@
     [Parameter]
     public string ShoppingListId { get; set; }
 
-    private bool IsAddingGroup;
-    private bool IsRemovingGroup;
     private bool IsLoading;
     private bool IsSavingList;
     private bool IsSavingItem;
@@ -342,11 +347,10 @@
     private ShoppingUserModel currentUser;
     private bool CurrentListHasChanged = false;
 
-    private List<UserGroup> _availableGroups;
-    private List<ProductItem> _availableProducts = new List<ProductItem>();
-
-    private GroupIdInputModel groupIdInput = new GroupIdInputModel();
-    private EditContext addGroupContext;
+    #region Overview
+    private SortingModel DoneSorting = new SortingModel();
+    private SortingModel NameSorting = new SortingModel();
+    #endregion
 
     #region Alerts
     AlertComponentModel LoadingAlertModel = null;
@@ -358,7 +362,15 @@
     #region AddItem
     private ShoppingListItem AddItem = new ShoppingListItem();
     private EditContext AddItemEditContext;
+    private List<ProductItem> _availableProducts = new List<ProductItem>();
+    #endregion
 
+    #region Access
+    private bool IsAddingGroup;
+    private bool IsRemovingGroup;
+    private List<UserGroup> _availableGroups;
+    private GroupIdInputModel groupIdInput = new GroupIdInputModel();
+    private EditContext addGroupContext;
     #endregion
 
     protected override async Task OnInitializedAsync()
@@ -382,7 +394,6 @@
             }
 
             await InitAvailableProducts();
-
             AddItemEditContext = new EditContext(AddItem);
         }
 
@@ -521,5 +532,40 @@
     private void NavigateToUserGroupDetails(string userGroupId)
     {
         NavigationManager.NavigateTo($"/groups/details/{userGroupId}");
+    }
+
+    private void SortTableByColumn(ShoppingListOverviewTableColumn column)
+    {
+        switch (column)
+        {
+            case ShoppingListOverviewTableColumn.Done:
+                {
+                    DoneSorting.Toggle();
+                    switch (DoneSorting.Type)
+                    {
+                        case SortingType.Ascending:
+                            CurrentList.Items = CurrentList.Items.OrderBy(e => e.Done).ToList();
+                            break;
+                        case SortingType.Descending:
+                            CurrentList.Items = CurrentList.Items.OrderByDescending(e => e.Done).ToList();
+                            break;
+                    }
+                }
+                break;
+            case ShoppingListOverviewTableColumn.Name:
+                {
+                    NameSorting.Toggle();
+                    switch (NameSorting.Type)
+                    {
+                        case SortingType.Ascending:
+                            CurrentList.Items = CurrentList.Items.OrderBy(e => e.ProductItem.Name).ToList();
+                            break;
+                        case SortingType.Descending:
+                            CurrentList.Items = CurrentList.Items.OrderByDescending(e => e.ProductItem.Name).ToList();
+                            break;
+                    }
+                }
+                break;
+        }
     }
 }
