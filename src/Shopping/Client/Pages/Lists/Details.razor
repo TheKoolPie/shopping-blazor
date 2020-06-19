@@ -85,45 +85,48 @@
                         {
                             <div class="row">
                                 <div class="col">
-                                    @if (CurrentList.Items.Count > 0)
-                                    {
-                                        <table class="table table-sm">
-                                            <thead class="thead-light">
-                                                <tr>
-                                                    <th></th>
-                                                    <th>Name</th>
-                                                    <th>Amount</th>
-                                                    <th>Unit</th>
-                                                    <th></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+
+                                    <table class="table table-sm">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th></th>
+                                                <th>Name</th>
+                                                <th>Amount</th>
+                                                <th>Unit</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (CurrentList.Items.Count > 0)
+                                            {
                                                 @foreach (var item in CurrentList.Items)
                                                 {
                                                     var opacity = item.Done ? "1" : "0";
-                                                    <tr>
-                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))">
+                                                    <tr class="selectable-row">
+                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))">
                                                             <span style="opacity:@opacity" class="oi oi-circle-check table-check-status"></span>
                                                         </td>
-                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Name </td>
-                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.Amount </td>
-                                                        <td @onclick="(()=>ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Unit.GetDescription()</td>
-                                                        <td>
+                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Name </td>
+                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))"> @item.Amount </td>
+                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Unit.GetDisplayName()</td>
+                                                        <td class="d-flex justify-content-start">
                                                             <ContextMenu>
-                                                                <ContextMenuItem OnClickCallback="@(()=>RemoveListItem(item.Id))">
+                                                                <ContextMenuItem OnClickCallback="@(() => RemoveListItem(item.Id))">
                                                                     Delete
                                                                 </ContextMenuItem>
                                                             </ContextMenu>
                                                         </td>
                                                     </tr>
                                                 }
-                                            </tbody>
-                                        </table>
-                                    }
-                                    else
-                                    {
-                                        <p>No items added to list</p>
-                                    }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="5" class="text-center">No items added</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         }

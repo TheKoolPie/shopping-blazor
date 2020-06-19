@@ -25,7 +25,9 @@
                                 <option value="0">Choose Unit...</option>
                                 @foreach (var unit in Enum.GetValues(typeof(ProductUnit)).Cast<ProductUnit>())
                                     {
-                                    <option value="@unit" selected=@(unit == _product.Unit)>@unit.GetDescription()</option>
+                                    <option value="@unit" selected=@(unit == _product.Unit)>
+                                        @unit.GetDescription() @unit.GetDescription() @($"[{unit.GetDisplayName()}]")
+                                    </option>
                                     }
                             </InputSelect>
                         </div>
