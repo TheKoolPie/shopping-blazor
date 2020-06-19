@@ -136,7 +136,7 @@ else
                                     <td>
                                         <AuthorizeView>
                                             <ContextMenu>
-                                                <ContextMenuItem>
+                                                <ContextMenuItem OnClickCallback="@(() => OnEditProduct(product.Id,product.Name,product.Unit,product.CategoryId))">
                                                     Edit
                                                 </ContextMenuItem>
                                                 <ContextMenuItem OnClickCallback="@(() => OnDeleteProduct(product.Id,product.Name))">
@@ -254,6 +254,16 @@ else
         }
     }
 
+    private void AddOrUpdateEntityInLists(ProductItem entity)
+    {
+        localBackup.AddOrUpdate(entity);
+        products.AddOrUpdate(entity);
+    }
+    private void DeleteEntityInLIsts(string id)
+    {
+        localBackup.RemoveIfExists(id);
+        products.RemoveIfExists(id);
+    }
     private async Task LoadProductItems()
     {
         localBackup = null;
@@ -269,6 +279,31 @@ else
         categories = await CategoryRepo.GetAllAsync();
     }
 
+    private async Task OnEditProduct(string id, string name, ProductUnit unit, string categoryId)
+    {
+        var modalParams = new ModalParameters();
+        modalParams.Add(nameof(EditProduct.ProductId), id);
+        modalParams.Add(nameof(EditProduct.ProductName), name);
+        modalParams.Add(nameof(EditProduct.ProductUnit), unit);
+        modalParams.Add(nameof(EditProduct.ProductCategoryId), categoryId);
+
+        var editProductModal = Modal.Show<EditProduct>("Edit product", modalParams);
+
+        var result = await editProductModal.Result;
+        if (!result.Cancelled)
+        {
+            var resultData = (ProductItem)result.Data;
+            if (resultData == null)
+            {
+                AlertData = AlertComponentModel.CreateErrorAlert($"Could not change product");
+            }
+            else
+            {
+                AlertData = AlertComponentModel.CreateSuccessAlert($"Successfully changed");
+                AddOrUpdateEntityInLists(resultData);
+            }
+        }
+    }
 
     private async Task OnDeleteProduct(string id, string name)
     {
@@ -283,7 +318,7 @@ else
             {
                 DeleteFailureAlert();
             }
-            await LoadProductItems();
+            DeleteEntityInLIsts(id);
         }
     }
 

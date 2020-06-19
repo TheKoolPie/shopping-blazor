@@ -105,7 +105,7 @@ else
                                     <td>
                                         <AuthorizeView>
                                             <ContextMenu>
-                                                <ContextMenuItem>
+                                                <ContextMenuItem OnClickCallback="@(()=> OnEditCategory(category.Id,category.Name,category.ColorCode))">
                                                     Edit
                                                 </ContextMenuItem>
                                                 <ContextMenuItem OnClickCallback="@(() => OnDeleteCategory(category.Id,category.Name))">
@@ -190,10 +190,9 @@ else
 
                 if (savedEntity != null)
                 {
-                    localBackup.Add(savedEntity);
-                    categories.Add(savedEntity);
+                    AddOrUpdateEntityInLists(savedEntity);
                     category = new ProductCategory();
-                    AlertData = AlertComponentModel.CreateSuccessAlert("Saving successful", "");
+                    AlertData = AlertComponentModel.CreateSuccessAlert("Saving successful");
                 }
                 else
                 {
@@ -210,6 +209,17 @@ else
         }
     }
 
+    private void AddOrUpdateEntityInLists(ProductCategory entity)
+    {
+        localBackup.AddOrUpdate(entity);
+        categories.AddOrUpdate(entity);
+    }
+
+    private void DeleteEntityInLists(string id)
+    {
+        localBackup.RemoveIfExists(id);
+        categories.RemoveIfExists(id);
+    }
 
     private async Task LoadProductCategories()
     {
@@ -235,7 +245,30 @@ else
             {
                 DeleteFailureAlert();
             }
-            await LoadProductCategories();
+            DeleteEntityInLists(id);
+        }
+    }
+    private async Task OnEditCategory(string id, string name, string colorcode)
+    {
+        var modalParams = new ModalParameters();
+        modalParams.Add(nameof(EditCategory.CategoryId), id);
+        modalParams.Add(nameof(EditCategory.CategoryName), name);
+        modalParams.Add(nameof(EditCategory.CategoryColorCode), colorcode);
+
+        var editModal = Modal.Show<EditCategory>("Edit category", modalParams);
+        var result = await editModal.Result;
+        if (!result.Cancelled)
+        {
+            var resultData = (ProductCategory)result.Data;
+            if (resultData == null)
+            {
+                AlertData = AlertComponentModel.CreateErrorAlert($"Could not change category '{name}'");
+            }
+            else
+            {
+                AlertData = AlertComponentModel.CreateSuccessAlert($"Successfully changed", $"Name {name} -> {resultData.Name}, Color {colorcode} -> {resultData.ColorCode}");
+                AddOrUpdateEntityInLists(resultData);
+            }
         }
     }
 
@@ -276,4 +309,5 @@ else
     {
         AlertData = AlertComponentModel.CreateErrorAlert("Error with deletion", resultMsg);
     }
+
 }

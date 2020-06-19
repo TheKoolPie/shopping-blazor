@@ -78,6 +78,7 @@ namespace Shopping.Server
             services.AddRazorPages();
             services.AddHttpContextAccessor();
 
+            services.AddTransient<IDataRepository, EfDataRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<ICurrentUserProvider, UserFromHttpContextProvider>();
             services.AddTransient<IUserGroupRepository, UserGroupRepository>();

@@ -64,7 +64,31 @@ namespace Shopping.Server.Controllers
             }
             return Ok(item);
         }
-
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProductItem>> UpdateProduct(string id, [FromBody] ProductItem product)
+        {
+            if (id != product.Id)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                await _products.UpdateAsync(id, product);
+            }
+            catch (ItemNotFoundException)
+            {
+                return NotFound($"Could not find product with id {id}");
+            }
+            catch (ItemAlreadyExistsException)
+            {
+                return Conflict();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return Ok(product);
+        }
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> DeleteProduct(string id)
         {
