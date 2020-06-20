@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shopping.Server.Data;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
+using Shopping.Shared.Model.Account;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -206,7 +208,6 @@ namespace Shopping.Server.Services.Implementations
 
             return result;
         }
-
         public bool ProductAlreadyExists(ProductItem product)
         {
             var all = _context.Products.ToList();
@@ -237,7 +238,6 @@ namespace Shopping.Server.Services.Implementations
             }
             return lists;
         }
-
         public async Task<ShoppingList> GetShoppingListAsync(string id)
         {
             var list = await _context.ShoppingLists.FirstOrDefaultAsync(i => i.Id == id);
@@ -251,7 +251,6 @@ namespace Shopping.Server.Services.Implementations
             }
             return list;
         }
-
         public async Task<ShoppingList> CreateShoppingListAsync(ShoppingList item)
         {
             if (ShoppingListAlreadyExists(item))
@@ -263,7 +262,6 @@ namespace Shopping.Server.Services.Implementations
             await SaveChangesAsync();
             return item;
         }
-
         public async Task<ShoppingList> UpdateShoppingListAsync(string id, ShoppingList item)
         {
             if (!ShoppingListCanBeUpdated(item))
@@ -308,7 +306,6 @@ namespace Shopping.Server.Services.Implementations
 
             return existing;
         }
-
         public async Task<bool> DeleteShoppingListAsync(string id)
         {
             var existing = await GetShoppingListAsync(id);
@@ -327,14 +324,12 @@ namespace Shopping.Server.Services.Implementations
 
             return result;
         }
-
         public bool ShoppingListAlreadyExists(ShoppingList item)
         {
             var lists = _context.ShoppingLists.ToList();
 
             return lists.Any(i => i.Id == item.Id || (i.Owner.Id == item.Owner.Id && i.Name == item.Name));
         }
-
         public bool ShoppingListCanBeUpdated(ShoppingList item)
         {
             var lists = _context.ShoppingLists.ToList();
@@ -346,39 +341,75 @@ namespace Shopping.Server.Services.Implementations
         #endregion
 
         #region User Group
-        public Task<List<UserGroup>> GetUserGroupsAsync()
+        public async Task<List<UserGroup>> GetUserGroupsAsync()
         {
-            throw new NotImplementedException();
+            var groups = await _context.UserGroups.ToListAsync();
+            return groups;
         }
-
-        public Task<UserGroup> GetUserGroupAsync(string id)
+        public async Task<UserGroup> GetUserGroupAsync(string id)
         {
-            throw new NotImplementedException();
+            var group = await _context.UserGroups.FirstOrDefaultAsync(i => i.Id == id);
+            if (group == null)
+            {
+                throw new ItemNotFoundException(typeof(UserGroup), id);
+            }
+            return group;
         }
-
-        public Task<UserGroup> CreateUserGroupAsync(UserGroup item)
+        public async Task<UserGroup> CreateUserGroupAsync(UserGroup item)
         {
-            throw new NotImplementedException();
-        }
+            if (UserGroupAlreadyExists(item))
+            {
+                throw new ItemAlreadyExistsException(typeof(UserGroup), item.Id);
+            }
 
-        public Task<UserGroup> UpdateUserGroupAsync(string id, UserGroup item)
+            _context.UserGroups.Add(item);
+            await SaveChangesAsync();
+            return item;
+        }
+        public async Task<UserGroup> UpdateUserGroupAsync(string id, UserGroup item)
         {
-            throw new NotImplementedException();
-        }
+            if (!UserGroupCanBeUpdated(item))
+            {
+                throw new ItemAlreadyExistsException(typeof(UserGroup), item.Id);
+            }
+            var existing = await GetUserGroupAsync(id);
+            existing.Name = item.Name;
+            existing.Owner = item.Owner;
+            existing.Members = new List<ShoppingUserModel>(item.Members);
 
-        public Task<bool> DeleteUserGroupAsync(string id)
+            await SaveChangesAsync();
+
+            return existing;
+        }
+        public async Task<bool> DeleteUserGroupAsync(string id)
         {
-            throw new NotImplementedException();
-        }
+            var existing = await GetUserGroupAsync(id);
+            _context.UserGroups.Remove(existing);
 
+            bool result = false;
+            try
+            {
+                await SaveChangesAsync();
+                result = true;
+            }
+            catch
+            {
+                result = false;
+            }
+
+            return result;
+        }
         public bool UserGroupAlreadyExists(UserGroup item)
         {
-            throw new NotImplementedException();
+            var groups = _context.UserGroups.ToList();
+            return groups.Any(g => g.Id == item.Id || (g.Owner.Id == item.Id && g.Name == item.Name));
         }
-
         public bool UserGroupCanBeUpdated(UserGroup item)
         {
-            throw new NotImplementedException();
+            var groups = _context.UserGroups.ToList();
+            var groupsWithoutCurrentItem = groups.Where(g => g.Id == item.Id).ToList();
+            var groupsOfOwner = groupsWithoutCurrentItem.Where(g => g.Owner.Id == item.Owner.Id).ToList();
+            return !(groupsOfOwner.Any(g => g.Name == item.Name));
         }
         #endregion
 
@@ -387,32 +418,26 @@ namespace Shopping.Server.Services.Implementations
         {
             throw new NotImplementedException();
         }
-
         public Task<UserGroupShoppingList> GetGroupListAssignmentAsync(string id)
         {
             throw new NotImplementedException();
         }
-
         public Task<UserGroupShoppingList> CreateGroupListAssignmentAsync(UserGroupShoppingList item)
         {
             throw new NotImplementedException();
         }
-
         public Task<UserGroupShoppingList> UpdateGroupListAssignmentAsync(string id, UserGroupShoppingList item)
         {
             throw new NotImplementedException();
         }
-
         public Task<bool> DeleteGroupListAssignmentAsync(string id)
         {
             throw new NotImplementedException();
         }
-
         public bool GroupListAssignmentAlreadyExists(UserGroupShoppingList item)
         {
             throw new NotImplementedException();
         }
-
         public bool GroupListAssignmentCanBeUpdated(UserGroupShoppingList item)
         {
             throw new NotImplementedException();
@@ -432,7 +457,6 @@ namespace Shopping.Server.Services.Implementations
                 throw new PersistencyException("Could not save changes", e);
             }
         }
-
         private async Task<List<ProductItem>> GetProductsWithCategory(string categoryId)
         {
             var products = await _context.Products.ToListAsync();

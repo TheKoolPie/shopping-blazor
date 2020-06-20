@@ -1,13 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
-using Serilog.Configuration;
-using Shopping.Server.Data;
-using Shopping.Shared.Data;
+﻿using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
-using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

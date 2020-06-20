@@ -37,7 +37,7 @@
                         {
                             @foreach (var group in _userGroups)
                             {
-                                <tr @onclick="@(() => NavigateToGroupDetails(group.Id))">
+                                <tr class="selectable-row" @onclick="@(() => NavigateToGroupDetails(group.Id))">
                                     <td>@group.Name</td>
                                     <td>@group.Owner.UserName</td>
                                     <td>@group.Members.Count</td>

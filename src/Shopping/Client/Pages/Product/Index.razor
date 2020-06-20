@@ -138,7 +138,7 @@ else
                                     <td>@product.Unit.GetDisplayName()</td>
                                     <td style="border-left: @borderContent">@product.Category.Name</td>
                                     <td class="d-flex justify-content-start">
-                                        <AuthorizeView>
+                                        <AuthorizeView Policy="@ShoppingUserPolicies.IsProductModifier">
                                             <ContextMenu>
                                                 <ContextMenuItem OnClickCallback="@(() => OnEditProduct(product.Id, product.Name, product.Unit, product.CategoryId))">
                                                     Edit

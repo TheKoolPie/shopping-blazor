@@ -100,7 +100,7 @@ else
                                                 {
                                                     @foreach (var list in userGroup.ShoppingLists)
                                                     {
-                                                        <tr>
+                                                        <tr class="selectable-row">
                                                             <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.Name</td>
                                                             <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.ListDate.ToString("dd.MM.yyyy")</td>
                                                             <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.Items.Count</td>
@@ -109,7 +109,7 @@ else
                                                                 {
                                                                     <ContextMenu>
                                                                         <ContextMenuItem OnClickCallback="@(() => OnRemoveList(list.Id))">
-                                                                            Delete
+                                                                            Remove
                                                                         </ContextMenuItem>
                                                                     </ContextMenu>
                                                                 }
