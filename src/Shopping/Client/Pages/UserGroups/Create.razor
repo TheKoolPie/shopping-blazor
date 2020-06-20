@@ -77,7 +77,7 @@ else
                         UserGroupId = createdGroup.Id,
                         ShoppingListId = ListId
                     });
-                    if (result)
+                    if (result != null)
                     {
                         Nav.NavigateTo($"/lists/details/{ListId}");
                     }

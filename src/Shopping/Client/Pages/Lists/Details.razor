@@ -486,7 +486,7 @@
 
             await InitAvailableGroups();
 
-            AccessAlertModel = result ? AlertComponentModel.CreateSuccessAlert("Assignment successful") :
+            AccessAlertModel = (result != null) ? AlertComponentModel.CreateSuccessAlert("Assignment successful") :
                 AlertComponentModel.CreateErrorAlert("Assignment failed");
 
             groupIdInput = new GroupIdInputModel();

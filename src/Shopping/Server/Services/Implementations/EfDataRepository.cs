@@ -414,33 +414,73 @@ namespace Shopping.Server.Services.Implementations
         #endregion
 
         #region GroupList Assignments
-        public Task<List<UserGroupShoppingList>> GetGroupListAssignmentsAsync()
+        public async Task<List<UserGroupShoppingList>> GetGroupListAssignmentsAsync()
         {
-            throw new NotImplementedException();
+            var assignments = await _context.UserGroupShoppingLists.ToListAsync();
+            return assignments;
         }
-        public Task<UserGroupShoppingList> GetGroupListAssignmentAsync(string id)
+        public async Task<UserGroupShoppingList> GetGroupListAssignmentAsync(string id)
         {
-            throw new NotImplementedException();
+            var assignment = await _context.UserGroupShoppingLists.FirstOrDefaultAsync(a => a.Id == id);
+            return assignment;
         }
-        public Task<UserGroupShoppingList> CreateGroupListAssignmentAsync(UserGroupShoppingList item)
+        public async Task<UserGroupShoppingList> CreateGroupListAssignmentAsync(UserGroupShoppingList item)
         {
-            throw new NotImplementedException();
+            if (GroupListAssignmentAlreadyExists(item))
+            {
+                throw new ItemAlreadyExistsException(typeof(UserGroupShoppingList), item.Id);
+            }
+
+            item.ShoppingList = await GetShoppingListAsync(item.ShoppingListId);
+            item.UserGroup = await GetUserGroupAsync(item.UserGroupId);
+
+            _context.UserGroupShoppingLists.Add(item);
+            await SaveChangesAsync();
+            return item;
         }
-        public Task<UserGroupShoppingList> UpdateGroupListAssignmentAsync(string id, UserGroupShoppingList item)
+        public async Task<UserGroupShoppingList> UpdateGroupListAssignmentAsync(string id, UserGroupShoppingList item)
         {
-            throw new NotImplementedException();
+            if (!GroupListAssignmentCanBeUpdated(item))
+            {
+                throw new ItemAlreadyExistsException(typeof(UserGroupShoppingList), id);
+            }
+            var existing = await GetGroupListAssignmentAsync(id);
+            existing.ShoppingListId = item.ShoppingListId;
+            existing.UserGroupId = item.UserGroupId;
+
+            await SaveChangesAsync();
+
+            return existing;
         }
-        public Task<bool> DeleteGroupListAssignmentAsync(string id)
+        public async Task<bool> DeleteGroupListAssignmentAsync(string id)
         {
-            throw new NotImplementedException();
+            var existing = await GetGroupListAssignmentAsync(id);
+            _context.UserGroupShoppingLists.Remove(existing);
+
+            bool result = false;
+            try
+            {
+                await SaveChangesAsync();
+                result = true;
+            }
+            catch
+            {
+                result = false;
+            }
+
+            return result;
         }
         public bool GroupListAssignmentAlreadyExists(UserGroupShoppingList item)
         {
-            throw new NotImplementedException();
+            var assignments = _context.UserGroupShoppingLists.ToList();
+            return assignments.Any(a => a.Id == item.Id || (a.ShoppingListId == item.ShoppingListId && a.UserGroupId == item.UserGroupId));
         }
         public bool GroupListAssignmentCanBeUpdated(UserGroupShoppingList item)
         {
-            throw new NotImplementedException();
+            var assignments = _context.UserGroupShoppingLists.ToList();
+            var itemsWithoutCurrent = assignments.Where(a => a.Id != item.Id).ToList();
+
+            return !(itemsWithoutCurrent.Any(a => a.ShoppingListId == item.ShoppingListId && a.UserGroupId == item.UserGroupId));
         }
         #endregion
 

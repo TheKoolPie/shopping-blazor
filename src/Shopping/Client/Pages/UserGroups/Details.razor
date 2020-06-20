@@ -412,7 +412,7 @@ else
 
             var result = await UserGroupShoppingLists.CreateAssignmentAsync(assignment);
             await InitGroup();
-            actionsAlert = result ? AlertComponentModel.CreateSuccessAlert("Assignment successful") :
+            actionsAlert = (result != null) ? AlertComponentModel.CreateSuccessAlert("Assignment successful") :
             AlertComponentModel.CreateErrorAlert("Assignment failed");
 
             listIdInput = new ListIdInputModel();

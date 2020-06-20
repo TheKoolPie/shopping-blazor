@@ -22,11 +22,22 @@ namespace Shopping.Client.Services.Implementations
             _logger = logger;
             _baseUri = "api/UserGroupShoppingLists";
         }
-        public async Task<bool> CreateAssignmentAsync(UserGroupShoppingList assignment)
+        public async Task<UserGroupShoppingList> CreateAssignmentAsync(UserGroupShoppingList assignment)
         {
+            UserGroupShoppingList retVal = null;
+
             var client = await _authService.GetHttpClientAsync();
+
             var response = await client.PostAsJsonAsync<UserGroupShoppingList>(_baseUri, assignment);
-            return response.IsSuccessStatusCode;
+            if (response.IsSuccessStatusCode)
+            {
+                retVal = await response.Content.ReadFromJsonAsync<UserGroupShoppingList>();
+            }
+            else
+            {
+                _logger.LogError(response.ReasonPhrase);
+            }
+            return retVal;
         }
 
         public async Task<List<ShoppingList>> GetShoppingListsOfUserGroupAsync(string userGroupId)

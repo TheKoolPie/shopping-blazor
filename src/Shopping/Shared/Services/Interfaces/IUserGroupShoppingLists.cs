@@ -8,7 +8,7 @@ namespace Shopping.Shared.Services.Interfaces
 {
     public interface IUserGroupShoppingLists
     {
-        Task<bool> CreateAssignmentAsync(UserGroupShoppingList assignment);
+        Task<UserGroupShoppingList> CreateAssignmentAsync(UserGroupShoppingList assignment);
         Task<bool> RemoveAssignmentAsync(UserGroupShoppingList assignment);
         Task<bool> RemoveAssignmentsOfGroupAsync(string userGroupId);
         Task<bool> RemoveAssignmentsOfShoppingListAsync(string shoppingListId);
