@@ -58,13 +58,13 @@
 
         string target = string.IsNullOrEmpty(returnUrl) ? "/" : returnUrl;
 
-        if (result.Successful)
+        if (result.IsSuccessful)
         {
             NavigationManager.NavigateTo(target);
         }
         else
         {
-            Error = result.Error;
+            Error = result.CompleteErrorMessage;
             ShowErrors = true;
         }
     }

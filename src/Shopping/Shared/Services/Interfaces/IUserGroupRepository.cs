@@ -1,9 +1,6 @@
 ﻿using Shopping.Shared.Data;
 using Shopping.Shared.Model.Account;
-using Shopping.Shared.Model.Results;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Shopping.Shared.Services.Interfaces

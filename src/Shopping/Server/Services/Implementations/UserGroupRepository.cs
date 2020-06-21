@@ -5,7 +5,7 @@ using Shopping.Server.Data;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
-using Shopping.Shared.Model.Results;
+using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -14,50 +14,30 @@ using System.Threading.Tasks;
 
 namespace Shopping.Server.Services.Implementations
 {
-    public class UserGroupRepository : CRUDDbContextBaseImpl<UserGroup>, IUserGroupRepository
+    public class UserGroupRepository : IUserGroupRepository
     {
-        private readonly IUserGroupShoppingLists _userGroupShoppingLists;
         private readonly IUserRepository _userRepository;
+        private readonly IDataRepository _data;
 
-        public UserGroupRepository(ShoppingDbContext context, IUserRepository userRepository,
-            ILogger<UserGroupRepository> logger, IUserGroupShoppingLists userGroupShoppingLists)
-            : base(context, logger)
+        public UserGroupRepository(IDataRepository data, IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _userGroupShoppingLists = userGroupShoppingLists;
+            _data = data;
         }
 
-        public override async Task<List<UserGroup>> GetAllAsync()
+        public async Task<List<UserGroup>> GetAllAsync()
         {
-            var groups = await _context.UserGroups.ToListAsync();
-            return groups;
+            return await _data.GetUserGroupsAsync();
         }
 
-        public override async Task<UserGroup> GetAsync(string id)
+        public async Task<UserGroup> GetAsync(string id)
         {
-            var userGroup = await _context.UserGroups.FirstOrDefaultAsync(i => i.Id == id);
-            if (userGroup == null)
-            {
-                throw new ItemNotFoundException(typeof(UserGroup), id);
-            }
-            return userGroup;
+            return await _data.GetUserGroupAsync(id);
         }
 
         public async Task<List<UserGroup>> GetAllOfUserAsync(string userId)
         {
             return (await GetAllAsync()).Where(i => UserIsInGroup(i, userId)).ToList();
-        }
-
-        public override bool ItemAlreadyExists(UserGroup item)
-        {
-            var userGroups = _context.UserGroups.ToList();
-            return userGroups.Any(i => i.Id == item.Id || i.Name == item.Name);
-        }
-        public override void UpdateExistingItem(UserGroup existing, UserGroup update)
-        {
-            existing.Owner = update.Owner;
-            existing.Name = update.Name;
-            existing.Members = new List<ShoppingUserModel>(update.Members);
         }
 
         public async Task<bool> UserIsInGroupAsync(string userGroupId, string userId)
@@ -94,16 +74,7 @@ namespace Shopping.Server.Services.Implementations
                 Id = existingUser.Id
             });
 
-            _context.UserGroups.Update(group);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                throw new PersistencyException($"Could save adding of user {existingUser.Id} to group '{group.Name}'", e);
-            }
+            await _data.SaveChangesAsync();
 
             return group;
         }
@@ -127,16 +98,7 @@ namespace Shopping.Server.Services.Implementations
                 throw new Exception("Could not remove member");
             }
 
-            _context.UserGroups.Update(group);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                throw new PersistencyException($"Could save adding of user {existingUser.Id} to group '{group.Name}'", e);
-            }
+            await _data.SaveChangesAsync();
 
             return group;
 
@@ -172,6 +134,19 @@ namespace Shopping.Server.Services.Implementations
             return commonLists;
         }
 
+        public Task<UserGroup> CreateAsync(UserGroup item)
+        {
+            return _data.CreateUserGroupAsync(item);
+        }
 
+        public Task<UserGroup> UpdateAsync(string id, UserGroup item)
+        {
+            return _data.UpdateUserGroupAsync(id, item);
+        }
+
+        public Task<bool> DeleteByIdAsync(string id)
+        {
+            return _data.DeleteUserGroupAsync(id);
+        }
     }
 }

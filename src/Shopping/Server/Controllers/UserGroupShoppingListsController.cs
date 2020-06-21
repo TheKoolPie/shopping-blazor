@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shopping.Server.Services;
 using Shopping.Shared.Data;
@@ -58,9 +59,9 @@ namespace Shopping.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateAssignment([FromBody] UserGroupShoppingList assignment)
+        public async Task<ActionResult<UserGroupShoppingList>> CreateAssignment([FromBody] UserGroupShoppingList assignment)
         {
-            bool result = false;
+            UserGroupShoppingList result = null;
             try
             {
                 result = await _userGroupShoppingLists.CreateAssignmentAsync(assignment);
@@ -69,7 +70,11 @@ namespace Shopping.Server.Controllers
             {
                 return Conflict(e.Message);
             }
-            return result;
+            catch (PersistencyException e)
+            {
+                return Conflict(e.Message);
+            }
+            return Ok(result);
         }
         [HttpDelete("{groupId}/{listId}")]
         public async Task<ActionResult<bool>> DeleteAssignment(string groupId, string listId)
@@ -84,11 +89,15 @@ namespace Shopping.Server.Controllers
             {
                 result = await _userGroupShoppingLists.RemoveAssignmentAsync(assignment);
             }
-            catch(ItemNotFoundException e)
+            catch (ItemNotFoundException e)
             {
                 return NotFound(e.Message);
             }
-            return result;
+            catch (PersistencyException e)
+            {
+                return NotFound(e.Message);
+            }
+            return Ok(result);
         }
     }
 }

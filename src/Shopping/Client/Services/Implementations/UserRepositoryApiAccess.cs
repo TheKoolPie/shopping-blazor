@@ -1,6 +1,6 @@
 ﻿using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Model.Account;
-using Shopping.Shared.Model.Results;
+using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace Shopping.Client.Services.Implementations
             var resultObject = await response.Content.ReadFromJsonAsync<ShoppingUserResult>();
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception(resultObject.Message);
+                throw new Exception(resultObject.CompleteErrorMessage);
             }
 
             return resultObject.ResultData.FirstOrDefault();

@@ -103,7 +103,7 @@ else
                                 <tr>
                                     <td style="border-left: @borderContent">@category.Name</td>
                                     <td>
-                                        <AuthorizeView>
+                                        <AuthorizeView Policy="@ShoppingUserPolicies.IsProductCategoryModifier">
                                             <ContextMenu>
                                                 <ContextMenuItem OnClickCallback="@(()=> OnEditCategory(category.Id,category.Name,category.ColorCode))">
                                                     Edit

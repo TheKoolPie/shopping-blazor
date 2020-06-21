@@ -75,13 +75,13 @@
         {
 
             var result = await AuthService.Register(RegisterModel);
-            if (result.Successful)
+            if (result.IsSuccessful)
             {
                 NavigationManager.NavigateTo("/account/login");
             }
             else
             {
-                Errors = result.Errors;
+                Errors = result.ErrorMessages;
                 ShowErrors = true;
             }
         }

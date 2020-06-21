@@ -20,7 +20,7 @@
 }
 else
 {
-    <h3>Details of @userGroup.Name</h3>
+    <h3>@userGroup.Name</h3>
     <hr />
     <div class="row">
         <div class="col">
@@ -100,7 +100,7 @@ else
                                                 {
                                                     @foreach (var list in userGroup.ShoppingLists)
                                                     {
-                                                        <tr>
+                                                        <tr class="selectable-row">
                                                             <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.Name</td>
                                                             <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.ListDate.ToString("dd.MM.yyyy")</td>
                                                             <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.Items.Count</td>
@@ -109,7 +109,7 @@ else
                                                                 {
                                                                     <ContextMenu>
                                                                         <ContextMenuItem OnClickCallback="@(() => OnRemoveList(list.Id))">
-                                                                            Delete
+                                                                            Remove
                                                                         </ContextMenuItem>
                                                                     </ContextMenu>
                                                                 }
@@ -263,28 +263,6 @@ else
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Delete group</h5>
-                                        <p class="card-text">
-                                            If you delete this group all assignments between shopping lists and this group will be removed.
-                                            Please confirm your decision, as this action is not revokeable
-                                        </p>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" @onchange="(()=>showLeaveButton = !showLeaveButton)" value="" id="deleteCheck">
-                                            <label class="form-check-label" for="deleteCheck">I really want to to delete!</label>
-                                        </div>
-                                        @if (showLeaveButton)
-                                        {
-                                            <hr />
-                                            <button type="button" class="btn btn-danger" @onclick="OnDeleteGroup">
-                                                <span class="oi oi-account-logout" /> Delete group
-                                            </button>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
                         }
                         else
                         {
@@ -318,6 +296,31 @@ else
                     <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
                         <h4>Properties</h4>
                         <hr />
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Delete group</h5>
+                                        <p class="card-text">
+                                            If you delete this group all assignments between shopping lists and this group will be removed.
+                                            Please confirm your decision, as this action is not revokeable
+                                        </p>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" @onchange="(()=>showLeaveButton = !showLeaveButton)" value="" id="deleteCheck">
+                                            <label class="form-check-label" for="deleteCheck">I really want to to delete!</label>
+                                        </div>
+                                        @if (showLeaveButton)
+                                        {
+                                            <hr />
+                                            <button type="button" class="btn btn-danger" @onclick="OnDeleteGroup">
+                                                <span class="oi oi-account-logout" /> Delete group
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 }
             </div>
@@ -412,7 +415,7 @@ else
 
             var result = await UserGroupShoppingLists.CreateAssignmentAsync(assignment);
             await InitGroup();
-            actionsAlert = result ? AlertComponentModel.CreateSuccessAlert("Assignment successful") :
+            actionsAlert = (result != null) ? AlertComponentModel.CreateSuccessAlert("Assignment successful") :
             AlertComponentModel.CreateErrorAlert("Assignment failed");
 
             listIdInput = new ListIdInputModel();

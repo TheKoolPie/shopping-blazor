@@ -1,44 +1,46 @@
-﻿using Microsoft.AspNetCore.Identity.UI.V3.Pages.Internal.Account;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Shopping.Server.Data;
+﻿using Microsoft.EntityFrameworkCore.Internal;
 using Shopping.Shared.Data;
-using Shopping.Shared.Exceptions;
-using Shopping.Shared.Model.Account;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
+using Shopping.Shared.Exceptions;
+using Shopping.Shared.Model.Account;
 
-namespace Shopping.Server.Services.Implementations
+namespace Shopping.Server.UnitTests.Mocks
 {
-    public class EfDataRepository : IDataRepository
+    public class DataRepoMock : IDataRepository
     {
-        private readonly ShoppingDbContext _context;
-        private readonly ILogger<EfDataRepository> _logger;
-        public EfDataRepository(ShoppingDbContext context, ILogger<EfDataRepository> logger)
+        private List<ProductCategory> _categories;
+        private List<ProductItem> _products;
+        private List<ShoppingList> _shoppingLists;
+        private List<UserGroup> _userGroups;
+        private List<UserGroupShoppingList> _userGroupShoppingLists;
+
+        public DataRepoMock()
         {
-            _context = context;
-            _logger = logger;
+            _categories = new List<ProductCategory>();
+            _products = new List<ProductItem>();
+            _shoppingLists = new List<ShoppingList>();
+            _userGroups = new List<UserGroup>();
+            _userGroupShoppingLists = new List<UserGroupShoppingList>();
         }
+        public DataRepoMock(string filePath) : this()
+        {
+
+        }
+
 
         #region Category
         public async Task<List<ProductCategory>> GetCategoriesAsync()
         {
-            var categories = await _context.Categories.ToListAsync();
-            return categories;
+            return await Task.FromResult(_categories.ToList());
         }
         public async Task<ProductCategory> GetCategoryAsync(string id)
         {
-            var category = await _context.Categories.FirstOrDefaultAsync(i => i.Id == id);
-            if (category == null)
-            {
-                throw new ItemNotFoundException(typeof(ProductCategory), id);
-            }
-            return category;
+            return await (Task.FromResult(_categories.FirstOrDefault(c => c.Id == id)));
         }
         public async Task<ProductCategory> CreateCategoryAsync(ProductCategory item)
         {
@@ -46,7 +48,7 @@ namespace Shopping.Server.Services.Implementations
             {
                 throw new ItemAlreadyExistsException(typeof(ProductCategory), item.Id);
             }
-            _context.Categories.Add(item);
+            _categories.Add(item);
             await SaveChangesAsync();
             return item;
         }
@@ -86,11 +88,11 @@ namespace Shopping.Server.Services.Implementations
                             }
                         }
                     }
-                    _context.Products.Remove(product);
+                    _products.Remove(product);
                 }
             }
 
-            _context.Categories.Remove(existing);
+            _categories.Remove(existing);
 
             bool result = false;
             try
@@ -107,9 +109,7 @@ namespace Shopping.Server.Services.Implementations
         }
         public bool CategoryAlreadyExists(ProductCategory item)
         {
-            var all = _context.Categories.ToList();
-            return all
-                    .Any(
+            return _categories.Any(
                         c => c.Id == item.Id ||
                         c.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase) ||
                         c.ColorCode.Equals(item.ColorCode, StringComparison.InvariantCultureIgnoreCase)
@@ -117,37 +117,22 @@ namespace Shopping.Server.Services.Implementations
         }
         public bool CategoryCanBeUpdated(ProductCategory item)
         {
-            var all = _context.Categories.ToList();
-            var restWithOutCurrentItem = all.Where(c => c.Id != item.Id).ToList();
-
-            return !(restWithOutCurrentItem
-                        .Any(
+            var items = _categories.Where(c => c.Id != item.Id).ToList();
+            return !(items.Any(
                             c => c.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase) ||
                             c.ColorCode.Equals(item.ColorCode, StringComparison.InvariantCultureIgnoreCase)
-                            )
-                    );
+                            ));
         }
         #endregion
 
         #region Product
         public async Task<List<ProductItem>> GetProductsAsync()
         {
-            var products = await _context.Products.ToListAsync();
-            foreach (var product in products)
-            {
-                product.Category = await GetCategoryAsync(product.CategoryId);
-            }
-            return products;
+            return await Task.FromResult(_products.ToList());
         }
         public async Task<ProductItem> GetProductAsync(string id)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(i => i.Id == id);
-            if (product == null)
-            {
-                throw new ItemNotFoundException(typeof(ProductItem), id);
-            }
-            product.Category = await GetCategoryAsync(product.CategoryId);
-            return product;
+            return await (Task.FromResult(_products.FirstOrDefault(c => c.Id == id)));
         }
         public async Task<ProductItem> CreateProductAsync(ProductItem item)
         {
@@ -158,7 +143,7 @@ namespace Shopping.Server.Services.Implementations
 
             item.Category = await GetCategoryAsync(item.CategoryId);
 
-            _context.Products.Add(item);
+            _products.Add(item);
             await SaveChangesAsync();
             return item;
         }
@@ -176,7 +161,7 @@ namespace Shopping.Server.Services.Implementations
 
             await SaveChangesAsync();
 
-            return existing;
+            return item;
         }
         public async Task<bool> DeleteProductAsync(string id)
         {
@@ -193,7 +178,7 @@ namespace Shopping.Server.Services.Implementations
                     }
                 }
             }
-            _context.Products.Remove(existing);
+            _products.Remove(existing);
 
             bool result = false;
             try
@@ -210,46 +195,28 @@ namespace Shopping.Server.Services.Implementations
         }
         public bool ProductAlreadyExists(ProductItem item)
         {
-            var all = _context.Products.ToList();
-            return all.Any(
+            return _products.Any(
                             p => p.Id == item.Id ||
                             p.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase)
                           );
         }
         public bool ProductCanBeUpdated(ProductItem item)
         {
-            var all = _context.Products.ToList();
-            var restWithOutCurrentItem = all.Where(p => p.Id != item.Id).ToList();
+            var restWithOutCurrentItem = _products.Where(p => p.Id != item.Id).ToList();
 
             return !(restWithOutCurrentItem.Any(p => p.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase)));
         }
+
         #endregion
 
         #region Shopping List
         public async Task<List<ShoppingList>> GetShoppingListsAsync()
         {
-            var lists = await _context.ShoppingLists.ToListAsync();
-            foreach (var list in lists)
-            {
-                foreach (var item in list.Items)
-                {
-                    item.ProductItem = await GetProductAsync(item.ProductItemId);
-                }
-            }
-            return lists;
+            return await Task.FromResult(_shoppingLists.ToList());
         }
         public async Task<ShoppingList> GetShoppingListAsync(string id)
         {
-            var list = await _context.ShoppingLists.FirstOrDefaultAsync(i => i.Id == id);
-            if (list == null)
-            {
-                throw new ItemNotFoundException(typeof(ShoppingList), id);
-            }
-            foreach (var item in list.Items)
-            {
-                item.ProductItem = await GetProductAsync(item.ProductItemId);
-            }
-            return list;
+            return await (Task.FromResult(_shoppingLists.FirstOrDefault(c => c.Id == id)));
         }
         public async Task<ShoppingList> CreateShoppingListAsync(ShoppingList item)
         {
@@ -258,7 +225,7 @@ namespace Shopping.Server.Services.Implementations
                 throw new ItemAlreadyExistsException(typeof(ShoppingList), item.Id);
             }
 
-            _context.ShoppingLists.Add(item);
+            _shoppingLists.Add(item);
             await SaveChangesAsync();
             return item;
         }
@@ -309,7 +276,7 @@ namespace Shopping.Server.Services.Implementations
         public async Task<bool> DeleteShoppingListAsync(string id)
         {
             var existing = await GetShoppingListAsync(id);
-            _context.ShoppingLists.Remove(existing);
+            _shoppingLists.Remove(existing);
 
             bool result = false;
             try
@@ -326,14 +293,11 @@ namespace Shopping.Server.Services.Implementations
         }
         public bool ShoppingListAlreadyExists(ShoppingList item)
         {
-            var lists = _context.ShoppingLists.ToList();
-
-            return lists.Any(i => i.Id == item.Id || (i.Owner.Id == item.Owner.Id && i.Name == item.Name));
+            return _shoppingLists.Any(i => i.Id == item.Id || (i.Owner.Id == item.Owner.Id && i.Name == item.Name));
         }
         public bool ShoppingListCanBeUpdated(ShoppingList item)
         {
-            var lists = _context.ShoppingLists.ToList();
-            var listsOfOwner = lists.Where(i => i.Owner.Id == item.Owner.Id).ToList();
+            var listsOfOwner = _shoppingLists.Where(i => i.Owner.Id == item.Owner.Id).ToList();
             var itemsWithOutCurrentItem = listsOfOwner.Where(i => i.Id != item.Id).ToList();
 
             return !(itemsWithOutCurrentItem.Any(i => i.Name == item.Name));
@@ -343,17 +307,11 @@ namespace Shopping.Server.Services.Implementations
         #region User Group
         public async Task<List<UserGroup>> GetUserGroupsAsync()
         {
-            var groups = await _context.UserGroups.ToListAsync();
-            return groups;
+            return await Task.FromResult(_userGroups.ToList());
         }
         public async Task<UserGroup> GetUserGroupAsync(string id)
         {
-            var group = await _context.UserGroups.FirstOrDefaultAsync(i => i.Id == id);
-            if (group == null)
-            {
-                throw new ItemNotFoundException(typeof(UserGroup), id);
-            }
-            return group;
+            return await Task.FromResult(_userGroups.FirstOrDefault(c => c.Id == id));
         }
         public async Task<UserGroup> CreateUserGroupAsync(UserGroup item)
         {
@@ -362,7 +320,7 @@ namespace Shopping.Server.Services.Implementations
                 throw new ItemAlreadyExistsException(typeof(UserGroup), item.Id);
             }
 
-            _context.UserGroups.Add(item);
+            _userGroups.Add(item);
             await SaveChangesAsync();
             return item;
         }
@@ -384,7 +342,7 @@ namespace Shopping.Server.Services.Implementations
         public async Task<bool> DeleteUserGroupAsync(string id)
         {
             var existing = await GetUserGroupAsync(id);
-            _context.UserGroups.Remove(existing);
+            _userGroups.Remove(existing);
 
             bool result = false;
             try
@@ -401,13 +359,11 @@ namespace Shopping.Server.Services.Implementations
         }
         public bool UserGroupAlreadyExists(UserGroup item)
         {
-            var groups = _context.UserGroups.ToList();
-            return groups.Any(g => g.Id == item.Id || (g.Owner.Id == item.Id && g.Name == item.Name));
+            return _userGroups.Any(g => g.Id == item.Id || (g.Owner.Id == item.Id && g.Name == item.Name));
         }
         public bool UserGroupCanBeUpdated(UserGroup item)
         {
-            var groups = _context.UserGroups.ToList();
-            var groupsWithoutCurrentItem = groups.Where(g => g.Id == item.Id).ToList();
+            var groupsWithoutCurrentItem = _userGroups.Where(g => g.Id == item.Id).ToList();
             var groupsOfOwner = groupsWithoutCurrentItem.Where(g => g.Owner.Id == item.Owner.Id).ToList();
             return !(groupsOfOwner.Any(g => g.Name == item.Name));
         }
@@ -416,13 +372,11 @@ namespace Shopping.Server.Services.Implementations
         #region GroupList Assignments
         public async Task<List<UserGroupShoppingList>> GetGroupListAssignmentsAsync()
         {
-            var assignments = await _context.UserGroupShoppingLists.ToListAsync();
-            return assignments;
+            return await Task.FromResult(_userGroupShoppingLists.ToList());
         }
         public async Task<UserGroupShoppingList> GetGroupListAssignmentAsync(string id)
         {
-            var assignment = await _context.UserGroupShoppingLists.FirstOrDefaultAsync(a => a.Id == id);
-            return assignment;
+            return await Task.FromResult(_userGroupShoppingLists.FirstOrDefault(c => c.Id == id));
         }
         public async Task<UserGroupShoppingList> CreateGroupListAssignmentAsync(UserGroupShoppingList item)
         {
@@ -434,7 +388,7 @@ namespace Shopping.Server.Services.Implementations
             item.ShoppingList = await GetShoppingListAsync(item.ShoppingListId);
             item.UserGroup = await GetUserGroupAsync(item.UserGroupId);
 
-            _context.UserGroupShoppingLists.Add(item);
+            _userGroupShoppingLists.Add(item);
             await SaveChangesAsync();
             return item;
         }
@@ -455,7 +409,7 @@ namespace Shopping.Server.Services.Implementations
         public async Task<bool> DeleteGroupListAssignmentAsync(string id)
         {
             var existing = await GetGroupListAssignmentAsync(id);
-            _context.UserGroupShoppingLists.Remove(existing);
+            _userGroupShoppingLists.Remove(existing);
 
             bool result = false;
             try
@@ -470,51 +424,41 @@ namespace Shopping.Server.Services.Implementations
 
             return result;
         }
+
         public bool GroupListAssignmentAlreadyExists(UserGroupShoppingList item)
         {
-            var assignments = _context.UserGroupShoppingLists.ToList();
-            return assignments.Any(a => a.Id == item.Id || (a.ShoppingListId == item.ShoppingListId && a.UserGroupId == item.UserGroupId));
+            return _userGroupShoppingLists
+                .Any(a => a.Id == item.Id || (a.ShoppingListId == item.ShoppingListId && a.UserGroupId == item.UserGroupId));
         }
         public bool GroupListAssignmentCanBeUpdated(UserGroupShoppingList item)
         {
-            var assignments = _context.UserGroupShoppingLists.ToList();
+            var assignments = _userGroupShoppingLists.ToList();
             var itemsWithoutCurrent = assignments.Where(a => a.Id != item.Id).ToList();
 
             return !(itemsWithoutCurrent.Any(a => a.ShoppingListId == item.ShoppingListId && a.UserGroupId == item.UserGroupId));
         }
         #endregion
 
-        #region Common Helpers
-        public async Task SaveChangesAsync()
+        public Task SaveChangesAsync()
         {
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("Could not save changes");
-                throw new PersistencyException("Could not save changes", e);
-            }
+            return Task.FromResult(true);
         }
         private async Task<List<ProductItem>> GetProductsWithCategory(string categoryId)
         {
-            var products = await _context.Products.ToListAsync();
+            var products = _products.ToList();
             products = products
                 .Where(p => p.CategoryId == categoryId)
                 .ToList();
 
-            return products;
+            return await Task.FromResult(products);
         }
         private async Task<List<ShoppingList>> GetShoppingListsWithProduct(string productItemId)
         {
-            var shoppinglist = await _context.ShoppingLists.ToListAsync();
+            var shoppinglist = _shoppingLists.ToList();
             shoppinglist = shoppinglist
                 .Where(i => i.Items.Any(p => p.ProductItemId == productItemId))
                 .ToList();
-            return shoppinglist;
+            return await Task.FromResult(shoppinglist);
         }
-        #endregion
-
     }
 }

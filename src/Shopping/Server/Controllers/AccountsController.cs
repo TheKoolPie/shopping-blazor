@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Shopping.Server.Models;
 using Shopping.Shared.Model.Account;
+using Shopping.Shared.Results;
 
 namespace Shopping.Server.Controllers
 {
@@ -52,8 +53,8 @@ namespace Shopping.Server.Controllers
             {
                 return Ok(new RegisterResult
                 {
-                    Successful = false,
-                    Errors = new List<string>
+                    IsSuccessful = false,
+                    ErrorMessages = new List<string>
                     {
                         $"User with user name {model.UserName} already exists"
                     }
@@ -65,8 +66,8 @@ namespace Shopping.Server.Controllers
             {
                 return Ok(new RegisterResult
                 {
-                    Successful = false,
-                    Errors = new List<string>
+                    IsSuccessful = false,
+                    ErrorMessages = new List<string>
                     {
                         $"User with email {model.Email} already exists"
                     }
@@ -78,8 +79,8 @@ namespace Shopping.Server.Controllers
             {
                 return Ok(new RegisterResult
                 {
-                    Successful = false,
-                    Errors = createResult.Errors.Select(x => x.Description)
+                    IsSuccessful = false,
+                    ErrorMessages = createResult.Errors.Select(x => x.Description).ToList()
                 });
             }
 
@@ -90,7 +91,7 @@ namespace Shopping.Server.Controllers
                 _logger.LogWarning($"Could not add user {existing.UserName} to role {ShoppingUserRoles.User}");
             }
 
-            return Ok(new RegisterResult { Successful = true });
+            return Ok(new RegisterResult { IsSuccessful = true });
         }
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
@@ -101,14 +102,24 @@ namespace Shopping.Server.Controllers
                 user = await _userManager.FindByEmailAsync(model.LoginName);
                 if (user == null)
                 {
-                    return BadRequest(new LoginResult { Successful = false, Error = $"Could not find user with name or email of value: {model.LoginName}" });
+                    return BadRequest(
+                        new LoginResult
+                        {
+                            IsSuccessful = false,
+                            ErrorMessages = new List<string> { $"Could not find user with name or email of value: {model.LoginName}" }
+                        });
                 }
             }
 
             var loginResult = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
             if (!loginResult.Succeeded)
             {
-                return BadRequest(new LoginResult { Successful = false, Error = $"Username and password combination is invalid." });
+                return BadRequest(
+                    new LoginResult
+                    {
+                        IsSuccessful = false,
+                        ErrorMessages = new List<string> { $"Username and password combination is invalid." }
+                    });
             }
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -131,7 +142,7 @@ namespace Shopping.Server.Controllers
                 expires: expiry,
                 signingCredentials: creds
             );
-            return Ok(new LoginResult { Successful = true, Token = new JwtSecurityTokenHandler().WriteToken(token) });
+            return Ok(new LoginResult { IsSuccessful = true, Token = new JwtSecurityTokenHandler().WriteToken(token) });
         }
     }
 }
