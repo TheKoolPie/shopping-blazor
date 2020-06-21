@@ -1,16 +1,24 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
 using Shopping.Shared.Data;
-using System.Net.Http;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Services;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Shopping.Shared.Results;
+using System.Net.Http.Json;
+using Microsoft.Extensions.Logging;
+using System.Linq;
+using Shopping.Client.Services.Implementations.Base;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class ProductCategoryApiAccess : CRUDApiAccessBaseImpl<ProductCategory>, IProductCategories
+    public class ProductCategoryApiAccess : BaseShoppingApiImpl<ProductCategory, ProductCategoryResult>, IProductCategories
     {
-        public ProductCategoryApiAccess(IAuthService authService, ILogger<ProductCategoryApiAccess> logger) : base(authService, logger)
+        public ProductCategoryApiAccess(IAuthService authService, ILogger<ProductCategoryApiAccess> logger)
+            : base("api/ProductCategory", authService, logger)
         {
-            BaseAddress = "api/ProductCategory";
         }
+
+
     }
 }
