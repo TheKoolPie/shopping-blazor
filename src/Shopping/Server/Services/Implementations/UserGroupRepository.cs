@@ -5,7 +5,7 @@ using Shopping.Server.Data;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
-using Shopping.Shared.Model.Results;
+using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;

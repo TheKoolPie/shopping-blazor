@@ -11,7 +11,7 @@ using Shopping.Server.Services;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
-using Shopping.Shared.Model.Results;
+using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 
 namespace Shopping.Server.Controllers
@@ -101,7 +101,7 @@ namespace Shopping.Server.Controllers
                 if (!isAdmin && !isInGroup)
                 {
                     result.IsSuccessful = false;
-                    result.Message = "Not authorized";
+                    result.ErrorMessages.Add("Not authorized");
                     return Unauthorized(result);
                 }
 
@@ -112,7 +112,7 @@ namespace Shopping.Server.Controllers
             catch (ItemNotFoundException e)
             {
                 result.IsSuccessful = false;
-                result.Message = e.Message;
+                result.ErrorMessages.Add(e.Message);
                 return NotFound(result);
             }
             return Ok(result);
@@ -160,7 +160,7 @@ namespace Shopping.Server.Controllers
             if (!(await _userGroups.UserIsInGroupAsync(id, currentUser.Id)))
             {
                 result.IsSuccessful = false;
-                result.Message = "Not authorized";
+                result.ErrorMessages.Add("Not authorized");
                 return Unauthorized(result);
             }
             try
@@ -180,7 +180,7 @@ namespace Shopping.Server.Controllers
             catch (Exception e)
             {
                 result.IsSuccessful = false;
-                result.Message = e.Message;
+                result.ErrorMessages.Add(e.Message);
             }
             return Ok(result);
         }
@@ -192,7 +192,7 @@ namespace Shopping.Server.Controllers
             if (!(await _userGroups.UserIsInGroupAsync(id, currentUser.Id)))
             {
                 result.IsSuccessful = false;
-                result.Message = "Not authorized";
+                result.ErrorMessages.Add("Not authorized");
                 return Unauthorized(result);
             }
             try
@@ -212,7 +212,7 @@ namespace Shopping.Server.Controllers
             catch (Exception e)
             {
                 result.IsSuccessful = false;
-                result.Message = e.Message;
+                result.ErrorMessages.Add(e.Message);
             }
             return Ok(result);
         }

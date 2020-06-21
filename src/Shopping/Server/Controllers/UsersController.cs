@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Shopping.Shared.Model.Account;
-using Shopping.Shared.Model.Results;
+using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 
 namespace Shopping.Server.Controllers
@@ -50,7 +50,7 @@ namespace Shopping.Server.Controllers
             {
                 _logger.LogDebug($"No user found with id {id}");
                 result.IsSuccessful = false;
-                result.Message = "Not authorized";
+                result.ErrorMessages.Add("Not authorized");
                 return Unauthorized(result);
             }
 
@@ -60,7 +60,7 @@ namespace Shopping.Server.Controllers
                 if (groupsInCommon.Count == 0)
                 {
                     result.IsSuccessful = false;
-                    result.Message = "Not authorized";
+                    result.ErrorMessages.Add("Not authorized");
                     return Unauthorized(result);
                 }
             }

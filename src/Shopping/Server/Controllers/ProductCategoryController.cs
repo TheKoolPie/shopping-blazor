@@ -76,9 +76,10 @@ namespace Shopping.Server.Controllers
             {
                 return BadRequest();
             }
+            ProductCategory updated = null;
             try
             {
-                await _categories.UpdateAsync(id, category);
+                updated = await _categories.UpdateAsync(id, category);
             }
             catch (ItemNotFoundException)
             {
@@ -92,7 +93,7 @@ namespace Shopping.Server.Controllers
             {
                 throw;
             }
-            return Ok(category);
+            return Ok(updated);
         }
 
         [HttpDelete("{id}")]

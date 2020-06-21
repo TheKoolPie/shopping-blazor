@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Data;
 using Shopping.Shared.Model.Account;
-using Shopping.Shared.Model.Results;
+using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ namespace Shopping.Client.Services.Implementations
                 var result = await response.Content.ReadFromJsonAsync<UserGroupResult>();
                 if (!result.IsSuccessful)
                 {
-                    throw new Exception(result.Message);
+                    throw new Exception(result.CompleteErrorMessage);
                 }
                 else
                 {
@@ -63,7 +63,7 @@ namespace Shopping.Client.Services.Implementations
                 var result = await response.Content.ReadFromJsonAsync<ShoppingUserResult>();
                 if (!result.IsSuccessful)
                 {
-                    throw new Exception(result.Message);
+                    throw new Exception(result.CompleteErrorMessage);
                 }
                 else
                 {
@@ -84,7 +84,7 @@ namespace Shopping.Client.Services.Implementations
                 var result = await response.Content.ReadFromJsonAsync<UserGroupResult>();
                 if (!result.IsSuccessful)
                 {
-                    throw new Exception(result.Message);
+                    throw new Exception(result.CompleteErrorMessage);
                 }
                 else
                 {

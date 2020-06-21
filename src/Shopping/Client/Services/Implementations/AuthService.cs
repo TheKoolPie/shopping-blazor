@@ -4,13 +4,10 @@ using Microsoft.Extensions.Logging;
 using Shopping.Client.Provider;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Model.Account;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Shopping.Shared.Results;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
