@@ -10,6 +10,8 @@ using Shopping.Server.Data;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Services;
 using Shopping.Shared.Exceptions;
+using Shopping.Shared.Results;
+using Microsoft.Extensions.Logging;
 
 namespace Shopping.Server.Controllers
 {
@@ -19,89 +21,143 @@ namespace Shopping.Server.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProducts _products;
-        public ProductController(IProducts products)
+        private readonly ILogger<ProductController> _logger;
+        public ProductController(IProducts products, ILogger<ProductController> logger)
         {
             _products = products;
+            _logger = logger;
         }
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<List<ProductItem>>> GetProducts()
+        public async Task<ActionResult<ProductItemResult>> GetProducts()
         {
             var products = await _products.GetAllAsync();
-            return Ok(products);
+
+            var result = new ProductItemResult()
+            {
+                IsSuccessful = true,
+                ResultData = products
+            };
+
+            return Ok(result);
         }
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProductItem>> GetProduct(string id)
+        public async Task<ActionResult<ProductItemResult>> GetProduct(string id)
         {
-            ProductItem item;
+            ProductItemResult result = new ProductItemResult();
             try
             {
-                item = await _products.GetAsync(id);
+                var item = await _products.GetAsync(id);
+                result.IsSuccessful = true;
+                result.ResultData = new List<ProductItem>()
+                {
+                    item
+                };
             }
-            catch (ItemNotFoundException)
+            catch (ItemNotFoundException e)
             {
-                return NotFound();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+
+                _logger.LogError(e.Message);
+
+                return NotFound(result);
             }
-            return Ok(item);
+            catch(Exception e)
+            {
+                _logger.LogDebug($"Unknown error", e);
+                throw e;
+            }
+            return Ok(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProductItem>> PostProduct(ProductItem product)
+        public async Task<ActionResult<ProductItemResult>> PostProduct(ProductItem product)
         {
-            ProductItem item;
+            ProductItemResult result = new ProductItemResult();
             try
             {
-                item = await _products.CreateAsync(product);
+                var item = await _products.CreateAsync(product);
+                result.IsSuccessful = true;
+                result.ResultData.Add(item);
             }
-            catch (ItemAlreadyExistsException)
+            catch (ItemAlreadyExistsException e)
             {
-                return Conflict();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+
+                _logger.LogError(e, "Error");
+
+                return Conflict(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                _logger.LogDebug($"Unknown error", e);
+                throw e;
             }
-            return Ok(item);
+            return Ok(result);
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult<ProductItem>> UpdateProduct(string id, [FromBody] ProductItem product)
+        public async Task<ActionResult<ProductItemResult>> UpdateProduct(string id, [FromBody] ProductItem product)
         {
+            ProductItemResult result = new ProductItemResult();
+
             if (id != product.Id)
             {
-                return BadRequest();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Id does not match with object id");
+                return BadRequest(result);
             }
             try
             {
-                await _products.UpdateAsync(id, product);
+                var update = await _products.UpdateAsync(id, product);
+                result.IsSuccessful = true;
+                result.ResultData.Add(update);
             }
-            catch (ItemNotFoundException)
+            catch (ItemNotFoundException e)
             {
-                return NotFound($"Could not find product with id {id}");
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+
+                return NotFound(result);
             }
-            catch (ItemAlreadyExistsException)
+            catch (ItemAlreadyExistsException e)
             {
-                return Conflict();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+
+                return Conflict(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                _logger.LogDebug($"Unknown error", e);
+                throw e;
             }
-            return Ok(product);
+            return Ok(result);
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult<bool>> DeleteProduct(string id)
+        public async Task<ActionResult<ProductItemResult>> DeleteProduct(string id)
         {
+            ProductItemResult result = new ProductItemResult();
             try
             {
                 await _products.DeleteByIdAsync(id);
+                result.IsSuccessful = true;
             }
-            catch (ItemNotFoundException)
+            catch (ItemNotFoundException e)
             {
-                return NotFound();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
+            }
+            catch (Exception e)
+            {
+                _logger.LogDebug($"Unknown error", e);
+                throw e;
             }
 
-            return Ok(true);
+            return Ok(result);
         }
     }
 }

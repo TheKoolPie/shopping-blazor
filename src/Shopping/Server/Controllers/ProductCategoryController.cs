@@ -67,6 +67,11 @@ namespace Shopping.Server.Controllers
 
                 return NotFound(result);
             }
+            catch(Exception e)
+            {
+                _logger.LogDebug($"Unknown error", e);
+                throw e;
+            }
 
             return Ok(result);
         }
@@ -91,9 +96,10 @@ namespace Shopping.Server.Controllers
 
                 return Conflict(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                _logger.LogDebug($"Unknown error", e);
+                throw e;
             }
 
             return Created("", result);
@@ -129,9 +135,10 @@ namespace Shopping.Server.Controllers
                 result.ErrorMessages.Add(e.Message);
                 return Conflict(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                _logger.LogDebug($"Unknown error", e);
+                throw e;
             }
             return Ok(result);
         }
@@ -151,9 +158,10 @@ namespace Shopping.Server.Controllers
                 result.ErrorMessages.Add(e.Message);
                 return NotFound(result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw;
+                _logger.LogDebug($"Unknown error", e);
+                throw e;
             }
 
             return Ok(result);
