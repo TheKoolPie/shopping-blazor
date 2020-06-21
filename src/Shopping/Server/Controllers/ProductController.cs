@@ -60,11 +60,11 @@ namespace Shopping.Server.Controllers
                 result.IsSuccessful = false;
                 result.ErrorMessages.Add(e.Message);
 
-                _logger.LogError(e.Message);
+                _logger?.LogError(e.Message);
 
                 return NotFound(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.LogDebug($"Unknown error", e);
                 throw e;
@@ -87,16 +87,16 @@ namespace Shopping.Server.Controllers
                 result.IsSuccessful = false;
                 result.ErrorMessages.Add(e.Message);
 
-                _logger.LogError(e, "Error");
+                _logger?.LogError(e, "Error");
 
                 return Conflict(result);
             }
             catch (Exception e)
             {
-                _logger.LogDebug($"Unknown error", e);
+                _logger?.LogDebug($"Unknown error", e);
                 throw e;
             }
-            return Ok(result);
+            return Created("", result);
         }
         [HttpPut("{id}")]
         public async Task<ActionResult<ProductItemResult>> UpdateProduct(string id, [FromBody] ProductItem product)
@@ -131,7 +131,7 @@ namespace Shopping.Server.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogDebug($"Unknown error", e);
+                _logger?.LogDebug($"Unknown error", e);
                 throw e;
             }
             return Ok(result);
@@ -153,7 +153,7 @@ namespace Shopping.Server.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogDebug($"Unknown error", e);
+                _logger?.LogDebug($"Unknown error", e);
                 throw e;
             }
 

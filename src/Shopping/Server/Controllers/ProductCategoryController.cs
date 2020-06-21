@@ -144,7 +144,7 @@ namespace Shopping.Server.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteProductCategory(string id)
+        public async Task<ActionResult<ProductCategoryResult>> DeleteProductCategory(string id)
         {
             ProductCategoryResult result = new ProductCategoryResult();
             try
