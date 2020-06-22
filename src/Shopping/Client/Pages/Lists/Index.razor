@@ -65,12 +65,13 @@ else
 
 @code {
     private bool IsLoading = false;
-    private List<ShoppingList> _shoppingLists;
+    private List<ShoppingList> _shoppingLists = new List<ShoppingList>();
 
     protected async override Task OnInitializedAsync()
     {
         IsLoading = true;
-        _shoppingLists = await ShoppingListRepo.GetAllAsync();
+        _shoppingLists = (await ShoppingListRepo.GetAllAsync())
+            .OrderByDescending(l=>l.ListDate).ToList();
         IsLoading = false;
     }
     private void NavigateToDetails(string id)
