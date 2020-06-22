@@ -277,7 +277,7 @@ else
     }
     private async Task LoadProductCategories()
     {
-        categories = await CategoryRepo.GetAllAsync();
+        categories = (await CategoryRepo.GetAllAsync()).OrderBy(c => c.Name).ToList();
     }
 
     private async Task OnEditProduct(string id, string name, ProductUnit unit, string categoryId)
