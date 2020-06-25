@@ -25,14 +25,29 @@ namespace Shopping.Client.Provider
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var savedToken = await _localStorage.GetItemAsync<string>("authToken");
+            var anonState = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             if (string.IsNullOrWhiteSpace(savedToken))
             {
-                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+                return anonState;
             }
+
+            var claims = ParseClaimsFromJwt(savedToken);
+            var expiry = claims.Where(c => c.Type.Equals("exp")).FirstOrDefault();
+            if(expiry == null)
+            {
+                return anonState;
+            }
+
+            var expDateTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expiry.Value));
+            if(expDateTime.UtcDateTime <= DateTime.UtcNow)
+            {
+                return anonState;
+            }
+
 
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", savedToken);
 
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(savedToken),"jwt")));
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt")));
 
         }
 

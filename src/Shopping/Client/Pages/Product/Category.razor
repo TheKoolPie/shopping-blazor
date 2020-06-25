@@ -36,18 +36,18 @@ else
                         <ValidationSummary />
                         <div class="row">
                             <div class="col">
-                                <label>
-                                    Name
-                                    <InputText class="form-control" @bind-Value="category.Name" />
-                                </label>
+                                <div class="form-group">
+                                    <label for="categoryNameInput">Name</label>
+                                    <InputText id="categoryNameInput" class="form-control" @bind-Value="category.Name" />
+                                </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col">
-                                <label>
-                                    Color
+                                <div class="form-group">
+                                    <label for="categoryColorInput">Color</label>
                                     <input class="form-control" type="color" @bind-value="category.ColorCode" />
-                                </label>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
