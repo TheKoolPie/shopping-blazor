@@ -117,7 +117,6 @@ namespace Shopping.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/hc");
                 endpoints.MapFallbackToFile("index.html");
             });
 
