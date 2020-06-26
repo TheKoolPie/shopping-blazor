@@ -1,0 +1,125 @@
+﻿@inject IModalService ModalService
+@inject IShoppingLists ShoppingListRepo
+@inject IProducts ProductRepo
+
+@if (IsSavingItem)
+{
+    <div class="row">
+        <div class="col">
+            <CustomSpinner>
+                Adding product...
+            </CustomSpinner>
+        </div>
+    </div>
+}
+else if (IsContinue)
+{
+    <div class="row">
+        <div class="col">
+            <p>Add additional items?</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <button class="btn btn-primary" @onclick="OnContinueClicked">Continue</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <button class="btn btn-secondary" @onclick="OnCancelClicked">Done</button>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <EditForm EditContext="AddItemEditContext" OnSubmit="HandleAddItemSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="product-search">Product</label>
+            <SearchableInput id="product-search"
+                             ValueOptions="_availableProducts.ToDictionary(x => x.Id, x => x.Name)"
+                             @bind-SelectedValue="AddItem.ProductItemId"
+                             Placeholder="Search Products..." />
+        </div>
+        @if (!string.IsNullOrEmpty(AddItem.ProductItemId))
+        {
+            <div class="form-row">
+                <div class="col">
+                    <label for="product-amount">Amount</label>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col">
+                    <CustomStepper id="product-amount" @bind-StepperValue="@AddItem.Amount"
+                                   Label="Amount" Increment="@(_availableProducts.FirstOrDefault(p => p.Id == AddItem.ProductItemId)?.Unit.GetStepperIncrement() ?? 0.1f)"
+                                   Minimum="0" Maximum="(float.MaxValue)" />
+                </div>
+                <div class="col-4">
+                    <span class="input-group-text">
+                        @(_availableProducts.FirstOrDefault(p => p.Id == AddItem.ProductItemId)?.Unit.GetDescription() ?? "")
+                    </span>
+                </div>
+            </div>
+            <hr />
+            <button type="submit" class="btn btn-primary">Add to List</button>
+        }
+    </EditForm>
+}
+
+
+@code {
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; }
+
+    [Parameter]
+    public string ListId { get; set; }
+
+    List<ProductItem> _availableProducts = new List<ProductItem>();
+
+    bool IsSavingItem;
+    bool IsContinue;
+
+    ShoppingListItem AddItem = new ShoppingListItem();
+    EditContext AddItemEditContext;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AddItemEditContext = new EditContext(AddItem);
+
+        _availableProducts = await ProductRepo.GetAllAsync();
+    }
+
+    private async Task HandleAddItemSubmit()
+    {
+        IsSavingItem = true;
+
+        if (AddItemEditContext.Validate())
+        {
+            var createdItem = await ShoppingListRepo.AddOrUpdateItemAsync(ListId, AddItem);
+            if (createdItem == null)
+            {
+
+            }
+            else
+            {
+                AddItem = new ShoppingListItem();
+                IsContinue = true;
+            }
+        }
+
+        IsSavingItem = false;
+    }
+    private async Task OnContinueClicked()
+    {
+        IsContinue = false;
+    }
+    private async Task OnCancelClicked()
+    {
+        BlazoredModal.Close();
+    }
+}

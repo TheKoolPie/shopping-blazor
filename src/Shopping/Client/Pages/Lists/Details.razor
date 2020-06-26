@@ -3,10 +3,10 @@
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject IShoppingLists ShoppingListRepo
-@inject IProducts ProductRepo
 @inject IUserGroupRepository UserGroupRepo
 @inject IUserGroupShoppingLists UserGroupShoppingListsRepo
 @inject ICurrentUserProvider CurrentUser
+@inject IModalService Modal
 
 <AlertComponent Model="@LoadingAlertModel" />
 @if (LoadingAlertModel == null)
@@ -23,7 +23,17 @@
     }
     else
     {
-        <h3>@CurrentList.Name</h3>
+        <div class="row">
+            <div class="col-auto mr-auto">
+                <h4>@CurrentList.Name</h4>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-light" @onclick="UpdateCurrentList">
+                    <span class="oi oi-reload" />
+                </button>
+            </div>
+        </div>
+
         <hr />
 
         <div class="row">
@@ -32,10 +42,6 @@
                     <a class="list-group-item list-group-item-action active" id="list-overview-list" @onclick="OnListTabClicked"
                        data-toggle="list" href="#list-overview" role="tab">
                         <span class="oi oi-list-rich"></span> Overview
-                    </a>
-                    <a class="list-group-item list-group-item-action" id="list-addItems-list" @onclick="OnListTabClicked"
-                       data-toggle="list" href="#list-addItems" role="tab">
-                        <span class="oi oi-plus"></span> Add Items
                     </a>
                     @if (IsOwner)
                     {
@@ -58,7 +64,9 @@
                     <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
                         <div class="row">
                             <div class="col-auto mr-auto">
-                                <h4>Overview</h4>
+                                <button class="btn btn-primary" @onclick="OnAddItemClicked">
+                                    <span class="oi oi-plus"></span> Add Items
+                                </button>
                             </div>
                             @if (CurrentListHasChanged)
                             {
@@ -133,58 +141,6 @@
                                     </table>
                                 </div>
                             </div>
-                        }
-                    </div>
-                    <div class="tab-pane fade" id="list-addItems" role="tabpanel" aria-labelledby="list-addItems-list">
-                        <h4>Add Items</h4>
-                        <hr />
-                        <AlertComponent Model="AddItemAlertModel" />
-                        @if (IsSavingItem)
-                        {
-                            <div class="row">
-                                <div class="col">
-                                    <CustomSpinner>
-                                        Adding product...
-                                    </CustomSpinner>
-                                </div>
-                            </div>
-                        }
-                        else
-                        {
-                            <EditForm EditContext="AddItemEditContext" OnSubmit="HandleAddItemSubmit">
-                                <DataAnnotationsValidator />
-                                <ValidationSummary />
-                                <div class="form-group">
-                                    <label for="product-search">Product</label>
-                                    <SearchableInput id="product-search"
-                                                     ValueOptions="_availableProducts.ToDictionary(x => x.Id, x => x.Name)"
-                                                     @bind-SelectedValue="AddItem.ProductItemId"
-                                                     Placeholder="Search Products..." />
-                                </div>
-                                @if (!string.IsNullOrEmpty(AddItem.ProductItemId))
-                                {
-                                    <div class="form-row">
-                                        <div class="col">
-                                            <label for="product-amount">Amount</label>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="col">
-                                            <CustomStepper id="product-amount" @bind-StepperValue="@AddItem.Amount"
-                                                           Label="Amount" Increment="@(_availableProducts.FirstOrDefault(p => p.Id == AddItem.ProductItemId)?.Unit.GetStepperIncrement() ?? 0.1f)"
-                                                           Minimum="0" Maximum="(float.MaxValue)" />
-                                        </div>
-                                        <div class="col-4">
-                                            <span class="input-group-text">
-                                                @(_availableProducts.FirstOrDefault(p => p.Id == AddItem.ProductItemId)?.Unit.GetDescription() ?? "")
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <hr />
-                                    <button type="submit" class="btn btn-primary">Add to List</button>
-                                }
-
-                            </EditForm>
                         }
                     </div>
                     @if (IsOwner)
@@ -337,7 +293,6 @@
 
     private bool IsLoading;
     private bool IsSavingList;
-    private bool IsSavingItem;
 
     private ShoppingList CurrentList;
 
@@ -354,15 +309,8 @@
 
     #region Alerts
     AlertComponentModel LoadingAlertModel = null;
-    AlertComponentModel AddItemAlertModel = null;
     AlertComponentModel AccessAlertModel = null;
     AlertComponentModel PropertyAlertModel = null;
-    #endregion
-
-    #region AddItem
-    private ShoppingListItem AddItem = new ShoppingListItem();
-    private EditContext AddItemEditContext;
-    private List<ProductItem> _availableProducts = new List<ProductItem>();
     #endregion
 
     #region Access
@@ -377,7 +325,9 @@
     {
         IsLoading = true;
         LoadingAlertModel = null;
-        CurrentList = await ShoppingListRepo.GetAsync(ShoppingListId);
+
+        await UpdateCurrentList();
+
         if (CurrentList == null)
         {
             LoadingAlertModel = AlertComponentModel.CreateErrorAlert("Error loading list",
@@ -392,12 +342,15 @@
                 await InitAvailableGroups();
                 addGroupContext = new EditContext(groupIdInput);
             }
-
-            await InitAvailableProducts();
-            AddItemEditContext = new EditContext(AddItem);
         }
 
         IsLoading = false;
+    }
+
+    private async Task UpdateCurrentList()
+    {
+        CurrentList = await ShoppingListRepo.GetAsync(ShoppingListId);
+        CurrentListHasChanged = false;
     }
 
     private void RemoveListItem(string id)
@@ -429,10 +382,6 @@
         IsSavingList = false;
     }
 
-    private async Task InitAvailableProducts()
-    {
-        _availableProducts = await ProductRepo.GetAllAsync();
-    }
     private async Task InitAvailableGroups()
     {
         CurrentList.UserGroups = await UserGroupShoppingListsRepo.GetUserGroupsOfShoppingListAsync(ShoppingListId);
@@ -444,29 +393,8 @@
 
     private void OnListTabClicked()
     {
-        AddItemAlertModel = null;
         AccessAlertModel = null;
         PropertyAlertModel = null;
-    }
-
-    private async Task HandleAddItemSubmit()
-    {
-        IsSavingItem = true;
-        AddItemAlertModel = null;
-        var createdItem = await ShoppingListRepo.AddOrUpdateItemAsync(CurrentList.Id, AddItem);
-        if (createdItem == null)
-        {
-            AddItemAlertModel = AlertComponentModel.CreateErrorAlert("Could not add item to list");
-        }
-        else
-        {
-            AddItemAlertModel = AlertComponentModel.CreateSuccessAlert($"{createdItem.Amount} {createdItem.ProductItem.Unit.GetDescription()} of {createdItem.ProductItem.Name} added");
-            CurrentList = await ShoppingListRepo.GetAsync(ShoppingListId);
-            await InitAvailableGroups();
-            AddItem = new ShoppingListItem();
-        }
-
-        IsSavingItem = false;
     }
 
     private async Task OnAddGroup()
@@ -512,7 +440,16 @@
             AlertComponentModel.CreateErrorAlert("Assignment could not be removed");
         IsRemovingGroup = false;
     }
+    private async Task OnAddItemClicked()
+    {
+        var modalParams = new ModalParameters();
+        modalParams.Add(nameof(AddItemToList.ListId), CurrentList.Id);
 
+        var addItemModal = Modal.Show<AddItemToList>("Add Item", modalParams);
+        var result = await addItemModal.Result;
+
+        await UpdateCurrentList();
+    }
     private async Task OnDeleteList()
     {
         if (await ShoppingListRepo.DeleteByIdAsync(ShoppingListId))
