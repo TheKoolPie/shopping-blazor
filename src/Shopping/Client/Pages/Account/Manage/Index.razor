@@ -1,0 +1,73 @@
+@page "/account/manage"
+
+@attribute [Authorize]
+@inject ICurrentUserProvider CurrentUserProvider
+
+<h3>My Account</h3>
+<hr />
+@if (IsLoading)
+    {
+        <div class="row">
+            <div class="col">
+                <CustomSpinner>
+                    Loading shopping list...
+                </CustomSpinner>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col">
+                <div class="list-group list-group-horizontal-md" id="list-tab" role="tablist">
+                    <a class="list-group-item list-group-item-action active" id="list-overview-list"
+                       data-toggle="list" href="#list-overview" role="tab">
+                        <span class="oi oi-list-rich"></span> Overview
+                    </a>
+                    <a class="list-group-item list-group-item-action" id="list-messages-list"
+                        data-toggle="list" href="#list-messages" role="tab">
+                        <span class="oi oi-envelope-closed"></span> Messages
+                    </a>
+                    <a class="list-group-item list-group-item-action" id="list-changepw-list"
+                        data-toggle="list" href="#list-changepw" role="tab">
+                        <span class="oi oi-key"></span> Change Password
+                    </a>
+                    <a class="list-group-item list-group-item-action" id="list-delete-account-list"
+                        data-toggle="list" href="#list-delete-account" role="tab">
+                        <span class="oi oi-trash"></span> Delete Account
+                    </a>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
+                        <h5>Overview</h5>
+                    </div>
+                    <div class="tab-pane fade show" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
+                        <h5>Messages</h5>
+                    </div>
+                    <div class="tab-pane fade show" id="list-changepw" role="tabpanel" aria-labelledby="list-changepw-list">
+                        <h5>Change Password</h5>
+                    </div>
+                    <div class="tab-pane fade show" id="list-delete-account" role="tabpanel" aria-labelledby="list-delete-account-list">
+                        <h5>Delete Account</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+@code {
+    bool IsLoading;
+    ShoppingUserModel currentUser;
+    List<string> userRoles = new List<string>();
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        currentUser = await CurrentUserProvider.GetUserAsync();
+        IsLoading = false;
+    }
+}
