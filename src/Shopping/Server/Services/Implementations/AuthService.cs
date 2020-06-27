@@ -153,5 +153,39 @@ namespace Shopping.Server.Services.Implementations
 
             return new RegisterResult { IsSuccessful = true };
         }
+
+        public async Task<ChangePasswordResult> ChangePassword(ChangePasswordModel model)
+        {
+            if (string.IsNullOrEmpty(model.UserId))
+            {
+                return new ChangePasswordResult
+                {
+                    IsSuccessful = false,
+                    ErrorMessages = new List<string> { "No user id provided" }
+                };
+            }
+
+            var existingUser = await _userManager.FindByIdAsync(model.UserId);
+            if (existingUser == null)
+            {
+                return new ChangePasswordResult
+                {
+                    IsSuccessful = false,
+                    ErrorMessages = new List<string> { $"Could not find user with id {model.UserId}" }
+                };
+            }
+
+            var changePwResult = await _userManager.ChangePasswordAsync(existingUser, model.CurrentPassword, model.NewPassword);
+            if (!changePwResult.Succeeded)
+            {
+                return new ChangePasswordResult
+                {
+                    IsSuccessful = false,
+                    ErrorMessages = changePwResult.Errors.Select(e => e.Description).ToList()
+                };
+            }
+
+            return new ChangePasswordResult { IsSuccessful = true };
+        }
     }
 }
