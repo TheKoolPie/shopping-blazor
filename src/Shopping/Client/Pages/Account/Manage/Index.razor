@@ -5,6 +5,8 @@
 @inject IUserRepository UserRepo
 @inject IAuthService AuthService
 @inject IModalService Modal
+@inject NavigationManager NavigationManager
+
 
 <h3>Hello @currentUser.UserName!</h3>
 <hr />
@@ -144,9 +146,37 @@ else
                             </div>
                         </div>
                     }
-                    </div>
+                </div>
                 <div class="tab-pane fade show" id="list-delete-account" role="tabpanel" aria-labelledby="list-delete-account-list">
                     <h5>Delete Account</h5>
+                    <hr />
+                    <div class="row">
+                        <div class="col">
+                            <p>
+                                Do you really want to delete your account? This is not reversible.
+                                Please confirm your decision
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmDeleteUserCheckbox" @onchange="(()=>DeleteUserConfirmed = !DeleteUserConfirmed)">
+                            <label class="form-check-label" for="confirmDeleteUserCheckbox">
+                                I am sure
+                            </label>
+                        </div>
+                    </div>
+                    @if (DeleteUserConfirmed)
+                    {
+                        <hr />
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-danger" @onclick="OnDeleteUser">
+                                    <span class="oi oi-trash" /> Delete Account
+                                </button>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -158,17 +188,22 @@ else
     bool IsUpdatingUserData;
     bool IsChangingPassword;
 
+    bool DeleteUserConfirmed = false;
+
     ShoppingUserModel currentUser = new ShoppingUserModel();
     List<string> userRoles = new List<string>();
 
     AlertComponentModel updateUserDataAlert;
     AlertComponentModel changePasswordDataAlert;
+    AlertComponentModel deleteUserDataAlert;
 
     ShoppingUserModel userEditModel = new ShoppingUserModel();
     EditContext editUserContext;
 
     ChangePasswordModel changePassworModel = new ChangePasswordModel();
     EditContext changePasswordContext;
+
+    DeleteUserModel deleteUserModel = new DeleteUserModel();
 
 
     protected async override Task OnInitializedAsync()
@@ -234,5 +269,21 @@ else
             changePassworModel = new ChangePasswordModel() { UserId = currentUser.Id };
         }
         IsChangingPassword = false;
+    }
+
+    private async Task OnDeleteUser()
+    {
+        deleteUserModel = new DeleteUserModel() { UserId = currentUser.Id };
+
+        var deleteUserResult = await AuthService.DeleteUser(deleteUserModel);
+        if (deleteUserResult.IsSuccessful)
+        {
+            await AuthService.Logout();
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            deleteUserDataAlert = AlertComponentModel.CreateErrorAlert("Could not delete user", deleteUserResult.CompleteErrorMessage);
+        }
     }
 }

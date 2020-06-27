@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using Shopping.Server.Models;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
 using Shopping.Shared.Services;
@@ -26,10 +16,12 @@ namespace Shopping.Server.Controllers
     {
         private readonly IAuthService _authService;
         private readonly ICurrentUserProvider _currentUser;
-        public AccountsController(IAuthService authService, ICurrentUserProvider currentUser)
+        private readonly ILogger<AccountsController> _logger;
+        public AccountsController(IAuthService authService, ICurrentUserProvider currentUser, ILogger<AccountsController> logger)
         {
             _authService = authService;
             _currentUser = currentUser;
+            _logger = logger;
         }
         [Authorize(Roles = ShoppingUserRoles.Admin)]
         [HttpPost("Register")]
@@ -67,10 +59,38 @@ namespace Shopping.Server.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<DeleteUserResult>> DeleteUser(string id)
+        {
+            var currentUser = await _currentUser.GetUserAsync();
+            var isAdmin = await _currentUser.IsUserAdminAsync();
+
+            DeleteUserResult result = new DeleteUserResult();
+            if (!(currentUser.Id == id || isAdmin))
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Not authorized");
+                return Unauthorized(result);
+            }
+
+            result = await _authService.DeleteUser(new DeleteUserModel { UserId = id });
+
+            return Ok(result);
+        }
+
+        [HttpGet("Logout")]
         public async Task<IActionResult> Logout()
         {
-            await _authService.Logout();
+            try
+            {
+                await _authService.Logout();
+                _logger.LogInformation("User logged out");
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e.Message);
+            }
+
 
             return Ok();
         }

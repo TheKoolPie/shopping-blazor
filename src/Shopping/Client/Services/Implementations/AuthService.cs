@@ -61,7 +61,7 @@ namespace Shopping.Client.Services.Implementations
         }
         public async Task Logout()
         {
-            var client = await GetHttpClientAsync();
+            var client = await GetHttpClientAsync(); 
             var response = await client.GetAsync("api/accounts/logout");
 
             await _localStorage.RemoveItemAsync("authToken");
@@ -76,6 +76,15 @@ namespace Shopping.Client.Services.Implementations
             return await response.Content.ReadFromJsonAsync<ChangePasswordResult>();
 
         }
+
+        public async Task<DeleteUserResult> DeleteUser(DeleteUserModel model)
+        {
+            var client = await GetHttpClientAsync();
+            var response = await client.DeleteAsync($"api/accounts/{model.UserId}");
+
+            return await response.Content.ReadFromJsonAsync<DeleteUserResult>();
+        }
+
         public async Task<HttpClient> GetHttpClientAsync()
         {
             if (_httpClient.DefaultRequestHeaders.Authorization == null)

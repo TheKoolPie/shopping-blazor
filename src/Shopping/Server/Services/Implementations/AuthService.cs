@@ -93,7 +93,14 @@ namespace Shopping.Server.Services.Implementations
 
         public async Task Logout()
         {
-            await _signInManager.SignOutAsync();
+            try
+            {
+                await _signInManager.SignOutAsync();
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e.Message);
+            }
         }
 
         public async Task<RegisterResult> Register(RegisterModel model)
@@ -186,6 +193,40 @@ namespace Shopping.Server.Services.Implementations
             }
 
             return new ChangePasswordResult { IsSuccessful = true };
+        }
+
+        public async Task<DeleteUserResult> DeleteUser(DeleteUserModel model)
+        {
+            if (string.IsNullOrEmpty(model.UserId))
+            {
+                return new DeleteUserResult
+                {
+                    IsSuccessful = false,
+                    ErrorMessages = new List<string> { "No user id provided" }
+                };
+            }
+
+            var existingUser = await _userManager.FindByIdAsync(model.UserId);
+            if (existingUser == null)
+            {
+                return new DeleteUserResult
+                {
+                    IsSuccessful = false,
+                    ErrorMessages = new List<string> { $"Could not find user with id {model.UserId}" }
+                };
+            }
+
+            var deleteUserResult = await _userManager.DeleteAsync(existingUser);
+            if (!deleteUserResult.Succeeded)
+            {
+                return new DeleteUserResult
+                {
+                    IsSuccessful = false,
+                    ErrorMessages = deleteUserResult.Errors.Select(e => e.Description).ToList()
+                };
+            }
+
+            return new DeleteUserResult { IsSuccessful = true };
         }
     }
 }

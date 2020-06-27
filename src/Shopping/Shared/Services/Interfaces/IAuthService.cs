@@ -11,6 +11,7 @@ namespace Shopping.Shared.Services
         Task<RegisterResult> Register(RegisterModel model);
         Task<ChangePasswordResult> ChangePassword(ChangePasswordModel model);
         Task Logout();
+        Task<DeleteUserResult> DeleteUser(DeleteUserModel model);
         Task<HttpClient> GetHttpClientAsync();
     }
 }
