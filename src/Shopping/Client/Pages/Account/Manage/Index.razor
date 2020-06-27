@@ -101,7 +101,50 @@ else
                 </div>
                 <div class="tab-pane fade show" id="list-changepw" role="tabpanel" aria-labelledby="list-changepw-list">
                     <h5>Change Password</h5>
-                </div>
+                    <hr />
+                    @if (IsChangingPassword)
+                    {
+                        <div class="row">
+                            <div class="col">
+                                <CustomSpinner>
+                                    Changing password...
+                                </CustomSpinner>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <AlertComponent Model="changePasswordDataAlert" />
+                        <div class="row">
+                            <div class="col">
+                                <EditForm EditContext="changePasswordContext" OnSubmit="OnChangePassword" autocomplete="off">
+                                    <DataAnnotationsValidator />
+                                    <ValidationSummary />
+                                    <div class="form-group">
+                                        <label for="oldpassword">Current Password</label>
+                                        <InputText Id="oldpassword" type="password" class="form-control" @bind-Value="changePassworModel.CurrentPassword" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newpassword">New Password</label>
+                                        <InputText Id="newpassword" type="password" class="form-control" @bind-Value="changePassworModel.NewPassword" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirmnewpassword">Confirm New Password</label>
+                                        <InputText Id="confirmnewpassword" type="password" class="form-control" @bind-Value="changePassworModel.NewConfirmPassword" />
+                                    </div>
+                                    <hr />
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <button class="btn btn-primary">Update Data</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </EditForm>
+                            </div>
+                        </div>
+                    }
+                    </div>
                 <div class="tab-pane fade show" id="list-delete-account" role="tabpanel" aria-labelledby="list-delete-account-list">
                     <h5>Delete Account</h5>
                 </div>
@@ -111,16 +154,22 @@ else
 }
 
 @code {
-        bool IsLoading;
-        bool IsUpdatingUserData;
+    bool IsLoading;
+    bool IsUpdatingUserData;
+    bool IsChangingPassword;
 
-        ShoppingUserModel currentUser = new ShoppingUserModel();
-        List<string> userRoles = new List<string>();
+    ShoppingUserModel currentUser = new ShoppingUserModel();
+    List<string> userRoles = new List<string>();
 
-        AlertComponentModel updateUserDataAlert;
+    AlertComponentModel updateUserDataAlert;
+    AlertComponentModel changePasswordDataAlert;
 
-        ShoppingUserModel userEditModel = new ShoppingUserModel();
-        EditContext editUserContext;
+    ShoppingUserModel userEditModel = new ShoppingUserModel();
+    EditContext editUserContext;
+
+    ChangePasswordModel changePassworModel = new ChangePasswordModel();
+    EditContext changePasswordContext;
+
 
     protected async override Task OnInitializedAsync()
     {
@@ -132,6 +181,9 @@ else
 
         editUserContext = new EditContext(userEditModel);
 
+        changePassworModel.UserId = currentUser.Id;
+        changePasswordContext = new EditContext(changePassworModel);
+
         IsLoading = false;
     }
 
@@ -139,25 +191,48 @@ else
     {
         IsUpdatingUserData = true;
 
-        var modalParams = new ModalParameters();
-        modalParams.Add(nameof(YesNoModal.Message),
-            "If you update your user data you'll get logged out and have to log in the application again with your new credentials");
-
-        var updateModal = Modal.Show<YesNoModal>("Update user data", modalParams);
-        var modalResult = await updateModal.Result;
-
-        if (!modalResult.Cancelled)
+        if (editUserContext.Validate())
         {
-            try
+
+            var modalParams = new ModalParameters();
+            modalParams.Add(nameof(YesNoModal.Message),
+                "If you update your user data you'll get logged out and have to log in the application again with your new credentials");
+
+            var updateModal = Modal.Show<YesNoModal>("Update user data", modalParams);
+            var modalResult = await updateModal.Result;
+
+            if (!modalResult.Cancelled)
             {
-                var result = await UserRepo.UpdateUserData(currentUser.Id, userEditModel);
-                await AuthService.Logout();
-            }
-            catch (Exception e)
-            {
-                updateUserDataAlert = AlertComponentModel.CreateErrorAlert("Could not update user data");
+                try
+                {
+                    var result = await UserRepo.UpdateUserData(currentUser.Id, userEditModel);
+                    await AuthService.Logout();
+                }
+                catch (Exception e)
+                {
+                    updateUserDataAlert = AlertComponentModel.CreateErrorAlert("Could not update user data");
+                }
             }
         }
+
         IsUpdatingUserData = false;
+    }
+    private async Task OnChangePassword()
+    {
+        IsChangingPassword = true;
+        if (changePasswordContext.Validate())
+        {
+            var changeResult = await AuthService.ChangePassword(changePassworModel);
+            if (changeResult.IsSuccessful)
+            {
+                changePasswordDataAlert = AlertComponentModel.CreateSuccessAlert("Changed password");
+            }
+            else
+            {
+                changePasswordDataAlert = AlertComponentModel.CreateErrorAlert("Could not change password", changeResult.CompleteErrorMessage);
+            }
+            changePassworModel = new ChangePasswordModel() { UserId = currentUser.Id };
+        }
+        IsChangingPassword = false;
     }
 }
