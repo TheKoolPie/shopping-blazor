@@ -458,20 +458,28 @@ namespace Shopping.Server.Services.Implementations
 
             return existing;
         }
-        public async Task<bool> DeleteGroupListAssignmentAsync(string id)
+        public async Task<bool> DeleteGroupListAssignmentAsync(UserGroupShoppingList assignment)
         {
-            var existing = await GetGroupListAssignmentAsync(id);
-            _context.UserGroupShoppingLists.Remove(existing);
+            var existing = (await GetGroupListAssignmentsAsync())
+                .FirstOrDefault(a => a.ShoppingListId == assignment.ShoppingListId && a.UserGroupId == assignment.UserGroupId);
 
             bool result = false;
-            try
+            if (existing != null)
             {
-                await SaveChangesAsync();
-                result = true;
+                _context.UserGroupShoppingLists.Remove(existing);
+                try
+                {
+                    await SaveChangesAsync();
+                    result = true;
+                }
+                catch
+                {
+                    result = false;
+                }
             }
-            catch
+            else
             {
-                result = false;
+                _logger.LogWarning($"No assignment found between list '{assignment.ShoppingListId}' and group '{assignment.UserGroupId}'");
             }
 
             return result;
@@ -510,7 +518,7 @@ namespace Shopping.Server.Services.Implementations
         {
             foreach (var assignment in assignments)
             {
-                if (!(await DeleteGroupListAssignmentAsync(assignment.Id)))
+                if (!(await DeleteGroupListAssignmentAsync(assignment)))
                 {
                     return false;
                 }

@@ -221,7 +221,7 @@
                                                     {
                                                         @foreach (var group in CurrentList.UserGroups)
                                                         {
-                                                            <tr>
+                                                            <tr class="selectable-row">
                                                                 <td @onclick="@(() => NavigateToUserGroupDetails(group.Id))">@group.Name</td>
                                                                 <td>
                                                                     <ContextMenu>

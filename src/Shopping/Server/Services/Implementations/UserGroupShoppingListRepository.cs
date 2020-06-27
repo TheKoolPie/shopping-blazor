@@ -68,7 +68,7 @@ namespace Shopping.Server.Services.Implementations
 
         public async Task<bool> RemoveAssignmentAsync(UserGroupShoppingList assignment)
         {
-            return await _data.DeleteGroupListAssignmentAsync(assignment.Id);
+            return await _data.DeleteGroupListAssignmentAsync(assignment);
         }
     }
 }

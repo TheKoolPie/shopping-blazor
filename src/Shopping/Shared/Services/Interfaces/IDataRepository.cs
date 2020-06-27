@@ -59,7 +59,7 @@ namespace Shopping.Shared.Services.Interfaces
         Task<UserGroupShoppingList> GetGroupListAssignmentAsync(string id);
         Task<UserGroupShoppingList> CreateGroupListAssignmentAsync(UserGroupShoppingList item);
         Task<UserGroupShoppingList> UpdateGroupListAssignmentAsync(string id, UserGroupShoppingList item);
-        Task<bool> DeleteGroupListAssignmentAsync(string id);
+        Task<bool> DeleteGroupListAssignmentAsync(UserGroupShoppingList assignment);
         bool GroupListAssignmentAlreadyExists(UserGroupShoppingList item);
         bool GroupListAssignmentCanBeUpdated(UserGroupShoppingList item);
         #endregion
