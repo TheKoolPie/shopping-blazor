@@ -45,6 +45,38 @@
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
                         <h5>Overview</h5>
+                        <hr />
+                        <div class="row">
+                            <div class="col">
+                                <EditForm EditContext="editUserContext" OnSubmit="OnChangeUserData">
+                                    <DataAnnotationsValidator />
+                                    <ValidationSummary />
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="usernameInput">User Name</label>
+                                                <InputText class="form-control" id="usernameInput" @bind-Value="userEditModel.UserName" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="emailInput">Email</label>
+                                                <InputText type="email" class="form-control" id="emailInput" @bind-Value="userEditModel.Email" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <button class="btn btn-primary">Update Data</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </EditForm>
+                            </div>
+                        </div>
                     </div>
                     <div class="tab-pane fade show" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
                         <h5>Messages</h5>
@@ -62,12 +94,31 @@
 
 @code {
     bool IsLoading;
+    bool IsUpdatingUserData;
+
     ShoppingUserModel currentUser;
     List<string> userRoles = new List<string>();
+
+    ShoppingUserModel userEditModel = new ShoppingUserModel();
+    EditContext editUserContext;
+
     protected async override Task OnInitializedAsync()
     {
         IsLoading = true;
+
         currentUser = await CurrentUserProvider.GetUserAsync();
+        
+        userEditModel.UserName = currentUser.UserName;
+        userEditModel.Email = currentUser.Email;
+        editUserContext = new EditContext(userEditModel);
+
         IsLoading = false;
+    }
+
+    private async Task OnChangeUserData()
+    {
+        IsUpdatingUserData = true;
+
+        IsUpdatingUserData = false;
     }
 }

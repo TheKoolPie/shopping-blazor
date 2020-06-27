@@ -69,5 +69,19 @@ namespace Shopping.Server.Controllers
             result.ResultData = new List<ShoppingUserModel>() { dbUser };
             return Ok(result);
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ShoppingUserResult>> UpdateUserData(string id, [FromBody] ShoppingUserModel updatedData)
+        {
+            var currentUser = await _currentUserProvider.GetUserAsync();
+            bool IsCurrentUserAdmin = await _currentUserProvider.IsUserAdminAsync();
+
+            if(!(currentUser.Id == id || IsCurrentUserAdmin))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(updatedData);
+        }
     }
 }
