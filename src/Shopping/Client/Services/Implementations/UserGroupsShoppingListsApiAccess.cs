@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Net.Http.Json;
+using Shopping.Shared.Services;
 
 namespace Shopping.Client.Services.Implementations
 {

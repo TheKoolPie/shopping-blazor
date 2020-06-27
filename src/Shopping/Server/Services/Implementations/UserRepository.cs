@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Shopping.Server.Models;
 using Shopping.Shared.Data;
+using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Services.Interfaces;
 using System;
@@ -65,6 +66,10 @@ namespace Shopping.Server.Services.Implementations
                     Email = user.Email
                 };
             }
+            else
+            {
+                _logger.LogError($"Could not find any user with email: {email}");
+            }
             return userModel;
         }
 
@@ -80,6 +85,10 @@ namespace Shopping.Server.Services.Implementations
                     UserName = user.UserName,
                     Email = user.Email
                 };
+            }
+            else
+            {
+                _logger.LogError($"Could not find any user by id: {id}");
             }
             return userModel;
         }
@@ -97,8 +106,29 @@ namespace Shopping.Server.Services.Implementations
                     Email = user.Email
                 };
             }
+            else
+            {
+                _logger.LogError($"Could not find any user with name: {userName}");
+            }
             return userModel;
         }
+
+        public async Task<ShoppingUserModel> UpdateUserData(string id, ShoppingUserModel updateData)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            user.Email = updateData.Email;
+            user.UserName = updateData.UserName;
+            var updateResult = await _userManager.UpdateAsync(user);
+
+            if (!updateResult.Succeeded)
+            {
+                _logger.LogError("Could not update user",updateResult.Errors.Select(e=>e.Description));
+                return null;
+            }
+
+            return updateData;
+        }
+
         private async Task<ShoppingUser> GetDbUserFromModelData(ShoppingUserModel userModel)
         {
             ShoppingUser dbUser = null;

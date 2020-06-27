@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Shopping.Server.Models;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
@@ -73,15 +74,39 @@ namespace Shopping.Server.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ShoppingUserResult>> UpdateUserData(string id, [FromBody] ShoppingUserModel updatedData)
         {
+            ShoppingUserResult result = new ShoppingUserResult();
+
+            if (id != updatedData.Id)
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add($"Ids do not match");
+                return BadRequest(result);
+            }
+
             var currentUser = await _currentUserProvider.GetUserAsync();
             bool IsCurrentUserAdmin = await _currentUserProvider.IsUserAdminAsync();
 
-            if(!(currentUser.Id == id || IsCurrentUserAdmin))
+            if (!(currentUser.Id == id || IsCurrentUserAdmin))
             {
-                return Unauthorized();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Not authorized to access this resource");
+                return Unauthorized(result);
             }
 
-            return Ok(updatedData);
+            var updateResult = await _userRepository.UpdateUserData(id, updatedData);
+            if (updateResult == null)
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Could not update user data");
+                return NotFound(result);
+            }
+
+
+
+            result.IsSuccessful = true;
+            result.ResultData.Add(updateResult);
+
+            return Ok(result);
         }
     }
 }

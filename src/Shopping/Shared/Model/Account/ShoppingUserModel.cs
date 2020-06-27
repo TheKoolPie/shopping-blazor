@@ -13,6 +13,14 @@ namespace Shopping.Shared.Model.Account
         [NotMapped]
         public string Email { get; set; }
 
+        public ShoppingUserModel() { }
+        public ShoppingUserModel(ShoppingUserModel user)
+        {
+            Id = user.Id;
+            UserName = user.UserName;
+            Email = user.Email;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is ShoppingUserModel model &&

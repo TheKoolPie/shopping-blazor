@@ -1,6 +1,7 @@
 ﻿using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
+using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,20 @@ namespace Shopping.Client.Services.Implementations
         public Task<ShoppingUserModel> GetUserByEmailAsync(string email)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ShoppingUserModel> UpdateUserData(string id, ShoppingUserModel updateData)
+        {
+            var client = await _authService.GetHttpClientAsync();
+            var response = await client.PutAsJsonAsync($"{BaseAddress}/{id}",updateData);
+
+            var resultObject = await response.Content.ReadFromJsonAsync<ShoppingUserResult>();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(resultObject.CompleteErrorMessage);
+            }
+
+            return resultObject.ResultData.FirstOrDefault();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Data;
+using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,8 @@ namespace Shopping.Client.Services.Implementations
 {
     public class ShoppingListsApiAccess : CRUDApiAccessBaseImpl<ShoppingList>, IShoppingLists
     {
-        public ShoppingListsApiAccess(IAuthService authService, ILogger<ShoppingListsApiAccess> logger) : base(authService, logger)
+        public ShoppingListsApiAccess(IAuthService authService, ILogger<ShoppingListsApiAccess> logger) 
+            : base(authService, logger)
         {
             BaseAddress = "api/ShoppingLists";
         }
