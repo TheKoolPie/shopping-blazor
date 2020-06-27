@@ -168,8 +168,6 @@ namespace Shopping.Server.Controllers
                     return Unauthorized(false);
                 }
 
-                await _userGroupShoppingLists.RemoveAssignmentsOfShoppingListAsync(id);
-
                 await _lists.DeleteByIdAsync(id);
             }
             catch (ItemNotFoundException)

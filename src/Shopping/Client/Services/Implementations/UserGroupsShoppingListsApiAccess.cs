@@ -71,15 +71,5 @@ namespace Shopping.Client.Services.Implementations
             var response = await client.DeleteAsync($"{_baseUri}/{assignment.UserGroupId}/{assignment.ShoppingListId}");
             return response.IsSuccessStatusCode;
         }
-
-        public Task<bool> RemoveAssignmentsOfGroupAsync(string userGroupId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> RemoveAssignmentsOfShoppingListAsync(string shoppingListId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

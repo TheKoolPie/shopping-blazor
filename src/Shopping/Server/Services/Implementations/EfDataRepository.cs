@@ -309,6 +309,9 @@ namespace Shopping.Server.Services.Implementations
         public async Task<bool> DeleteShoppingListAsync(string id)
         {
             var existing = await GetShoppingListAsync(id);
+
+            await RemoveAssignmentsOfShoppingListAsync(id);
+
             _context.ShoppingLists.Remove(existing);
 
             bool result = false;
@@ -384,6 +387,9 @@ namespace Shopping.Server.Services.Implementations
         public async Task<bool> DeleteUserGroupAsync(string id)
         {
             var existing = await GetUserGroupAsync(id);
+
+            await RemoveAssignmentsOfGroupAsync(id);
+
             _context.UserGroups.Remove(existing);
 
             bool result = false;
@@ -481,6 +487,35 @@ namespace Shopping.Server.Services.Implementations
             var itemsWithoutCurrent = assignments.Where(a => a.Id != item.Id).ToList();
 
             return !(itemsWithoutCurrent.Any(a => a.ShoppingListId == item.ShoppingListId && a.UserGroupId == item.UserGroupId));
+        }
+
+        private async Task<bool> RemoveAssignmentsOfGroupAsync(string userGroupId)
+        {
+            var allAssignmentsOfGroup = (await GetGroupListAssignmentsAsync())
+                .Where(a => a.UserGroupId == userGroupId)
+                .ToList();
+
+            return await DeleteAssignments(allAssignmentsOfGroup);
+        }
+
+        private async Task<bool> RemoveAssignmentsOfShoppingListAsync(string shoppingListId)
+        {
+            var allAssignmentsOfList = (await GetGroupListAssignmentsAsync())
+                .Where(a => a.ShoppingListId == shoppingListId)
+                .ToList();
+
+            return await DeleteAssignments(allAssignmentsOfList);
+        }
+        private async Task<bool> DeleteAssignments(List<UserGroupShoppingList> assignments)
+        {
+            foreach (var assignment in assignments)
+            {
+                if (!(await DeleteGroupListAssignmentAsync(assignment.Id)))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
         #endregion
 

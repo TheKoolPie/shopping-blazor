@@ -10,8 +10,6 @@ namespace Shopping.Shared.Services.Interfaces
     {
         Task<UserGroupShoppingList> CreateAssignmentAsync(UserGroupShoppingList assignment);
         Task<bool> RemoveAssignmentAsync(UserGroupShoppingList assignment);
-        Task<bool> RemoveAssignmentsOfGroupAsync(string userGroupId);
-        Task<bool> RemoveAssignmentsOfShoppingListAsync(string shoppingListId);
         Task<List<ShoppingList>> GetShoppingListsOfUserGroupAsync(string userGroupId);
         Task<List<UserGroup>> GetUserGroupsOfShoppingListAsync(string shoppingListId);
     }

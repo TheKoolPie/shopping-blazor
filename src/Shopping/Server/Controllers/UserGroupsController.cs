@@ -228,9 +228,6 @@ namespace Shopping.Server.Controllers
                 {
                     return Unauthorized();
                 }
-
-                await _userGroupShoppingListAssignments.RemoveAssignmentsOfGroupAsync(id);
-
                 await _userGroups.DeleteByIdAsync(id);
             }
             catch (ItemNotFoundException e)
