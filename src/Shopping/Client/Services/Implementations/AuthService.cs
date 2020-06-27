@@ -68,7 +68,14 @@ namespace Shopping.Client.Services.Implementations
             ((ApiAuthenticationStateProvider)_authStateProvider).MarkUserAsLoggedOut();
             _httpClient.DefaultRequestHeaders.Authorization = null;
         }
+        public async Task<ChangePasswordResult> ChangePassword(ChangePasswordModel model)
+        {
+            var client = await GetHttpClientAsync();
+            var response = await client.PostAsJsonAsync("api/accounts/changepassword", model);
 
+            return await response.Content.ReadFromJsonAsync<ChangePasswordResult>();
+
+        }
         public async Task<HttpClient> GetHttpClientAsync()
         {
             if (_httpClient.DefaultRequestHeaders.Authorization == null)
@@ -82,5 +89,7 @@ namespace Shopping.Client.Services.Implementations
             }
             return _httpClient;
         }
+
+
     }
 }

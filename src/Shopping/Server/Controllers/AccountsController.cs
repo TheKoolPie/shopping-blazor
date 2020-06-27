@@ -16,6 +16,7 @@ using Shopping.Server.Models;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
 using Shopping.Shared.Services;
+using Shopping.Shared.Services.Interfaces;
 
 namespace Shopping.Server.Controllers
 {
@@ -24,9 +25,11 @@ namespace Shopping.Server.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly IAuthService _authService;
-        public AccountsController(IAuthService authService)
+        private readonly ICurrentUserProvider _currentUser;
+        public AccountsController(IAuthService authService, ICurrentUserProvider currentUser)
         {
             _authService = authService;
+            _currentUser = currentUser;
         }
         [Authorize(Roles = ShoppingUserRoles.Admin)]
         [HttpPost("Register")]
@@ -42,6 +45,26 @@ namespace Shopping.Server.Controllers
             var loginResult = await _authService.Login(model);
 
             return Ok(loginResult);
+        }
+
+        [HttpPost("ChangePassword")]
+        public async Task<ActionResult<ChangePasswordResult>> ChangePassword([FromBody] ChangePasswordModel model)
+        {
+            var currentUser = await _currentUser.GetUserAsync();
+            var isAdmin = await _currentUser.IsUserAdminAsync();
+
+            ChangePasswordResult result = new ChangePasswordResult();
+
+            if(!(currentUser.Id == model.UserId || isAdmin))
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Not authorized");
+                return Unauthorized(result);
+            }
+
+            result = await _authService.ChangePassword(model);
+
+            return Ok(result);
         }
 
         [HttpGet]
