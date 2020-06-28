@@ -78,7 +78,14 @@ namespace Shopping.Client.Services.Implementations
             var response = await client.GetAsync($"{BaseAddress}/{id}");
             if (response.IsSuccessStatusCode)
             {
-                item = await response.Content.ReadFromJsonAsync<T>();
+                try
+                {
+                    item = await response.Content.ReadFromJsonAsync<T>();
+                }
+                catch(Exception e)
+                {
+                    _logger.LogError("Could not deserialize result", e);
+                }
             }
             return item;
         }

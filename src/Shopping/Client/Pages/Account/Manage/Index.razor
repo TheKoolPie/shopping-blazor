@@ -1,0 +1,289 @@
+@page "/account/manage"
+
+@attribute [Authorize]
+@inject ICurrentUserProvider CurrentUserProvider
+@inject IUserRepository UserRepo
+@inject IAuthService AuthService
+@inject IModalService Modal
+@inject NavigationManager NavigationManager
+
+
+<h3>Hello @currentUser.UserName!</h3>
+<hr />
+@if (IsLoading)
+{
+    <div class="row">
+        <div class="col">
+            <CustomSpinner>
+                Loading user data...
+            </CustomSpinner>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col">
+            <div class="list-group list-group-horizontal-md" id="list-tab" role="tablist">
+                <a class="list-group-item list-group-item-action active" id="list-overview-list"
+                   data-toggle="list" href="#list-overview" role="tab">
+                    <span class="oi oi-list-rich"></span> Overview
+                </a>
+                <a class="list-group-item list-group-item-action" id="list-messages-list"
+                   data-toggle="list" href="#list-messages" role="tab">
+                    <span class="oi oi-envelope-closed"></span> Messages
+                </a>
+                <a class="list-group-item list-group-item-action" id="list-changepw-list"
+                   data-toggle="list" href="#list-changepw" role="tab">
+                    <span class="oi oi-key"></span> Change Password
+                </a>
+                <a class="list-group-item list-group-item-action" id="list-delete-account-list"
+                   data-toggle="list" href="#list-delete-account" role="tab">
+                    <span class="oi oi-trash"></span> Delete Account
+                </a>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col">
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
+                    <h5>Overview</h5>
+                    <hr />
+                    @if (IsUpdatingUserData)
+                    {
+                        <div class="row">
+                            <div class="col">
+                                <CustomSpinner>
+                                    Update user data...
+                                </CustomSpinner>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <AlertComponent Model="updateUserDataAlert" />
+                        <div class="row">
+                            <div class="col">
+                                <EditForm EditContext="editUserContext" OnSubmit="OnChangeUserData" autocomplete="off">
+                                    <DataAnnotationsValidator />
+                                    <ValidationSummary />
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="usernameInput">User Name</label>
+                                                <InputText class="form-control" id="usernameInput" @bind-Value="userEditModel.UserName" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="emailInput">Email</label>
+                                                <InputText type="email" class="form-control" id="emailInput" @bind-Value="userEditModel.Email" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <button class="btn btn-primary">Update Data</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </EditForm>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="tab-pane fade show" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
+                    <h5>Messages</h5>
+                </div>
+                <div class="tab-pane fade show" id="list-changepw" role="tabpanel" aria-labelledby="list-changepw-list">
+                    <h5>Change Password</h5>
+                    <hr />
+                    @if (IsChangingPassword)
+                    {
+                        <div class="row">
+                            <div class="col">
+                                <CustomSpinner>
+                                    Changing password...
+                                </CustomSpinner>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <AlertComponent Model="changePasswordDataAlert" />
+                        <div class="row">
+                            <div class="col">
+                                <EditForm EditContext="changePasswordContext" OnSubmit="OnChangePassword" autocomplete="off">
+                                    <DataAnnotationsValidator />
+                                    <ValidationSummary />
+                                    <div class="form-group">
+                                        <label for="oldpassword">Current Password</label>
+                                        <InputText Id="oldpassword" type="password" class="form-control" @bind-Value="changePassworModel.CurrentPassword" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newpassword">New Password</label>
+                                        <InputText Id="newpassword" type="password" class="form-control" @bind-Value="changePassworModel.NewPassword" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirmnewpassword">Confirm New Password</label>
+                                        <InputText Id="confirmnewpassword" type="password" class="form-control" @bind-Value="changePassworModel.NewConfirmPassword" />
+                                    </div>
+                                    <hr />
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <button class="btn btn-primary">Update Data</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </EditForm>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="tab-pane fade show" id="list-delete-account" role="tabpanel" aria-labelledby="list-delete-account-list">
+                    <h5>Delete Account</h5>
+                    <hr />
+                    <div class="row">
+                        <div class="col">
+                            <p>
+                                Do you really want to delete your account? This is not reversible.
+                                Please confirm your decision
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmDeleteUserCheckbox" @onchange="(()=>DeleteUserConfirmed = !DeleteUserConfirmed)">
+                            <label class="form-check-label" for="confirmDeleteUserCheckbox">
+                                I am sure
+                            </label>
+                        </div>
+                    </div>
+                    @if (DeleteUserConfirmed)
+                    {
+                        <hr />
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-danger" @onclick="OnDeleteUser">
+                                    <span class="oi oi-trash" /> Delete Account
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    bool IsLoading;
+    bool IsUpdatingUserData;
+    bool IsChangingPassword;
+
+    bool DeleteUserConfirmed = false;
+
+    ShoppingUserModel currentUser = new ShoppingUserModel();
+    List<string> userRoles = new List<string>();
+
+    AlertComponentModel updateUserDataAlert;
+    AlertComponentModel changePasswordDataAlert;
+    AlertComponentModel deleteUserDataAlert;
+
+    ShoppingUserModel userEditModel = new ShoppingUserModel();
+    EditContext editUserContext;
+
+    ChangePasswordModel changePassworModel = new ChangePasswordModel();
+    EditContext changePasswordContext;
+
+    DeleteUserModel deleteUserModel = new DeleteUserModel();
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        currentUser = await CurrentUserProvider.GetUserAsync();
+
+        userEditModel = new ShoppingUserModel(currentUser);
+
+        editUserContext = new EditContext(userEditModel);
+
+        changePassworModel.UserId = currentUser.Id;
+        changePasswordContext = new EditContext(changePassworModel);
+
+        IsLoading = false;
+    }
+
+    private async Task OnChangeUserData()
+    {
+        IsUpdatingUserData = true;
+
+        if (editUserContext.Validate())
+        {
+
+            var modalParams = new ModalParameters();
+            modalParams.Add(nameof(YesNoModal.Message),
+                "If you update your user data you'll get logged out and have to log in the application again with your new credentials");
+
+            var updateModal = Modal.Show<YesNoModal>("Update user data", modalParams);
+            var modalResult = await updateModal.Result;
+
+            if (!modalResult.Cancelled)
+            {
+                try
+                {
+                    var result = await UserRepo.UpdateUserData(currentUser.Id, userEditModel);
+                    await AuthService.Logout();
+                }
+                catch (Exception e)
+                {
+                    updateUserDataAlert = AlertComponentModel.CreateErrorAlert("Could not update user data");
+                }
+            }
+        }
+
+        IsUpdatingUserData = false;
+    }
+    private async Task OnChangePassword()
+    {
+        IsChangingPassword = true;
+        if (changePasswordContext.Validate())
+        {
+            var changeResult = await AuthService.ChangePassword(changePassworModel);
+            if (changeResult.IsSuccessful)
+            {
+                changePasswordDataAlert = AlertComponentModel.CreateSuccessAlert("Changed password");
+            }
+            else
+            {
+                changePasswordDataAlert = AlertComponentModel.CreateErrorAlert("Could not change password", changeResult.CompleteErrorMessage);
+            }
+            changePassworModel = new ChangePasswordModel() { UserId = currentUser.Id };
+        }
+        IsChangingPassword = false;
+    }
+
+    private async Task OnDeleteUser()
+    {
+        deleteUserModel = new DeleteUserModel() { UserId = currentUser.Id };
+
+        var deleteUserResult = await AuthService.DeleteUser(deleteUserModel);
+        if (deleteUserResult.IsSuccessful)
+        {
+            await AuthService.Logout();
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            deleteUserDataAlert = AlertComponentModel.CreateErrorAlert("Could not delete user", deleteUserResult.CompleteErrorMessage);
+        }
+    }
+}

@@ -5,6 +5,7 @@ using Shopping.Client.Provider;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
+using Shopping.Shared.Services;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -47,7 +48,7 @@ namespace Shopping.Client.Services.Implementations
 
             var result = await response.Content.ReadFromJsonAsync<LoginResult>();
 
-            if (!response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode || string.IsNullOrEmpty(result.Token))
             {
                 return result;
             }
@@ -60,9 +61,28 @@ namespace Shopping.Client.Services.Implementations
         }
         public async Task Logout()
         {
+            var client = await GetHttpClientAsync(); 
+            var response = await client.GetAsync("api/accounts/logout");
+
             await _localStorage.RemoveItemAsync("authToken");
             ((ApiAuthenticationStateProvider)_authStateProvider).MarkUserAsLoggedOut();
             _httpClient.DefaultRequestHeaders.Authorization = null;
+        }
+        public async Task<ChangePasswordResult> ChangePassword(ChangePasswordModel model)
+        {
+            var client = await GetHttpClientAsync();
+            var response = await client.PostAsJsonAsync("api/accounts/changepassword", model);
+
+            return await response.Content.ReadFromJsonAsync<ChangePasswordResult>();
+
+        }
+
+        public async Task<DeleteUserResult> DeleteUser(DeleteUserModel model)
+        {
+            var client = await GetHttpClientAsync();
+            var response = await client.DeleteAsync($"api/accounts/{model.UserId}");
+
+            return await response.Content.ReadFromJsonAsync<DeleteUserResult>();
         }
 
         public async Task<HttpClient> GetHttpClientAsync()
@@ -78,5 +98,7 @@ namespace Shopping.Client.Services.Implementations
             }
             return _httpClient;
         }
+
+
     }
 }

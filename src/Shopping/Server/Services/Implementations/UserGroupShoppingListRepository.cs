@@ -68,37 +68,7 @@ namespace Shopping.Server.Services.Implementations
 
         public async Task<bool> RemoveAssignmentAsync(UserGroupShoppingList assignment)
         {
-            return await _data.DeleteGroupListAssignmentAsync(assignment.Id);
-        }
-
-        public async Task<bool> RemoveAssignmentsOfGroupAsync(string userGroupId)
-        {
-            var allAssignmentsOfGroup = (await _data.GetGroupListAssignmentsAsync())
-                .Where(a => a.UserGroupId == userGroupId)
-                .ToList();
-
-            return await DeleteAssignments(allAssignmentsOfGroup);
-        }
-
-        public async Task<bool> RemoveAssignmentsOfShoppingListAsync(string shoppingListId)
-        {
-            var allAssignmentsOfList = (await _data.GetGroupListAssignmentsAsync())
-                .Where(a => a.ShoppingListId == shoppingListId)
-                .ToList();
-
-            return await DeleteAssignments(allAssignmentsOfList);
-        }
-
-        private async Task<bool> DeleteAssignments(List<UserGroupShoppingList> assignments)
-        {
-            foreach (var assignment in assignments)
-            {
-                if (!(await _data.DeleteGroupListAssignmentAsync(assignment.Id)))
-                {
-                    return false;
-                }
-            }
-            return true;
+            return await _data.DeleteGroupListAssignmentAsync(assignment);
         }
     }
 }

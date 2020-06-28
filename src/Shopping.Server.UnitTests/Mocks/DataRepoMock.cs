@@ -406,9 +406,11 @@ namespace Shopping.Server.UnitTests.Mocks
 
             return existing;
         }
-        public async Task<bool> DeleteGroupListAssignmentAsync(string id)
+        public async Task<bool> DeleteGroupListAssignmentAsync(UserGroupShoppingList assignment)
         {
-            var existing = await GetGroupListAssignmentAsync(id);
+            var existing = _userGroupShoppingLists
+                .FirstOrDefault(a => a.ShoppingListId == assignment.ShoppingListId && a.UserGroupId == assignment.UserGroupId);
+
             _userGroupShoppingLists.Remove(existing);
 
             bool result = false;
@@ -460,5 +462,7 @@ namespace Shopping.Server.UnitTests.Mocks
                 .ToList();
             return await Task.FromResult(shoppinglist);
         }
+
+
     }
 }

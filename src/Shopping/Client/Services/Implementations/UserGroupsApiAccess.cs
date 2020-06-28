@@ -4,6 +4,7 @@ using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Data;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
+using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,11 @@ namespace Shopping.Client.Services.Implementations
             return null;
         }
 
+        public Task<bool> DeleteAllOfUser(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<UserGroup>> GetAllOfUserAsync(string userId)
         {
             throw new NotImplementedException();
@@ -71,6 +77,11 @@ namespace Shopping.Client.Services.Implementations
                 }
             }
             return null;
+        }
+
+        public Task<bool> RemoveUserFromAllGroups(string userId)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<UserGroup> RemoveUserFromGroup(string userGroupId, ShoppingUserModel user)

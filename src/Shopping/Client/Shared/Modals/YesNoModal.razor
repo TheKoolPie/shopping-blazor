@@ -1,0 +1,32 @@
+﻿
+<div class="row">
+    <div class="col">
+        <p>@Message</p>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        <button class="btn btn-primary" @onclick="OnOkClicked">Ok</button>
+    </div>
+    <div class="col">
+        <button class="btn btn-secondary" @onclick="OnCancelClicked">Cancel</button>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; }
+
+    [Parameter]
+    public string Message { get; set; }
+
+    private void OnOkClicked()
+    {
+        BlazoredModal.Close(ModalResult.Ok<bool>(true));
+    }
+    private void OnCancelClicked()
+    {
+        BlazoredModal.Cancel();
+    }
+}

@@ -13,5 +13,7 @@ namespace Shopping.Shared.Services.Interfaces
         Task<UserGroup> RemoveUserFromGroup(string userGroupId, ShoppingUserModel user);
         Task<List<ShoppingUserModel>> GetUsersInGroup(string userGroupId);
         Task<List<UserGroup>> GetCommonGroupsAsync(string userOneId, string userTwoId);
+        Task<bool> DeleteAllOfUser(string userId);
+        Task<bool> RemoveUserFromAllGroups(string userId);
     }
 }

@@ -14,5 +14,6 @@ namespace Shopping.Shared.Services.Interfaces
         Task<ShoppingUserModel> GetUserByEmailAsync(string email);
         Task<List<string>> GetRolesOfUserAsync(ShoppingUserModel userModel);
         Task<ShoppingUserModel> GetUserAsync(ShoppingUserModel userModel);
+        Task<ShoppingUserModel> UpdateUserData(string id, ShoppingUserModel updateData);
     }
 }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Net.Http.Json;
+using Shopping.Shared.Services;
 
 namespace Shopping.Client.Services.Implementations
 {
@@ -69,16 +70,6 @@ namespace Shopping.Client.Services.Implementations
             var client = await _authService.GetHttpClientAsync();
             var response = await client.DeleteAsync($"{_baseUri}/{assignment.UserGroupId}/{assignment.ShoppingListId}");
             return response.IsSuccessStatusCode;
-        }
-
-        public Task<bool> RemoveAssignmentsOfGroupAsync(string userGroupId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> RemoveAssignmentsOfShoppingListAsync(string shoppingListId)
-        {
-            throw new NotImplementedException();
         }
     }
 }
