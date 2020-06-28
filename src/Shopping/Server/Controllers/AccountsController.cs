@@ -17,12 +17,18 @@ namespace Shopping.Server.Controllers
         private readonly IAuthService _authService;
         private readonly ICurrentUserProvider _currentUser;
         private readonly ILogger<AccountsController> _logger;
-        public AccountsController(IAuthService authService, ICurrentUserProvider currentUser, ILogger<AccountsController> logger)
+        private readonly IUserGroupRepository _userGroupRepo;
+        private readonly IShoppingLists _shoppingListRepo;
+        public AccountsController(IAuthService authService, ICurrentUserProvider currentUser, 
+            ILogger<AccountsController> logger, IUserGroupRepository userGroupRepo, IShoppingLists shoppingListRepo)
         {
             _authService = authService;
             _currentUser = currentUser;
             _logger = logger;
+            _userGroupRepo = userGroupRepo;
+            _shoppingListRepo = shoppingListRepo;
         }
+
         [Authorize(Roles = ShoppingUserRoles.Admin)]
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
@@ -72,6 +78,11 @@ namespace Shopping.Server.Controllers
                 result.ErrorMessages.Add("Not authorized");
                 return Unauthorized(result);
             }
+
+            await _userGroupRepo.DeleteAllOfUser(id);
+            await _userGroupRepo.RemoveUserFromAllGroups(id);
+            await _shoppingListRepo.DeleteAllOfUser(id);
+            
 
             result = await _authService.DeleteUser(new DeleteUserModel { UserId = id });
 

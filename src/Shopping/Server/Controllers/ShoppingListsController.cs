@@ -57,7 +57,11 @@ namespace Shopping.Server.Controllers
             try
             {
                 list = await _lists.GetAsync(id);
-                if (!(await _lists.IsOfUserAsync(list, user.Id)))
+
+                bool isAdmin = await _users.IsUserAdminAsync();
+                bool isInList = await _lists.IsOfUserAsync(list, user.Id);
+
+                if (!(isInList || isAdmin))
                 {
                     return Unauthorized();
                 }

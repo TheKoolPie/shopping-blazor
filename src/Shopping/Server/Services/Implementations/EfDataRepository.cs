@@ -496,7 +496,6 @@ namespace Shopping.Server.Services.Implementations
 
             return !(itemsWithoutCurrent.Any(a => a.ShoppingListId == item.ShoppingListId && a.UserGroupId == item.UserGroupId));
         }
-
         private async Task<bool> RemoveAssignmentsOfGroupAsync(string userGroupId)
         {
             var allAssignmentsOfGroup = (await GetGroupListAssignmentsAsync())
@@ -505,7 +504,6 @@ namespace Shopping.Server.Services.Implementations
 
             return await DeleteAssignments(allAssignmentsOfGroup);
         }
-
         private async Task<bool> RemoveAssignmentsOfShoppingListAsync(string shoppingListId)
         {
             var allAssignmentsOfList = (await GetGroupListAssignmentsAsync())

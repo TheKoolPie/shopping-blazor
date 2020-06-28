@@ -21,6 +21,7 @@ namespace Shopping.Server.Services.Implementations
             _userManager = userManager;
             _logger = logger;
         }
+
         public async Task<List<string>> GetRolesOfUserAsync(ShoppingUserModel userModel)
         {
             List<string> roles = null;

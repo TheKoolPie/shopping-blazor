@@ -36,7 +36,10 @@ namespace Shopping.Server.Controllers
         {
             var user = await _users.GetUserAsync();
 
-            if (!(await _userGroups.UserIsInGroupAsync(id, user.Id)))
+            bool isAdmin = await _users.IsUserAdminAsync();
+            bool isInGroup = await _userGroups.UserIsInGroupAsync(id, user.Id);
+
+            if (!(isInGroup || isAdmin))
             {
                 return Unauthorized();
             }
@@ -49,7 +52,10 @@ namespace Shopping.Server.Controllers
         {
             var user = await _users.GetUserAsync();
 
-            if (!(await _shoppingLists.IsOfUserAsync(id, user.Id)))
+            bool isAdmin = await _users.IsUserAdminAsync();
+            bool isInList = await _shoppingLists.IsOfUserAsync(id,user.Id);
+
+            if (!(isInList || isAdmin))
             {
                 return Unauthorized();
             }
