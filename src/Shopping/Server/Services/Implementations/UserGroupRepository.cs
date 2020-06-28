@@ -1,11 +1,8 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Shopping.Server.Data;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
-using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -147,6 +144,37 @@ namespace Shopping.Server.Services.Implementations
         public Task<bool> DeleteByIdAsync(string id)
         {
             return _data.DeleteUserGroupAsync(id);
+        }
+
+        public async Task<bool> DeleteAllOfUser(string userId)
+        {
+            var all = await GetAllAsync();
+            var owning = all.Where(g => g.Owner.Id == userId)
+                .Select(u => u.Id)
+                .ToList();
+
+            foreach (var groupId in owning)
+            {
+                if (!await _data.DeleteUserGroupAsync(groupId))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public async Task<bool> RemoveUserFromAllGroups(string userId)
+        {
+            var all = await GetAllAsync();
+            var groupsWhereUserIsMember = all.Where(g => g.Owner.Id != userId && g.Members.Select(x => x.Id).Contains(userId))
+                .ToList();
+
+            foreach (var group in groupsWhereUserIsMember)
+            {
+                await RemoveUserFromGroup(group.Id, new ShoppingUserModel { Id = userId });
+            }
+
+            return true;
         }
     }
 }

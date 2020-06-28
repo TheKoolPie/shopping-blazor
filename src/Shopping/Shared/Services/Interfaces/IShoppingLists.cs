@@ -14,5 +14,6 @@ namespace Shopping.Shared.Services.Interfaces
         Task<bool> RemoveItemAsync(string listId, ShoppingListItem item);
         Task<bool> IsOfUserAsync(ShoppingList list, string userId);
         Task<bool> IsOfUserAsync(string listId, string userId);
+        Task<bool> DeleteAllOfUser(string userId);
     }
 }

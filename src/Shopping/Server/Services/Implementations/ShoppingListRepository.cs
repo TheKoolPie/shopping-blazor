@@ -128,5 +128,22 @@ namespace Shopping.Server.Services.Implementations
         {
             return await _data.DeleteShoppingListAsync(id);
         }
+
+        public async Task<bool> DeleteAllOfUser(string userId)
+        {
+            var allLists = await GetAllAsync();
+            var owningLists = allLists.Where(u => u.Owner.Id == userId)
+                .Select(u => u.Id)
+                .ToList();
+
+            foreach (var listId in owningLists)
+            {
+                if (!await _data.DeleteShoppingListAsync(listId))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

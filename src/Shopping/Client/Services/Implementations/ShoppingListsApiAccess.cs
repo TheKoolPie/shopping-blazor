@@ -42,6 +42,11 @@ namespace Shopping.Client.Services.Implementations
             throw new NotImplementedException();
         }
 
+        public Task<bool> DeleteAllOfUser(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<ShoppingList>> GetAllOfUserAsync(string userId)
         {
             throw new NotImplementedException();
