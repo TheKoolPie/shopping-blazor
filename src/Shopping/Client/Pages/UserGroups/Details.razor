@@ -413,7 +413,7 @@ else
                 UserGroupId = GroupId
             };
 
-            var result = await UserGroupShoppingLists.CreateAssignmentAsync(assignment);
+            var result = await UserGroupShoppingLists.CreateAsync(assignment);
             await InitGroup();
             actionsAlert = (result != null) ? AlertComponentModel.CreateSuccessAlert("Assignment successful") :
             AlertComponentModel.CreateErrorAlert("Assignment failed");
@@ -451,7 +451,7 @@ else
             UserGroupId = GroupId
         };
 
-        var result = await UserGroupShoppingLists.RemoveAssignmentAsync(assignment);
+        var result = await UserGroupShoppingLists.DeleteAsync(assignment);
         await InitGroup();
         overviewAlert = result ? AlertComponentModel.CreateSuccessAlert("Assignment removed") :
         AlertComponentModel.CreateErrorAlert("Assignment could not be removed");

@@ -13,5 +13,8 @@ namespace Shopping.Shared.Services
         Task<T> CreateAsync(T item);
         Task<T> UpdateAsync(string id, T item);
         Task<bool> DeleteByIdAsync(string id);
+
+        bool ItemAlreadyExists(T item);
+        bool ItemCanBeUpdated(T item);
     }
 }

@@ -125,7 +125,7 @@ else
             {
                 if (!string.IsNullOrEmpty(_addGroupId))
                 {
-                    var result = await GroupListAssignments.CreateAssignmentAsync(new UserGroupShoppingList()
+                    var result = await GroupListAssignments.CreateAsync(new UserGroupShoppingList()
                     {
                         ShoppingListId = createdItem.Id,
                         UserGroupId = _addGroupId

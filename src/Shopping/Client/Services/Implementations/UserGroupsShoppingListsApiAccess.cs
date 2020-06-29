@@ -12,40 +12,18 @@ using Shopping.Shared.Services;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class UserGroupsShoppingListsApiAccess : IUserGroupShoppingLists
+    public class UserGroupsShoppingListsApiAccess : CRUDApiAccessBaseImpl<UserGroupShoppingList>, IUserGroupShoppingLists
     {
-        protected readonly ILogger _logger;
-        protected readonly IAuthService _authService;
-        private string _baseUri;
-        public UserGroupsShoppingListsApiAccess(IAuthService authService, ILogger<UserGroupsShoppingListsApiAccess> logger)
+        public UserGroupsShoppingListsApiAccess(IAuthService authService, ILogger<UserGroupsShoppingListsApiAccess> logger) : base(authService, logger)
         {
-            _authService = authService;
-            _logger = logger;
-            _baseUri = "api/UserGroupShoppingLists";
-        }
-        public async Task<UserGroupShoppingList> CreateAssignmentAsync(UserGroupShoppingList assignment)
-        {
-            UserGroupShoppingList retVal = null;
-
-            var client = await _authService.GetHttpClientAsync();
-
-            var response = await client.PostAsJsonAsync<UserGroupShoppingList>(_baseUri, assignment);
-            if (response.IsSuccessStatusCode)
-            {
-                retVal = await response.Content.ReadFromJsonAsync<UserGroupShoppingList>();
-            }
-            else
-            {
-                _logger.LogError(response.ReasonPhrase);
-            }
-            return retVal;
+            BaseAddress = "api/UserGroupShoppingLists";
         }
 
         public async Task<List<ShoppingList>> GetShoppingListsOfUserGroupAsync(string userGroupId)
         {
             List<ShoppingList> lists = null;
             var client = await _authService.GetHttpClientAsync();
-            var response = await client.GetAsync($"{_baseUri}/ShoppingListsOfGroup/{userGroupId}");
+            var response = await client.GetAsync($"{BaseAddress}/ShoppingListsOfGroup/{userGroupId}");
             if (response.IsSuccessStatusCode)
             {
                 lists = await response.Content.ReadFromJsonAsync<List<ShoppingList>>();
@@ -57,7 +35,7 @@ namespace Shopping.Client.Services.Implementations
         {
             List<UserGroup> userGroups = null;
             var client = await _authService.GetHttpClientAsync();
-            var response = await client.GetAsync($"{_baseUri}/UserGroupsOfShoppingList/{shoppingListId}");
+            var response = await client.GetAsync($"{BaseAddress}/UserGroupsOfShoppingList/{shoppingListId}");
             if (response.IsSuccessStatusCode)
             {
                 userGroups = await response.Content.ReadFromJsonAsync<List<UserGroup>>();
@@ -65,10 +43,10 @@ namespace Shopping.Client.Services.Implementations
             return userGroups;
         }
 
-        public async Task<bool> RemoveAssignmentAsync(UserGroupShoppingList assignment)
+        public async Task<bool> DeleteAsync(UserGroupShoppingList assignment)
         {
             var client = await _authService.GetHttpClientAsync();
-            var response = await client.DeleteAsync($"{_baseUri}/{assignment.UserGroupId}/{assignment.ShoppingListId}");
+            var response = await client.DeleteAsync($"{BaseAddress}/{assignment.UserGroupId}/{assignment.ShoppingListId}");
             return response.IsSuccessStatusCode;
         }
     }

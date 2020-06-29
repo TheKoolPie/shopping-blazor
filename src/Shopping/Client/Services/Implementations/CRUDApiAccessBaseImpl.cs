@@ -90,6 +90,16 @@ namespace Shopping.Client.Services.Implementations
             return item;
         }
 
+        public bool ItemAlreadyExists(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ItemCanBeUpdated(T item)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<T> UpdateAsync(string id, T item)
         {
             T retVal = null;

@@ -80,7 +80,7 @@ namespace Shopping.Server.Services.Implementations
 
         public async Task<ProductCategory> CreateAsync(ProductCategory item)
         {
-            if (CategoryAlreadyExists(item))
+            if (ItemAlreadyExists(item))
             {
                 throw new ItemAlreadyExistsException(typeof(ProductCategory), item.Id);
             }
@@ -91,7 +91,7 @@ namespace Shopping.Server.Services.Implementations
 
         public async Task<ProductCategory> UpdateAsync(string id, ProductCategory item)
         {
-            if (!CategoryCanBeUpdated(item))
+            if (!ItemCanBeUpdated(item))
             {
                 throw new ItemAlreadyExistsException(typeof(ProductCategory), item.Id);
             }
@@ -105,7 +105,7 @@ namespace Shopping.Server.Services.Implementations
             return existing;
         }
 
-        public bool CategoryAlreadyExists(ProductCategory item)
+        public bool ItemAlreadyExists(ProductCategory item)
         {
             var all = _context.Categories.ToList();
             return all
@@ -115,7 +115,7 @@ namespace Shopping.Server.Services.Implementations
                         c.ColorCode.Equals(item.ColorCode, StringComparison.InvariantCultureIgnoreCase)
                         );
         }
-        public bool CategoryCanBeUpdated(ProductCategory item)
+        public bool ItemCanBeUpdated(ProductCategory item)
         {
             var all = _context.Categories.ToList();
             var restWithOutCurrentItem = all.Where(c => c.Id != item.Id).ToList();
