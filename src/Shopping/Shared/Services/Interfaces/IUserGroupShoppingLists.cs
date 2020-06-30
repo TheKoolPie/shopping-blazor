@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Shopping.Shared.Services.Interfaces
 {
-    public interface IUserGroupShoppingLists
+    public interface IUserGroupShoppingLists : ICRUDAccess<UserGroupShoppingList>
     {
-        Task<UserGroupShoppingList> CreateAssignmentAsync(UserGroupShoppingList assignment);
-        Task<bool> RemoveAssignmentAsync(UserGroupShoppingList assignment);
+        Task<bool> DeleteAsync(UserGroupShoppingList assignment);
         Task<List<ShoppingList>> GetShoppingListsOfUserGroupAsync(string userGroupId);
         Task<List<UserGroup>> GetUserGroupsOfShoppingListAsync(string shoppingListId);
     }

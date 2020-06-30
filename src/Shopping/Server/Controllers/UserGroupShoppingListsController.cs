@@ -70,7 +70,7 @@ namespace Shopping.Server.Controllers
             UserGroupShoppingList result = null;
             try
             {
-                result = await _userGroupShoppingLists.CreateAssignmentAsync(assignment);
+                result = await _userGroupShoppingLists.CreateAsync(assignment);
             }
             catch (ItemAlreadyExistsException e)
             {
@@ -93,7 +93,7 @@ namespace Shopping.Server.Controllers
             bool result = false;
             try
             {
-                result = await _userGroupShoppingLists.RemoveAssignmentAsync(assignment);
+                result = await _userGroupShoppingLists.DeleteAsync(assignment);
             }
             catch (ItemNotFoundException e)
             {

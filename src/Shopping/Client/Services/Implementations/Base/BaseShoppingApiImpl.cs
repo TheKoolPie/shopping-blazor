@@ -117,5 +117,15 @@ namespace Shopping.Client.Services.Implementations.Base
 
             return response.IsSuccessStatusCode && result.IsSuccessful;
         }
+
+        public bool ItemAlreadyExists(TEntity item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ItemCanBeUpdated(TEntity item)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

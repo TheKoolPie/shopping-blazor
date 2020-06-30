@@ -410,7 +410,7 @@
                 UserGroupId = groupIdInput.GroupId
             };
 
-            var result = await UserGroupShoppingListsRepo.CreateAssignmentAsync(assignment);
+            var result = await UserGroupShoppingListsRepo.CreateAsync(assignment);
 
             await InitAvailableGroups();
 
@@ -432,7 +432,7 @@
             UserGroupId = groupId
         };
 
-        var result = await UserGroupShoppingListsRepo.RemoveAssignmentAsync(assignment);
+        var result = await UserGroupShoppingListsRepo.DeleteAsync(assignment);
 
         await InitAvailableGroups();
 

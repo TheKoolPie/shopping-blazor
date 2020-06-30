@@ -19,6 +19,7 @@ using Shopping.Server.Services;
 using Shopping.Shared.Services.Interfaces;
 using Shopping.Server.Services.Implementations;
 using Shopping.Shared.Services;
+using Shopping.Shared.Data.Abstractions;
 
 namespace Shopping.Server
 {
@@ -79,7 +80,8 @@ namespace Shopping.Server
             services.AddHttpContextAccessor();
 
             services.AddTransient<IAuthService, AuthService>();
-            services.AddTransient<IDataRepository, EfDataRepository>();
+
+            services.AddTransient<IShoppingDataRepository, ShoppingDataRepoEf>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<ICurrentUserProvider, UserFromHttpContextProvider>();
             services.AddTransient<IUserGroupRepository, UserGroupRepository>();

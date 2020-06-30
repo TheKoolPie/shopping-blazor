@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Shared.Data;
+using Shopping.Shared.Data.Abstractions;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Services.Interfaces;
@@ -14,22 +15,29 @@ namespace Shopping.Server.Services.Implementations
     public class UserGroupRepository : IUserGroupRepository
     {
         private readonly IUserRepository _userRepository;
-        private readonly IDataRepository _data;
+        private readonly IShoppingDataRepository _context;
+        private readonly IUserGroupShoppingLists _groupListAssignments;
 
-        public UserGroupRepository(IDataRepository data, IUserRepository userRepository)
+        public UserGroupRepository(IShoppingDataRepository context, IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _data = data;
+            _context = context;
         }
 
         public async Task<List<UserGroup>> GetAllAsync()
         {
-            return await _data.GetUserGroupsAsync();
+            var groups = await _context.UserGroups.ToListAsync();
+            return groups;
         }
 
         public async Task<UserGroup> GetAsync(string id)
         {
-            return await _data.GetUserGroupAsync(id);
+            var group = await _context.UserGroups.FirstOrDefaultAsync(i => i.Id == id);
+            if (group == null)
+            {
+                throw new ItemNotFoundException(typeof(UserGroup), id);
+            }
+            return group;
         }
 
         public async Task<List<UserGroup>> GetAllOfUserAsync(string userId)
@@ -71,7 +79,7 @@ namespace Shopping.Server.Services.Implementations
                 Id = existingUser.Id
             });
 
-            await _data.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return group;
         }
@@ -95,7 +103,7 @@ namespace Shopping.Server.Services.Implementations
                 throw new Exception("Could not remove member");
             }
 
-            await _data.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return group;
 
@@ -131,19 +139,54 @@ namespace Shopping.Server.Services.Implementations
             return commonLists;
         }
 
-        public Task<UserGroup> CreateAsync(UserGroup item)
+        public async Task<UserGroup> CreateAsync(UserGroup item)
         {
-            return _data.CreateUserGroupAsync(item);
+            if (ItemAlreadyExists(item))
+            {
+                throw new ItemAlreadyExistsException(typeof(UserGroup), item.Id);
+            }
+
+            _context.UserGroups.Add(item);
+            await _context.SaveChangesAsync();
+            return item;
         }
 
-        public Task<UserGroup> UpdateAsync(string id, UserGroup item)
+        public async Task<UserGroup> UpdateAsync(string id, UserGroup item)
         {
-            return _data.UpdateUserGroupAsync(id, item);
+            if (!ItemCanBeUpdated(item))
+            {
+                throw new ItemAlreadyExistsException(typeof(UserGroup), item.Id);
+            }
+            var existing = await GetAsync(id);
+            existing.Name = item.Name;
+            existing.Owner = item.Owner;
+            existing.Members = new List<ShoppingUserModel>(item.Members);
+
+            await _context.SaveChangesAsync();
+
+            return existing;
         }
 
-        public Task<bool> DeleteByIdAsync(string id)
+        public async Task<bool> DeleteByIdAsync(string id)
         {
-            return _data.DeleteUserGroupAsync(id);
+            var existing = await GetAsync(id);
+
+            await RemoveAssignmentsOfGroupAsync(id);
+
+            _context.UserGroups.Remove(existing);
+
+            bool result = false;
+            try
+            {
+                await _context.SaveChangesAsync();
+                result = true;
+            }
+            catch
+            {
+                result = false;
+            }
+
+            return result;
         }
 
         public async Task<bool> DeleteAllOfUser(string userId)
@@ -155,7 +198,7 @@ namespace Shopping.Server.Services.Implementations
 
             foreach (var groupId in owning)
             {
-                if (!await _data.DeleteUserGroupAsync(groupId))
+                if (!await DeleteByIdAsync(groupId))
                 {
                     return false;
                 }
@@ -174,6 +217,41 @@ namespace Shopping.Server.Services.Implementations
                 await RemoveUserFromGroup(group.Id, new ShoppingUserModel { Id = userId });
             }
 
+            return true;
+        }
+
+        public bool ItemAlreadyExists(UserGroup item)
+        {
+            var groups = _context.UserGroups.ToList();
+            return groups.Any(g => g.Id == item.Id || (g.Owner.Id == item.Id && g.Name == item.Name));
+        }
+
+        public bool ItemCanBeUpdated(UserGroup item)
+        {
+            var groups = _context.UserGroups.ToList();
+            var groupsWithoutCurrentItem = groups.Where(g => g.Id == item.Id).ToList();
+            var groupsOfOwner = groupsWithoutCurrentItem.Where(g => g.Owner.Id == item.Owner.Id).ToList();
+            return !(groupsOfOwner.Any(g => g.Name == item.Name));
+        }
+
+        private async Task<bool> RemoveAssignmentsOfGroupAsync(string userGroupId)
+        {
+            var allAssignmentsOfGroup = (await _groupListAssignments.GetAllAsync())
+                .Where(a => a.UserGroupId == userGroupId)
+                .ToList();
+
+            return await DeleteAssignments(allAssignmentsOfGroup);
+        }
+
+        private async Task<bool> DeleteAssignments(List<UserGroupShoppingList> assignments)
+        {
+            foreach (var assignment in assignments)
+            {
+                if (!(await _groupListAssignments.DeleteAsync(assignment)))
+                {
+                    return false;
+                }
+            }
             return true;
         }
     }

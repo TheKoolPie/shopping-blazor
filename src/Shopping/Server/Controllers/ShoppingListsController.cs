@@ -53,15 +53,10 @@ namespace Shopping.Server.Controllers
         public async Task<ActionResult<ShoppingList>> GetList(string id)
         {
             ShoppingList list;
-            var user = await _users.GetUserAsync();
             try
             {
                 list = await _lists.GetAsync(id);
-
-                bool isAdmin = await _users.IsUserAdminAsync();
-                bool isInList = await _lists.IsOfUserAsync(list, user.Id);
-
-                if (!(isInList || isAdmin))
+                if (!(await IsUserAuthorizedToAccessList(list.Id)))
                 {
                     return Unauthorized();
                 }
@@ -91,41 +86,31 @@ namespace Shopping.Server.Controllers
             {
                 return Conflict();
             }
-            catch (Exception)
+            catch (PersistencyException)
             {
-                throw;
+                return Conflict();
             }
             return Ok(item);
         }
         [HttpPost("AddItem/{id}")]
         public async Task<ActionResult<ShoppingListItem>> AddItemToList(string id, [FromBody] ShoppingListItem item)
         {
-            var user = await _users.GetUserAsync();
-            ShoppingList list = null;
+            ShoppingListItem createdItem;
             try
             {
-                list = await _lists.GetAsync(id);
+                if (!(await IsUserAuthorizedToAccessList(id)))
+                {
+                    return Unauthorized();
+                }
+                createdItem = await _lists.AddOrUpdateItemAsync(id, item);
             }
-            catch (ItemNotFoundException e)
+            catch (ItemNotFoundException)
             {
-                return NotFound(e.Message);
+                return NotFound();
             }
-            if (!(await _lists.IsOfUserAsync(list, user.Id)))
+            catch (PersistencyException)
             {
-                return Unauthorized();
-            }
-            ShoppingListItem createdItem = null;
-            try
-            {
-                createdItem = await _lists.AddOrUpdateItemAsync(list.Id, item);
-            }
-            catch (ItemNotFoundException e)
-            {
-                return NotFound(e.Message);
-            }
-            catch (PersistencyException e)
-            {
-                return Conflict(e.Message);
+                return Conflict();
             }
 
             return Ok(createdItem);
@@ -138,19 +123,22 @@ namespace Shopping.Server.Controllers
             {
                 return BadRequest();
             }
-
-            ShoppingList updatedList = null;
+            ShoppingList updatedList;
             try
             {
+                if (!(await IsUserAuthorizedToAccessList(list.Id)))
+                {
+                    return Unauthorized();
+                }
                 updatedList = await _lists.UpdateAsync(id, list);
             }
-            catch (ItemNotFoundException e)
+            catch (ItemNotFoundException)
             {
-                return NotFound(e.Message);
+                return NotFound();
             }
-            catch (PersistencyException e)
+            catch (PersistencyException)
             {
-                return Conflict(e.Message);
+                return Conflict();
             }
 
             return Ok(updatedList);
@@ -161,24 +149,33 @@ namespace Shopping.Server.Controllers
         {
             try
             {
-                var list = await _lists.GetAsync(id);
-                var user = await _users.GetUserAsync();
-
-                bool isAdmin = await _users.IsUserAdminAsync();
-                bool isOwner = await _lists.IsOfUserAsync(list, user.Id);
-
-                if (!(isAdmin || isOwner))
+                if (!(await IsUserAuthorizedToAccessList(id)))
                 {
-                    return Unauthorized(false);
+                    return Unauthorized();
                 }
 
                 await _lists.DeleteByIdAsync(id);
             }
             catch (ItemNotFoundException)
             {
-                return NotFound(false);
+                return NotFound();
             }
-            return Ok(true);
+            catch (PersistencyException)
+            {
+                return Conflict();
+            }
+            return Ok();
+        }
+
+
+        private async Task<bool> IsUserAuthorizedToAccessList(string listId)
+        {
+            var currentUser = await _users.GetUserAsync();
+
+            var isAdmin = await _users.IsUserAdminAsync();
+            var listIsOfUser = await _lists.IsOfUserAsync(listId, currentUser.Id);
+
+            return isAdmin || listIsOfUser;
         }
     }
 }
