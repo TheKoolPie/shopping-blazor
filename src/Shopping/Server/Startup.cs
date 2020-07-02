@@ -43,10 +43,8 @@ namespace Shopping.Server
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            var connString = Configuration.GetConnectionString("Shopping_Azure");
-            var connData = new CosmosDbConnStringData(connString);
-
-            services.AddDbContext<ShoppingDbContext>(o => o.UseCosmos(connData.Endpoint, connData.Key, "shopping-list"));
+            services.AddDbContext<ShoppingDbContext>(o => 
+            o.UseMySql(Configuration.GetConnectionString("Shopping_Azure")));
 
             services.AddHealthChecks();
 
