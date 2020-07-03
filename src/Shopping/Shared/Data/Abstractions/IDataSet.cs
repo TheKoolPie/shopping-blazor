@@ -12,5 +12,6 @@ namespace Shopping.Shared.Data.Abstractions
         void Add(T entity);
         void Remove(T entity);
         Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+        int Count { get; }
     }
 }

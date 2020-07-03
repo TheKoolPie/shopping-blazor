@@ -16,6 +16,8 @@ namespace Shopping.Shared.Data.Abstractions
             _data = new List<T>();
         }
 
+        public int Count => _data.Count;
+
         public void Add(T entity)
         {
             _data.Add(entity);

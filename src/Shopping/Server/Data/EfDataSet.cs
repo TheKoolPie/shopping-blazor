@@ -12,6 +12,9 @@ namespace Shopping.Server.Data
     public class EfDataSet<T> : IDataSet<T> where T : class
     {
         DbSet<T> _dbSet;
+
+        public int Count => _dbSet.Count();
+
         public EfDataSet(DbSet<T> dbSet)
         {
             _dbSet = dbSet;
