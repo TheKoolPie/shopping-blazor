@@ -25,125 +25,150 @@ namespace Shopping.Shared.UnitTests.TestData
         {
             return new TestDataModel
             {
+                ExpectedCategoryCount = 20,
+                ExpectedProductCount = 146,
+                ExpectedShoppingListCount = 5,
+                ExpectedUserGroupCount = 1,
+                ExpectedAssignmentCount = 5,
                 Data = new ShoppingDataSerializationModel
                 {
                     Categories = new List<ProductCategory>
                    {
-                        new ProductCategory {
+                        new ProductCategory 
+                        {
                           Name= "Fleisch",
                           ColorCode= "#e1a8a8",
                           Id= "f3c6cc51-fcbe-4056-9c35-a1ed055ca9f0",
                           CreatedAt= DateTime.Parse("2020-07-03T12:34:43.0569932+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Gemüse",
                           ColorCode = "#96d35f",
                           Id = "8b768402-fd38-4605-8b4a-1b6519b9a4c8",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0586309+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Obst",
                           ColorCode = "#e22400",
                           Id = "6e04fc0f-9f78-4a31-91aa-cb4c838867c0",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0603093+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Süßigkeit",
                           ColorCode = "#52d6fc",
                           Id = "23736a14-2e67-45f8-9da8-0b15ba31a348",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0603529+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Chips",
                           ColorCode = "#fee4a8",
                           Id = "6a1c39dd-7a45-4bb5-ae0e-ba0aa99d139f",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604165+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Milchprodukte ",
                           ColorCode = "#cbf0ff",
                           Id = "6134c1cf-62dc-4502-9ac6-14941c2b98ff",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604248+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Sauce",
                           ColorCode = "#ff8c82",
                           Id = "1e190d8a-f989-4b85-a61d-38b054c1c15d",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604306+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Konserven",
                           ColorCode = "#000000",
                           Id = "bab91259-2b36-4f62-871c-857f8e2bef95",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604361+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Backwaren",
                           ColorCode = "#a67b01",
                           Id = "4a1084ab-82d1-4838-95ef-710c811e6b06",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604459+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Teigwaren",
                           ColorCode = "#fdc700",
                           Id = "55f92dfd-b3a8-435c-a668-ef5235174372",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604518+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Getränke",
                           ColorCode = "#7a219e",
                           Id = "80322c66-7733-47af-9045-2b8650993490",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604593+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Wurst",
                           ColorCode = "#99244f",
                           Id = "d22dd97b-52e8-4bab-bb0c-cf6c53b73ee0",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0647508+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Hygiene",
                           ColorCode = "#fefb41",
                           Id = "7eb72a7e-bf70-4d88-a765-9ad73bb35a2c",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0648154+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Reinigungsmittel",
                           ColorCode = "#016e8f",
                           Id = "2f8d0fed-725d-47f0-b353-22f39a2ac5e8",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0648212+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Eier",
                           ColorCode = "#ebebeb",
                           Id = "e731a8d0-3996-4711-9e1b-096d893d8c78",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0649092+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Küche",
                           ColorCode = "#ff4015",
                           Id = "2a8f6252-cfe5-4f3b-80cb-b12707152c23",
                           CreatedAt = DateTime.Parse( "2020-06-16T19:35:04.887+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Tiefkühlgericht",
                           ColorCode = "#0061fe",
                           Id = "42b96200-8d14-4d43-9ef4-02cc372c3e08",
                           CreatedAt = DateTime.Parse( "2020-06-21T18:56:23.265+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Baby",
                           ColorCode = "#e292fe",
                           Id = "406728b4-545e-4182-94fa-f79fad0c02a1",
                           CreatedAt = DateTime.Parse( "2020-06-21T20:12:18.491+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Gewürze",
                           ColorCode = "#f5ec00",
                           Id = "9048b819-c949-4fb3-843b-372c6900b336",
                           CreatedAt = DateTime.Parse( "2020-06-22T19:24:24.375+02:00"),
                         },
-                        new ProductCategory{
+                        new ProductCategory
+                        {
                           Name = "Nüsse",
                           ColorCode = "#a96800",
                           Id = "543a909f-f689-4046-a44e-c3e1bb8f9c09",
