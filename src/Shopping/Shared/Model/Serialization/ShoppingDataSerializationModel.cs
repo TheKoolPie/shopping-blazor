@@ -24,11 +24,11 @@ namespace Shopping.Shared.Model.Serialization
         }
         public ShoppingDataSerializationModel(IShoppingDataRepository dataRepo)
         {
-            Categories = dataRepo.Categories.ToList();
-            Products = dataRepo.Products.ToList();
-            UserGroups = dataRepo.UserGroups.ToList();
-            ShoppingLists = dataRepo.ShoppingLists.ToList();
-            UserGroupShoppingLists = dataRepo.UserGroupShoppingLists.ToList();
+            Categories = dataRepo.Categories?.ToList() ?? new List<ProductCategory>();
+            Products = dataRepo.Products?.ToList() ?? new List<ProductItem>();
+            UserGroups = dataRepo.UserGroups?.ToList() ?? new List<UserGroup>();
+            ShoppingLists = dataRepo.ShoppingLists?.ToList() ?? new List<ShoppingList>();
+            UserGroupShoppingLists = dataRepo.UserGroupShoppingLists?.ToList() ?? new List<UserGroupShoppingList>();
         }
     }
 }

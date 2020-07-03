@@ -19,7 +19,7 @@ namespace Shopping.Shared.UnitTests.TestData
         public ShoppingDataSerializationModel Data;
     }
 
-    public static class TestData
+    public static class TestDataRepo
     {
         public static TestDataModel GetDataSet()
         {
