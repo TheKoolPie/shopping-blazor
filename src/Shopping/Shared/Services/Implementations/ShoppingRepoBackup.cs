@@ -5,6 +5,7 @@ using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -37,29 +38,31 @@ namespace Shopping.Shared.Services.Implementations
 
         public async Task ImportDataAsync(ShoppingDataSerializationModel data)
         {
-            foreach (var category in data.Categories)
-            {
-                _repository.Categories.Add(category);
-            }
-            foreach (var product in data.Products)
-            {
-                _repository.Products.Add(product);
-            }
-            foreach (var group in data.UserGroups)
-            {
-                _repository.UserGroups.Add(group);
-            }
-            foreach (var lists in data.ShoppingLists)
-            {
-                _repository.ShoppingLists.Add(lists);
-            }
-            foreach (var assignments in data.UserGroupShoppingLists)
-            {
-                _repository.UserGroupShoppingLists.Add(assignments);
-            }
-
             try
             {
+                foreach (var category in data.Categories)
+                {
+                    _repository.Categories.Add(category);
+                }
+                foreach (var product in data.Products)
+                {
+                    product.Category = await _repository.Categories.FirstOrDefaultAsync(c => c.Id == product.CategoryId);
+                    _repository.Products.Add(product);
+                }
+                foreach (var group in data.UserGroups)
+                {
+                    _repository.UserGroups.Add(group);
+                }
+                foreach (var lists in data.ShoppingLists)
+                {
+                    _repository.ShoppingLists.Add(lists);
+                }
+                foreach (var assignments in data.UserGroupShoppingLists)
+                {
+                    _repository.UserGroupShoppingLists.Add(assignments);
+                }
+
+
                 await _repository.SaveChangesAsync();
             }
             catch (Exception e)

@@ -38,6 +38,11 @@ namespace Shopping.Client.Services.Implementations
         {
             var client = await _authService.GetHttpClientAsync();
 
+            foreach (var product in data.Products)
+            {
+                product.Category = data.Categories.FirstOrDefault(c => c.Id == product.CategoryId);
+            }
+
             var response = await client.PostAsJsonAsync(uri, data);
 
             var result = await response.Content.ReadFromJsonAsync<DatabaseBackupResult>();

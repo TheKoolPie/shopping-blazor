@@ -21,6 +21,7 @@ using Shopping.Server.Services.Implementations;
 using Shopping.Shared.Services;
 using Shopping.Shared.Data.Abstractions;
 using Shopping.Shared.Services.Implementations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Shopping.Server
 {
@@ -77,6 +78,11 @@ namespace Shopping.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddHttpContextAccessor();
+
+            services.Configure<MvcOptions>(o =>
+            {
+                o.MaxValidationDepth = null;
+            });
 
             services.AddTransient<IAuthService, AuthService>();
 

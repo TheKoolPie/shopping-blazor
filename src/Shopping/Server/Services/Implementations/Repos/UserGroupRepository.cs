@@ -18,10 +18,11 @@ namespace Shopping.Server.Services.Implementations
         private readonly IShoppingDataRepository _context;
         private readonly IUserGroupShoppingLists _groupListAssignments;
 
-        public UserGroupRepository(IShoppingDataRepository context, IUserRepository userRepository)
+        public UserGroupRepository(IShoppingDataRepository context, IUserRepository userRepository, IUserGroupShoppingLists groupListAssignments)
         {
             _userRepository = userRepository;
             _context = context;
+            _groupListAssignments = groupListAssignments;
         }
 
         public async Task<List<UserGroup>> GetAllAsync()
@@ -236,7 +237,8 @@ namespace Shopping.Server.Services.Implementations
 
         private async Task<bool> RemoveAssignmentsOfGroupAsync(string userGroupId)
         {
-            var allAssignmentsOfGroup = (await _groupListAssignments.GetAllAsync())
+            var allAssignments = await _groupListAssignments.GetAllAsync();
+            var allAssignmentsOfGroup = allAssignments
                 .Where(a => a.UserGroupId == userGroupId)
                 .ToList();
 

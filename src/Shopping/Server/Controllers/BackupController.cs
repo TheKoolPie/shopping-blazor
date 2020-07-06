@@ -48,8 +48,6 @@ namespace Shopping.Server.Controllers
                 {
                     _logger.LogInformation($"Replace owner in group: {group.Id}");
                     group.Owner = fallbackUser;
-                    group.Members.Add(fallbackUser);
-
                 }
                 for (int i = group.Members.Count - 1; i > 0; i--)
                 {
