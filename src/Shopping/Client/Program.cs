@@ -41,7 +41,7 @@ namespace Shopping.Client
             builder.Services.AddScoped<IAuthService, AuthService>();
 
             builder.Services.AddScoped<ITokenProvider, TokenProviderLocalStorage>();
-
+            builder.Services.AddTransient<IShoppingRepoBackup, ShoppingListRepoBackupApiAccess>();
             builder.Services.AddTransient<IProductCategories, ProductCategoryApiAccess>();
             builder.Services.AddTransient<IProducts, ProductsApiAccess>();
             builder.Services.AddTransient<IShoppingLists, ShoppingListsApiAccess>();

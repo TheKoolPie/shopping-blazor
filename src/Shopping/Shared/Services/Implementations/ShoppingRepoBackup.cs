@@ -35,29 +35,25 @@ namespace Shopping.Shared.Services.Implementations
             await File.WriteAllTextAsync(filePath, jsonString);
         }
 
-        public async Task ImportDataJsonAsync(string filePath)
+        public async Task ImportDataAsync(ShoppingDataSerializationModel data)
         {
-            var jsonString = await File.ReadAllTextAsync(filePath);
-
-            var model = JsonSerializer.Deserialize<ShoppingDataSerializationModel>(jsonString);
-
-            foreach (var category in model.Categories)
+            foreach (var category in data.Categories)
             {
                 _repository.Categories.Add(category);
             }
-            foreach (var product in model.Products)
+            foreach (var product in data.Products)
             {
                 _repository.Products.Add(product);
             }
-            foreach (var group in model.UserGroups)
+            foreach (var group in data.UserGroups)
             {
                 _repository.UserGroups.Add(group);
             }
-            foreach (var lists in model.ShoppingLists)
+            foreach (var lists in data.ShoppingLists)
             {
                 _repository.ShoppingLists.Add(lists);
             }
-            foreach (var assignments in model.UserGroupShoppingLists)
+            foreach (var assignments in data.UserGroupShoppingLists)
             {
                 _repository.UserGroupShoppingLists.Add(assignments);
             }
@@ -70,6 +66,15 @@ namespace Shopping.Shared.Services.Implementations
             {
                 throw new PersistencyException("Could not perform import", e);
             }
+        }
+
+        public async Task ImportDataJsonAsync(string filePath)
+        {
+            var jsonString = await File.ReadAllTextAsync(filePath);
+
+            var data = JsonSerializer.Deserialize<ShoppingDataSerializationModel>(jsonString);
+
+            await ImportDataAsync(data);
         }
     }
 }
