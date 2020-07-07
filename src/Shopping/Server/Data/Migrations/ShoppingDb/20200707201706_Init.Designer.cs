@@ -9,7 +9,7 @@ using Shopping.Server.Data;
 namespace Shopping.Server.Data.Migrations.ShoppingDb
 {
     [DbContext(typeof(ShoppingDbContext))]
-    [Migration("20200702154039_Init")]
+    [Migration("20200707201706_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,9 +81,41 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                         .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<string>("OwnerId")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.HasKey("Id");
 
                     b.ToTable("ShoppingLists");
+                });
+
+            modelBuilder.Entity("Shopping.Shared.Data.ShoppingListItem", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+
+                    b.Property<float>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Done")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ProductItemId")
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+
+                    b.Property<string>("ShoppingListId")
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductItemId");
+
+                    b.HasIndex("ShoppingListId");
+
+                    b.ToTable("ShoppingListItems");
                 });
 
             modelBuilder.Entity("Shopping.Shared.Data.UserGroup", b =>
@@ -98,9 +130,33 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                         .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<string>("OwnerId")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.HasKey("Id");
 
                     b.ToTable("UserGroups");
+                });
+
+            modelBuilder.Entity("Shopping.Shared.Data.UserGroupMembers", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("MemberId")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("UserGroupId")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserGroupMembers");
                 });
 
             modelBuilder.Entity("Shopping.Shared.Data.UserGroupShoppingList", b =>
@@ -112,9 +168,11 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("ShoppingListId")
+                        .IsRequired()
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
 
                     b.Property<string>("UserGroupId")
+                        .IsRequired()
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
@@ -135,103 +193,30 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Shopping.Shared.Data.ShoppingList", b =>
+            modelBuilder.Entity("Shopping.Shared.Data.ShoppingListItem", b =>
                 {
-                    b.OwnsMany("Shopping.Shared.Data.ShoppingListItem", "Items", b1 =>
-                        {
-                            b1.Property<string>("ShoppingListId")
-                                .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+                    b.HasOne("Shopping.Shared.Data.ProductItem", "ProductItem")
+                        .WithMany()
+                        .HasForeignKey("ProductItemId");
 
-                            b1.Property<string>("Id")
-                                .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
-                            b1.Property<float>("Amount")
-                                .HasColumnType("float");
-
-                            b1.Property<DateTime?>("CreatedAt")
-                                .HasColumnType("datetime(6)");
-
-                            b1.Property<bool>("Done")
-                                .HasColumnType("tinyint(1)");
-
-                            b1.Property<string>("ProductItemId")
-                                .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
-                            b1.HasKey("ShoppingListId", "Id");
-
-                            b1.HasIndex("ProductItemId");
-
-                            b1.ToTable("ShoppingListItem");
-
-                            b1.HasOne("Shopping.Shared.Data.ProductItem", "ProductItem")
-                                .WithMany()
-                                .HasForeignKey("ProductItemId");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ShoppingListId");
-                        });
-
-                    b.OwnsOne("Shopping.Shared.Model.Account.ShoppingUserModel", "Owner", b1 =>
-                        {
-                            b1.Property<string>("ShoppingListId")
-                                .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
-                            b1.Property<string>("Id")
-                                .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                            b1.HasKey("ShoppingListId");
-
-                            b1.ToTable("ShoppingLists");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ShoppingListId");
-                        });
-                });
-
-            modelBuilder.Entity("Shopping.Shared.Data.UserGroup", b =>
-                {
-                    b.OwnsMany("Shopping.Shared.Model.Account.ShoppingUserModel", "Members", b1 =>
-                        {
-                            b1.Property<string>("UserGroupId")
-                                .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
-                            b1.Property<string>("Id")
-                                .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
-                            b1.HasKey("UserGroupId", "Id");
-
-                            b1.ToTable("UserGroups_Members");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserGroupId");
-                        });
-
-                    b.OwnsOne("Shopping.Shared.Model.Account.ShoppingUserModel", "Owner", b1 =>
-                        {
-                            b1.Property<string>("UserGroupId")
-                                .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
-
-                            b1.Property<string>("Id")
-                                .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                            b1.HasKey("UserGroupId");
-
-                            b1.ToTable("UserGroups");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserGroupId");
-                        });
+                    b.HasOne("Shopping.Shared.Data.ShoppingList", "ShoppingList")
+                        .WithMany("Items")
+                        .HasForeignKey("ShoppingListId");
                 });
 
             modelBuilder.Entity("Shopping.Shared.Data.UserGroupShoppingList", b =>
                 {
                     b.HasOne("Shopping.Shared.Data.ShoppingList", "ShoppingList")
                         .WithMany()
-                        .HasForeignKey("ShoppingListId");
+                        .HasForeignKey("ShoppingListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Shopping.Shared.Data.UserGroup", "UserGroup")
                         .WithMany()
-                        .HasForeignKey("UserGroupId");
+                        .HasForeignKey("UserGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

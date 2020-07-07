@@ -73,10 +73,8 @@ namespace Shopping.Server.Controllers
         public async Task<ActionResult<ShoppingList>> CreateList(ShoppingList shoppingList)
         {
             var user = await _users.GetUserAsync();
-            shoppingList.Owner = new ShoppingUserModel()
-            {
-                Id = user.Id
-            };
+            shoppingList.OwnerId = user.Id;
+
             ShoppingList item;
             try
             {

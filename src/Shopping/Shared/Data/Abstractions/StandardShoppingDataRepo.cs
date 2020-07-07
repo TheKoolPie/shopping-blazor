@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Shopping.Shared.Model.Account;
 using System.Threading.Tasks;
 
 namespace Shopping.Shared.Data.Abstractions
@@ -12,6 +10,8 @@ namespace Shopping.Shared.Data.Abstractions
         private StandardDataSet<ShoppingList> _shoppingLists;
         private StandardDataSet<UserGroup> _userGroups;
         private StandardDataSet<UserGroupShoppingList> _userGroupShoppingList;
+        private StandardDataSet<ShoppingListItem> _shoppinglistItems;
+        private StandardDataSet<UserGroupMembers> _userGroupMembers;
 
         public StandardShoppingDataRepo()
         {
@@ -20,6 +20,8 @@ namespace Shopping.Shared.Data.Abstractions
             _shoppingLists = new StandardDataSet<ShoppingList>();
             _userGroups = new StandardDataSet<UserGroup>();
             _userGroupShoppingList = new StandardDataSet<UserGroupShoppingList>();
+            _shoppinglistItems = new StandardDataSet<ShoppingListItem>();
+            _userGroupMembers = new StandardDataSet<UserGroupMembers>();
         }
 
         public IDataSet<ProductCategory> Categories => _categories;
@@ -31,6 +33,10 @@ namespace Shopping.Shared.Data.Abstractions
         public IDataSet<ShoppingList> ShoppingLists => _shoppingLists;
 
         public IDataSet<UserGroupShoppingList> UserGroupShoppingLists => _userGroupShoppingList;
+
+        public IDataSet<ShoppingListItem> ShoppingListItems => _shoppinglistItems;
+
+        public IDataSet<UserGroupMembers> UserGroupMembers => _userGroupMembers;
 
         public async Task SaveChangesAsync()
         {

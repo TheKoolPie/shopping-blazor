@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.Serialization;
 
 namespace Shopping.Shared.Data
 {
@@ -16,6 +13,9 @@ namespace Shopping.Shared.Data
         public string Name { get; set; }
         [Required]
         public DateTime ListDate { get; set; }
+
+        public string OwnerId { get; set; }
+        [NotMapped]
         public ShoppingUserModel Owner { get; set; }
 
         [NotMapped]
@@ -36,13 +36,13 @@ namespace Shopping.Shared.Data
             return obj is ShoppingList list &&
                    Name == list.Name &&
                    ListDate == list.ListDate &&
-                   Owner.Equals(list.Owner) &&
+                   OwnerId.Equals(list.OwnerId) &&
                    ItemsEqual(list.Items);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, ListDate, Owner, Items);
+            return HashCode.Combine(Name, ListDate, OwnerId, Items);
         }
 
         private bool ItemsEqual(List<ShoppingListItem> items)

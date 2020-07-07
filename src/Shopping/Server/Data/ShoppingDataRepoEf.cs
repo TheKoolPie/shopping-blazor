@@ -1,5 +1,6 @@
 ﻿using Shopping.Shared.Data;
 using Shopping.Shared.Data.Abstractions;
+using Shopping.Shared.Model.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace Shopping.Server.Data
         private EfDataSet<UserGroup> _userGroups { get; set; }
         private EfDataSet<ShoppingList> _shoppingLists { get; set; }
         private EfDataSet<UserGroupShoppingList> _userGroupShoppingLists { get; set; }
+        private EfDataSet<ShoppingListItem> _shoppinglistItems { get; set; }
+        private EfDataSet<UserGroupMembers> _userGroupMembers { get; set; }
 
         public ShoppingDataRepoEf(ShoppingDbContext context)
         {
@@ -26,6 +29,8 @@ namespace Shopping.Server.Data
             _userGroups = new EfDataSet<UserGroup>(_context.UserGroups);
             _shoppingLists = new EfDataSet<ShoppingList>(_context.ShoppingLists);
             _userGroupShoppingLists = new EfDataSet<UserGroupShoppingList>(_context.UserGroupShoppingLists);
+            _shoppinglistItems = new EfDataSet<ShoppingListItem>(_context.ShoppingListItems);
+            _userGroupMembers = new EfDataSet<UserGroupMembers>(_context.UserGroupMembers);
         }
 
 
@@ -38,6 +43,10 @@ namespace Shopping.Server.Data
         public IDataSet<ShoppingList> ShoppingLists => _shoppingLists;
 
         public IDataSet<UserGroupShoppingList> UserGroupShoppingLists => _userGroupShoppingLists;
+
+        public IDataSet<ShoppingListItem> ShoppingListItems => _shoppinglistItems;
+
+        public IDataSet<UserGroupMembers> UserGroupMembers => _userGroupMembers;
 
         public async Task SaveChangesAsync()
         {

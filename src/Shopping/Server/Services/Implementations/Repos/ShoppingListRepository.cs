@@ -10,12 +10,15 @@ namespace Shopping.Server.Services.Implementations
 {
     public class ShoppingListRepository : IShoppingLists
     {
+        private readonly IUserRepository _userRepository;
         private readonly IShoppingDataRepository _context;
         private readonly IUserGroupShoppingLists _groupListAssignments;
         private readonly IUserGroupRepository _userGroups;
 
-        public ShoppingListRepository(IShoppingDataRepository context, IUserGroupShoppingLists groupListAssignments, IUserGroupRepository userGroups)
+        public ShoppingListRepository(IUserRepository userRepository, IShoppingDataRepository context,
+            IUserGroupShoppingLists groupListAssignments, IUserGroupRepository userGroups)
         {
+            _userRepository = userRepository;
             _context = context;
             _groupListAssignments = groupListAssignments;
             _userGroups = userGroups;
@@ -26,6 +29,7 @@ namespace Shopping.Server.Services.Implementations
             var lists = await _context.ShoppingLists.ToListAsync();
             foreach (var list in lists)
             {
+                list.Owner = await _userRepository.GetUserByIdAsync(list.OwnerId);
                 foreach (var item in list.Items)
                 {
                     item.ProductItem = await GetProductAsync(item.ProductItemId);
@@ -41,6 +45,7 @@ namespace Shopping.Server.Services.Implementations
             {
                 throw new ItemNotFoundException(typeof(ShoppingList), id);
             }
+            list.Owner = await _userRepository.GetUserByIdAsync(list.OwnerId);
             foreach (var item in list.Items)
             {
                 item.ProductItem = await GetProductAsync(item.ProductItemId);
@@ -53,15 +58,18 @@ namespace Shopping.Server.Services.Implementations
             var list = await GetAsync(listId);
             item.ProductItem = await GetProductAsync(item.ProductItemId);
 
-            var existingItem = list.Items.FirstOrDefault(i => i.ProductItem.Name == item.ProductItem.Name);
-            if (existingItem == null)
+            var allItems = await _context.ShoppingListItems.ToListAsync();
+            var itemsOfList = allItems.Where(i => i.ShoppingListId == listId);
+
+            var existing = itemsOfList.FirstOrDefault(i => i.ProductItemId == item.ProductItemId);
+            if (existing == null)
             {
-                list.Items.Add(item);
+                _context.ShoppingListItems.Add(item);
             }
             else
             {
-                existingItem.Amount = item.Amount;
-                existingItem.Done = item.Done;
+                existing.Done = item.Done;
+                existing.Amount = item.Amount;
             }
 
             await _context.SaveChangesAsync();
@@ -76,13 +84,12 @@ namespace Shopping.Server.Services.Implementations
             {
                 throw new ItemNotFoundException(typeof(ShoppingList), listId);
             }
-            var deleteItem = list.Items.FirstOrDefault(i => i.Id == itemId);
-            if (deleteItem == null)
-            {
-                throw new ItemNotFoundException(typeof(ShoppingListItem), itemId);
-            }
 
-            list.Items.Remove(deleteItem);
+            var items = await _context.ShoppingListItems.FirstOrDefaultAsync(i => i.ShoppingListId == listId && i.ProductItemId == itemId);
+            if (items != null)
+            {
+                _context.ShoppingListItems.Remove(items);
+            }
 
             await _context.SaveChangesAsync();
 
@@ -112,7 +119,7 @@ namespace Shopping.Server.Services.Implementations
 
         public async Task<bool> IsOfUserAsync(ShoppingList list, string userId)
         {
-            bool isListOwner = list.Owner.Id == userId;
+            bool isListOwner = list.OwnerId == userId;
             if (isListOwner) { return true; }
 
             var userGroupsOfList = await _groupListAssignments.GetUserGroupsOfShoppingListAsync(list.Id);
@@ -154,7 +161,7 @@ namespace Shopping.Server.Services.Implementations
 
             existing.Name = item.Name;
             existing.ListDate = item.ListDate;
-            existing.Owner = item.Owner;
+            existing.OwnerId = item.OwnerId;
 
             var deleteItems = existing.Items
                 .Where(i => !item.Items.Any(j => j.ProductItemId == i.ProductItemId))

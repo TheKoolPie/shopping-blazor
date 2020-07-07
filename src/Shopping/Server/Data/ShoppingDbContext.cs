@@ -3,6 +3,7 @@ using Shopping.Client.Pages;
 using Shopping.Shared;
 using Shopping.Shared.Data;
 using Shopping.Shared.Data.Abstractions;
+using Shopping.Shared.Model.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,9 @@ namespace Shopping.Server.Data
         public DbSet<ProductItem> Products { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
         public DbSet<ShoppingList> ShoppingLists { get; set; }
+        public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
         public DbSet<UserGroupShoppingList> UserGroupShoppingLists { get; set; }
+        public DbSet<UserGroupMembers> UserGroupMembers { get; set; }
 
         public ShoppingDbContext() : base() { }
         public ShoppingDbContext(DbContextOptions<ShoppingDbContext> options) : base(options)
@@ -25,19 +28,6 @@ namespace Shopping.Server.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder
-                .Entity<ShoppingList>()
-                .OwnsMany(l => l.Items);
-            modelBuilder
-                .Entity<ShoppingList>()
-                .OwnsOne(l => l.Owner);
-            modelBuilder
-                .Entity<UserGroup>()
-                .OwnsMany(l => l.Members);
-            modelBuilder
-                .Entity<UserGroup>()
-                .OwnsOne(l => l.Owner);
-
             base.OnModelCreating(modelBuilder);
         }
     }

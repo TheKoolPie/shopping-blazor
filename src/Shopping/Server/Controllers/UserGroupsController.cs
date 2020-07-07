@@ -53,7 +53,7 @@ namespace Shopping.Server.Controllers
 
             foreach (var group in groups)
             {
-                group.Owner = await _userRepository.GetUserByIdAsync(group.Owner.Id);
+                group.Owner = await _userRepository.GetUserByIdAsync(group.OwnerId);
             }
 
             return Ok(groups);
@@ -74,7 +74,7 @@ namespace Shopping.Server.Controllers
                     return Unauthorized();
                 }
 
-                group.Owner = await _userRepository.GetUserByIdAsync(group.Owner.Id);
+                group.Owner = await _userRepository.GetUserByIdAsync(group.OwnerId);
                 foreach (var member in group.Members)
                 {
                     var dbUser = await _userRepository.GetUserByIdAsync(member.Id);
@@ -122,17 +122,8 @@ namespace Shopping.Server.Controllers
         public async Task<ActionResult<UserGroup>> CreateUserGroup(UserGroup group)
         {
             var user = await _userProvider.GetUserAsync();
-            group.Owner = new ShoppingUserModel()
-            {
-                Id = user.Id
-            };
-            group.Members = new List<ShoppingUserModel>()
-            {
-                new ShoppingUserModel()
-                {
-                    Id = user.Id
-                }
-            };
+
+            group.OwnerId = user.Id;
 
             UserGroup created = null;
             try
@@ -166,7 +157,7 @@ namespace Shopping.Server.Controllers
             try
             {
                 var group = await _userGroups.AddUserToGroup(id, user);
-                group.Owner = await _userRepository.GetUserByIdAsync(group.Owner.Id);
+                group.Owner = await _userRepository.GetUserByIdAsync(group.OwnerId);
                 foreach (var member in group.Members)
                 {
                     var dbUser = await _userRepository.GetUserByIdAsync(member.Id);
@@ -198,7 +189,7 @@ namespace Shopping.Server.Controllers
             try
             {
                 var group = await _userGroups.RemoveUserFromGroup(id, user);
-                group.Owner = await _userRepository.GetUserByIdAsync(group.Owner.Id);
+                group.Owner = await _userRepository.GetUserByIdAsync(group.OwnerId);
                 foreach (var member in group.Members)
                 {
                     var dbUser = await _userRepository.GetUserByIdAsync(member.Id);

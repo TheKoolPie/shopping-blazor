@@ -2373,12 +2373,7 @@ namespace Shopping.Shared.UnitTests.TestData
                         new UserGroup
                         {
                             Name = "Philipp\u0026Zaira",
-                            Owner = new ShoppingUserModel
-                            {
-                                Id = "9f7b66b5-32b8-4ccd-8ec9-b64c7e95b33d",
-                                UserName = null,
-                                Email = null
-                            },
+                            OwnerId = "9f7b66b5-32b8-4ccd-8ec9-b64c7e95b33d",
                             ShoppingLists = new List<ShoppingList>(),
                             Members = new List<ShoppingUserModel>
                             {

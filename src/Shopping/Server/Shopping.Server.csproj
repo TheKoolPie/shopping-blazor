@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
+    <Folder Include="Data\Migrations\ShoppingDb\" />
   </ItemGroup>
 
 

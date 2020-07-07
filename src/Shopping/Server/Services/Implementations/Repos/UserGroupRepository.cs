@@ -28,6 +28,10 @@ namespace Shopping.Server.Services.Implementations
         public async Task<List<UserGroup>> GetAllAsync()
         {
             var groups = await _context.UserGroups.ToListAsync();
+            foreach (var group in groups)
+            {
+                group.Owner = await _userRepository.GetUserByIdAsync(group.OwnerId);
+            }
             return groups;
         }
 
@@ -38,6 +42,7 @@ namespace Shopping.Server.Services.Implementations
             {
                 throw new ItemNotFoundException(typeof(UserGroup), id);
             }
+            group.Owner = await _userRepository.GetUserByIdAsync(group.OwnerId);
             return group;
         }
 
@@ -54,7 +59,7 @@ namespace Shopping.Server.Services.Implementations
         }
         private bool UserIsInGroup(UserGroup group, string userId)
         {
-            bool isOwner = group.Owner.Id == userId;
+            bool isOwner = group.OwnerId == userId;
             bool isMember = group.Members.Select(x => x.Id).Contains(userId);
 
             return isOwner || isMember;
@@ -75,9 +80,10 @@ namespace Shopping.Server.Services.Implementations
                 throw new ItemAlreadyExistsException($"User with '{existingUser.UserName} already exists in group: '{group.Name}'");
             }
 
-            group.Members.Add(new ShoppingUserModel()
+            _context.UserGroupMembers.Add(new UserGroupMembers
             {
-                Id = existingUser.Id
+                MemberId = existingUser.Id,
+                UserGroupId = userGroupId
             });
 
             await _context.SaveChangesAsync();
@@ -93,16 +99,9 @@ namespace Shopping.Server.Services.Implementations
             {
                 throw new ItemNotFoundException($"No user with provided user data found");
             }
-            var groupMember = group.Members.FirstOrDefault(m => m.Id == existingUser.Id);
-            if (groupMember == null)
-            {
-                throw new ItemNotFoundException($"User not in group: '{group.Name}'");
-            }
 
-            if (!group.Members.Remove(groupMember))
-            {
-                throw new Exception("Could not remove member");
-            }
+            var assignment = await _context.UserGroupMembers.FirstOrDefaultAsync(c => c.UserGroupId == userGroupId && c.MemberId == user.Id);
+            _context.UserGroupMembers.Remove(assignment);
 
             await _context.SaveChangesAsync();
 
@@ -118,9 +117,13 @@ namespace Shopping.Server.Services.Implementations
                 throw new ItemNotFoundException(typeof(UserGroup), userGroupId);
             }
             List<ShoppingUserModel> users = new List<ShoppingUserModel>();
-            foreach (var member in group.Members)
+
+            var allAssignments = await _context.UserGroupMembers.ToListAsync();
+            var assignmentsOfGroup = allAssignments.Where(g => g.UserGroupId == userGroupId).ToList();
+
+            foreach (var member in assignmentsOfGroup)
             {
-                var userData = await _userRepository.GetUserAsync(member);
+                var userData = await _userRepository.GetUserAsync(new ShoppingUserModel { Id = member.MemberId });
                 users.Add(userData);
             }
             return users;
@@ -131,6 +134,10 @@ namespace Shopping.Server.Services.Implementations
             List<UserGroup> commonLists = new List<UserGroup>();
 
             var allGroups = await GetAllOfUserAsync(userOneId);
+            foreach (var group in allGroups)
+            {
+                group.Members = await GetUsersInGroup(group.Id);
+            }
             if (allGroups.Count > 0)
             {
                 commonLists
@@ -160,8 +167,7 @@ namespace Shopping.Server.Services.Implementations
             }
             var existing = await GetAsync(id);
             existing.Name = item.Name;
-            existing.Owner = item.Owner;
-            existing.Members = new List<ShoppingUserModel>(item.Members);
+            existing.OwnerId = item.OwnerId;
 
             await _context.SaveChangesAsync();
 

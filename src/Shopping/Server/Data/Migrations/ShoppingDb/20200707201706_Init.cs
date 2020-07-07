@@ -29,11 +29,25 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                     CreatedAt = table.Column<DateTime>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     ListDate = table.Column<DateTime>(nullable: false),
-                    Owner_Id = table.Column<string>(nullable: true)
+                    OwnerId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ShoppingLists", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserGroupMembers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: true),
+                    UserGroupId = table.Column<string>(nullable: false),
+                    MemberId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserGroupMembers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -43,7 +57,7 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                     Id = table.Column<string>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: true),
                     Name = table.Column<string>(nullable: false),
-                    Owner_Id = table.Column<string>(nullable: true)
+                    OwnerId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -72,31 +86,13 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserGroups_Members",
-                columns: table => new
-                {
-                    Id = table.Column<string>(nullable: false),
-                    UserGroupId = table.Column<string>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserGroups_Members", x => new { x.UserGroupId, x.Id });
-                    table.ForeignKey(
-                        name: "FK_UserGroups_Members_UserGroups_UserGroupId",
-                        column: x => x.UserGroupId,
-                        principalTable: "UserGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserGroupShoppingLists",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: true),
-                    UserGroupId = table.Column<string>(nullable: true),
-                    ShoppingListId = table.Column<string>(nullable: true)
+                    UserGroupId = table.Column<string>(nullable: false),
+                    ShoppingListId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -106,41 +102,41 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                         column: x => x.ShoppingListId,
                         principalTable: "ShoppingLists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserGroupShoppingLists_UserGroups_UserGroupId",
                         column: x => x.UserGroupId,
                         principalTable: "UserGroups",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ShoppingListItem",
+                name: "ShoppingListItems",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    ShoppingListId = table.Column<string>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: true),
                     ProductItemId = table.Column<string>(nullable: true),
+                    ShoppingListId = table.Column<string>(nullable: true),
                     Amount = table.Column<float>(nullable: false),
                     Done = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShoppingListItem", x => new { x.ShoppingListId, x.Id });
+                    table.PrimaryKey("PK_ShoppingListItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ShoppingListItem_Products_ProductItemId",
+                        name: "FK_ShoppingListItems_Products_ProductItemId",
                         column: x => x.ProductItemId,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ShoppingListItem_ShoppingLists_ShoppingListId",
+                        name: "FK_ShoppingListItems_ShoppingLists_ShoppingListId",
                         column: x => x.ShoppingListId,
                         principalTable: "ShoppingLists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -149,9 +145,14 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShoppingListItem_ProductItemId",
-                table: "ShoppingListItem",
+                name: "IX_ShoppingListItems_ProductItemId",
+                table: "ShoppingListItems",
                 column: "ProductItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShoppingListItems_ShoppingListId",
+                table: "ShoppingListItems",
+                column: "ShoppingListId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserGroupShoppingLists_ShoppingListId",
@@ -167,10 +168,10 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ShoppingListItem");
+                name: "ShoppingListItems");
 
             migrationBuilder.DropTable(
-                name: "UserGroups_Members");
+                name: "UserGroupMembers");
 
             migrationBuilder.DropTable(
                 name: "UserGroupShoppingLists");
