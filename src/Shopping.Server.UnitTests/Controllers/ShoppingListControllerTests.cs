@@ -243,7 +243,7 @@ namespace Shopping.Server.UnitTests.Controllers
             var result = response.Result as OkObjectResult;
             var list = result.Value as ShoppingList;
 
-            Assert.Equal(UserMocks.AdminUser.Id, list.Owner.Id);
+            Assert.Equal(UserMocks.AdminUser.Id, list.OwnerId);
         }
 
         [Fact]

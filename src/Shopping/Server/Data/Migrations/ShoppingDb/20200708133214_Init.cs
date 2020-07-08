@@ -91,8 +91,8 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                 {
                     Id = table.Column<string>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: true),
-                    UserGroupId = table.Column<string>(nullable: false),
-                    ShoppingListId = table.Column<string>(nullable: false)
+                    UserGroupId = table.Column<string>(nullable: true),
+                    ShoppingListId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -102,13 +102,13 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                         column: x => x.ShoppingListId,
                         principalTable: "ShoppingLists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserGroupShoppingLists_UserGroups_UserGroupId",
                         column: x => x.UserGroupId,
                         principalTable: "UserGroups",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(

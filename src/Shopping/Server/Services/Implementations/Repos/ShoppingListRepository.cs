@@ -46,6 +46,9 @@ namespace Shopping.Server.Services.Implementations
                 throw new ItemNotFoundException(typeof(ShoppingList), id);
             }
             list.Owner = await _userRepository.GetUserByIdAsync(list.OwnerId);
+
+            list.Items = await GetItemsOfList(id);
+
             foreach (var item in list.Items)
             {
                 item.ProductItem = await GetProductAsync(item.ProductItemId);
@@ -56,10 +59,11 @@ namespace Shopping.Server.Services.Implementations
         public async Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item)
         {
             var list = await GetAsync(listId);
+
+            item.ShoppingListId = listId;
             item.ProductItem = await GetProductAsync(item.ProductItemId);
 
-            var allItems = await _context.ShoppingListItems.ToListAsync();
-            var itemsOfList = allItems.Where(i => i.ShoppingListId == listId);
+            var itemsOfList = await GetItemsOfList(listId);
 
             var existing = itemsOfList.FirstOrDefault(i => i.ProductItemId == item.ProductItemId);
             if (existing == null)
@@ -170,19 +174,19 @@ namespace Shopping.Server.Services.Implementations
 
             foreach (var deleteId in deleteItems)
             {
-                var delete = existing.Items.FirstOrDefault(i => i.Id == deleteId);
+                var delete = await _context.ShoppingListItems.FirstOrDefaultAsync(i => i.Id == deleteId);
                 if (delete != null)
                 {
-                    existing.Items.Remove(delete);
+                    _context.ShoppingListItems.Remove(delete);
                 }
             }
 
             foreach (var updateItem in item.Items)
             {
-                var existingItem = existing.Items.FirstOrDefault(i => i.Id == updateItem.Id);
+                var existingItem = await _context.ShoppingListItems.FirstOrDefaultAsync(i => i.Id == updateItem.Id);
                 if (existing == null)
                 {
-                    existing.Items.Add(updateItem);
+                    _context.ShoppingListItems.Add(updateItem);
                 }
                 else
                 {
@@ -201,6 +205,7 @@ namespace Shopping.Server.Services.Implementations
             var existing = await GetAsync(id);
 
             await RemoveAssignmentsOfShoppingListAsync(id);
+            await DeleteAllItemsOfList(id);
 
             _context.ShoppingLists.Remove(existing);
 
@@ -255,6 +260,15 @@ namespace Shopping.Server.Services.Implementations
         {
             return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
         }
+        private async Task DeleteAllItemsOfList(string shoppingListId)
+        {
+            var allItems = await _context.ShoppingListItems.ToListAsync();
+            var itemsOfList = allItems.Where(i => i.ShoppingListId == shoppingListId).ToList();
+            foreach (var item in itemsOfList)
+            {
+                _context.ShoppingListItems.Remove(item);
+            }
+        }
         private async Task<bool> RemoveAssignmentsOfShoppingListAsync(string shoppingListId)
         {
             var allAssignmentsOfList = (await _groupListAssignments.GetAllAsync())
@@ -273,6 +287,12 @@ namespace Shopping.Server.Services.Implementations
                 }
             }
             return true;
+        }
+
+        private async Task<List<ShoppingListItem>> GetItemsOfList(string id)
+        {
+            var items = await _context.ShoppingListItems.ToListAsync();
+            return items.Where(c => c.ShoppingListId == id).ToList();
         }
     }
 }

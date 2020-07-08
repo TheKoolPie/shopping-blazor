@@ -9,7 +9,7 @@ using Shopping.Server.Data;
 namespace Shopping.Server.Data.Migrations.ShoppingDb
 {
     [DbContext(typeof(ShoppingDbContext))]
-    [Migration("20200707201706_Init")]
+    [Migration("20200708133214_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -168,11 +168,9 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("ShoppingListId")
-                        .IsRequired()
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
 
                     b.Property<string>("UserGroupId")
-                        .IsRequired()
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
@@ -199,7 +197,7 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                         .WithMany()
                         .HasForeignKey("ProductItemId");
 
-                    b.HasOne("Shopping.Shared.Data.ShoppingList", "ShoppingList")
+                    b.HasOne("Shopping.Shared.Data.ShoppingList", null)
                         .WithMany("Items")
                         .HasForeignKey("ShoppingListId");
                 });
@@ -208,15 +206,11 @@ namespace Shopping.Server.Data.Migrations.ShoppingDb
                 {
                     b.HasOne("Shopping.Shared.Data.ShoppingList", "ShoppingList")
                         .WithMany()
-                        .HasForeignKey("ShoppingListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ShoppingListId");
 
                     b.HasOne("Shopping.Shared.Data.UserGroup", "UserGroup")
                         .WithMany()
-                        .HasForeignKey("UserGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserGroupId");
                 });
 #pragma warning restore 612, 618
         }

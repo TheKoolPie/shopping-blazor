@@ -12,8 +12,6 @@ namespace Shopping.Shared.Data
         public ProductItem ProductItem { get; set; }
 
         public string ShoppingListId { get; set; }
-        public ShoppingList ShoppingList { get; set; }
-
 
         [Required(ErrorMessage = "Amount is needed")]
         [Range(float.Epsilon, float.MaxValue, ErrorMessage = "Please select value greater than 0")]
