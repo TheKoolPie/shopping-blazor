@@ -43,10 +43,11 @@ namespace Shopping.Server.Controllers
             _logger.LogInformation("Check user data in user groups");
             foreach (var group in model.UserGroups)
             {
-                var owner = await _users.GetUserByIdAsync(group.Owner.Id);
+                var owner = await _users.GetUserByIdAsync(group.OwnerId);
                 if (owner == null)
                 {
                     _logger.LogInformation($"Replace owner in group: {group.Id}");
+                    group.OwnerId = fallbackUser.Id;
                     group.Owner = fallbackUser;
                 }
                 for (int i = group.Members.Count - 1; i > 0; i--)
@@ -63,10 +64,11 @@ namespace Shopping.Server.Controllers
             _logger.LogInformation("Check user data in shopping lists");
             foreach (var list in model.ShoppingLists)
             {
-                var owner = await _users.GetUserByIdAsync(list.Owner.Id);
+                var owner = await _users.GetUserByIdAsync(list.OwnerId);
                 if (owner == null)
                 {
                     _logger.LogInformation($"Replace owner in list: {list.Id}");
+                    list.OwnerId = fallbackUser.Id;
                     list.Owner = fallbackUser;
                 }
             }

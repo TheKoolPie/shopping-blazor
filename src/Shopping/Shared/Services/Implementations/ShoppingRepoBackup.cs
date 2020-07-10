@@ -1,4 +1,5 @@
-﻿using Shopping.Shared.Data.Abstractions;
+﻿using Shopping.Shared.Data;
+using Shopping.Shared.Data.Abstractions;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Serialization;
 using Shopping.Shared.Services.Interfaces;
@@ -44,19 +45,59 @@ namespace Shopping.Shared.Services.Implementations
                 {
                     _repository.Categories.Add(category);
                 }
+
+                await _repository.SaveChangesAsync();
+
                 foreach (var product in data.Products)
                 {
                     product.Category = await _repository.Categories.FirstOrDefaultAsync(c => c.Id == product.CategoryId);
                     _repository.Products.Add(product);
                 }
+
+                await _repository.SaveChangesAsync();
+
                 foreach (var group in data.UserGroups)
                 {
                     _repository.UserGroups.Add(group);
+                    foreach (var member in group.Members)
+                    {
+                        _repository.UserGroupMembers.Add(new Data.UserGroupMembers
+                        {
+                            MemberId = member.Id,
+                            UserGroupId = group.Id
+                        });
+                    }
                 }
-                foreach (var lists in data.ShoppingLists)
+
+                await _repository.SaveChangesAsync();
+
+                List<ShoppingListItem> shoppinglistitems = new List<ShoppingListItem>();
+
+                foreach (var list in data.ShoppingLists)
                 {
-                    _repository.ShoppingLists.Add(lists);
+                    foreach (var item in list.Items)
+                    {
+                        item.ShoppingListId = list.Id;
+                        shoppinglistitems.Add(item);
+                    }
+                    list.Items.Clear();
+
+                    _repository.ShoppingLists.Add(list);
                 }
+
+                await _repository.SaveChangesAsync();
+
+                foreach (var item in shoppinglistitems)
+                {
+                    item.ProductItem = await _repository.Products.FirstOrDefaultAsync(p => p.Id == item.ProductItemId);
+                    if (item.ProductItem != null)
+                    {
+                        _repository.ShoppingListItems.Add(item);
+                    }
+                }
+
+                await _repository.SaveChangesAsync();
+
                 foreach (var assignments in data.UserGroupShoppingLists)
                 {
                     _repository.UserGroupShoppingLists.Add(assignments);
