@@ -260,7 +260,10 @@ namespace Shopping.Server.Services.Implementations
 
         private async Task<ProductItem> GetProductAsync(string id)
         {
-            return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            product.Category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == product.CategoryId);
+
+            return product;
         }
         private async Task DeleteAllItemsOfList(string shoppingListId)
         {
