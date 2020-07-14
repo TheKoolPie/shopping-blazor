@@ -29,11 +29,10 @@ namespace Shopping.Server.Services.Implementations
             var lists = await _context.ShoppingLists.ToListAsync();
             foreach (var list in lists)
             {
+                var items = await GetItemsOfList(list.Id);
+                list.ListDone = items.All(i => i.Done);
+                list.ItemCount = items.Count;
                 list.Owner = await _userRepository.GetUserByIdAsync(list.OwnerId);
-                foreach (var item in list.Items)
-                {
-                    item.ProductItem = await GetProductAsync(item.ProductItemId);
-                }
             }
             return lists;
         }
@@ -48,6 +47,9 @@ namespace Shopping.Server.Services.Implementations
             list.Owner = await _userRepository.GetUserByIdAsync(list.OwnerId);
 
             list.Items = await GetItemsOfList(id);
+
+            list.ItemCount = list.Items.Count;
+            list.ListDone = list.Items.All(i => i.Done);
 
             foreach (var item in list.Items)
             {

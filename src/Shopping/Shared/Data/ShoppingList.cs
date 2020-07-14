@@ -15,14 +15,19 @@ namespace Shopping.Shared.Data
         public DateTime ListDate { get; set; }
 
         public string OwnerId { get; set; }
+
         [NotMapped]
         public ShoppingUserModel Owner { get; set; }
-
         [NotMapped]
         public List<UserGroup> UserGroups { get; set; }
 
         public List<ShoppingListItem> Items { get; set; }
 
+
+        [NotMapped]
+        public int ItemCount { get; set; }
+        [NotMapped]
+        public bool ListDone { get; set; }
 
         public ShoppingList()
         {
