@@ -29,9 +29,17 @@ namespace Shopping.Client.Services.Implementations
             _authService = authService;
         }
 
-        public Task ExportDataJsonAsync(string filePath)
+        public async Task ExportDataJsonAsync(string filePath)
         {
-            throw new NotImplementedException();
+            var client = await _authService.GetHttpClientAsync();
+
+            var response = await client.GetAsync($"{uri}/{filePath}");
+
+            var result = await response.Content.ReadFromJsonAsync<DatabaseBackupResult>();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(result.CompleteErrorMessage);
+            }
         }
 
         public async Task ImportDataAsync(ShoppingDataSerializationModel data)

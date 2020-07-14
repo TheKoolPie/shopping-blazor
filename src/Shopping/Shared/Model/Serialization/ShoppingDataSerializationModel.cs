@@ -2,6 +2,7 @@
 using Shopping.Shared.Data.Abstractions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Shopping.Shared.Model.Serialization
@@ -27,8 +28,37 @@ namespace Shopping.Shared.Model.Serialization
             Categories = dataRepo.Categories?.ToList() ?? new List<ProductCategory>();
             Products = dataRepo.Products?.ToList() ?? new List<ProductItem>();
             UserGroups = dataRepo.UserGroups?.ToList() ?? new List<UserGroup>();
+            foreach (var group in UserGroups)
+            {
+                var members = dataRepo.UserGroupMembers.ToList();
+                var membersOfGroup = members.Where(m => m.UserGroupId == group.Id);
+                group.Members = new List<Account.ShoppingUserModel>();
+                foreach (var member in membersOfGroup)
+                {
+                    group.Members.Add(new Account.ShoppingUserModel
+                    {
+                        Id = member.MemberId
+                    });
+                }
+            }
             ShoppingLists = dataRepo.ShoppingLists?.ToList() ?? new List<ShoppingList>();
+            foreach (var list in ShoppingLists)
+            {
+                var listItems = dataRepo.ShoppingListItems.ToList();
+                var itemsOfList = listItems.Where(i => i.ShoppingListId == list.Id);
+                list.Items = new List<ShoppingListItem>();
+                foreach (var item in itemsOfList)
+                {
+                    item.ProductItem = null;
+                    list.Items.Add(item);
+                }
+            }
             UserGroupShoppingLists = dataRepo.UserGroupShoppingLists?.ToList() ?? new List<UserGroupShoppingList>();
+            foreach (var assignment in UserGroupShoppingLists)
+            {
+                assignment.ShoppingList = null;
+                assignment.UserGroup = null;
+            }
         }
     }
 }

@@ -69,6 +69,9 @@ else
             </div>
         </div>
     }
+    <h3>Export backup</h3>
+    <hr />
+    <button class="btn btn-primary" @onclick="CreateExportFile">Create Export file</button>
 }
 @code {
     ShoppingDataSerializationModel serializedModel;
@@ -80,6 +83,7 @@ else
     async Task HandleFileSelected(IFileListEntry[] files)
     {
         IsProcessing = true;
+        importError = null;
         var file = files.FirstOrDefault();
         if (file != null)
         {
@@ -107,6 +111,22 @@ else
         }
         serializedModel = null;
         IsImporting = false;
+    }
+
+    private async Task CreateExportFile()
+    {
+        IsProcessing = true;
+
+        try
+        {
+            await BackupService.ExportDataJsonAsync($"{DateTime.Now:ddMMyy}");
+        }
+        catch (Exception e)
+        {
+            importError = AlertComponentModel.CreateErrorAlert("Could not create export file", e.Message);
+        }
+
+        IsProcessing = false;
     }
     private void HandleReset()
     {

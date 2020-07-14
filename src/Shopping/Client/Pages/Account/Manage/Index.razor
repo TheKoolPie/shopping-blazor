@@ -243,7 +243,7 @@ else
                     var result = await UserRepo.UpdateUserData(currentUser.Id, userEditModel);
                     await AuthService.Logout();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     updateUserDataAlert = AlertComponentModel.CreateErrorAlert("Could not update user data");
                 }

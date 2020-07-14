@@ -6,6 +6,7 @@ using Shopping.Shared.Model.Account;
 using Shopping.Shared.Model.Serialization;
 using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
+using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -29,6 +30,31 @@ namespace Shopping.Server.Controllers
             _currentUser = currentUser;
             _users = users;
             _logger = logger;
+        }
+
+        [HttpGet("{filePath}")]
+        public async Task<ActionResult<DatabaseBackupResult>> ExportData(string filePath)
+        {
+            string targetFileName = $"ExportShopping_{DateTime.UtcNow:ddMMyy}.json";
+            var backUpDir = Path.Combine(Directory.GetCurrentDirectory(), "DbBackups");
+            if (!Directory.Exists(backUpDir))
+            {
+                Directory.CreateDirectory(backUpDir);
+            }
+
+            DatabaseBackupResult result = new DatabaseBackupResult();
+            try
+            {
+                await _backup.ExportDataJsonAsync(Path.Combine(backUpDir, targetFileName));
+            }
+            catch (Exception e)
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return Conflict(result);
+            }
+            return Ok(result);
+
         }
 
         [HttpPost]
