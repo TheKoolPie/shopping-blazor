@@ -353,3 +353,4 @@ MigrationBackup/
 .vscode/launch.json
 .vscode/tasks.json
 /src/Shopping/Server/DbBackups
+.DS_Store
