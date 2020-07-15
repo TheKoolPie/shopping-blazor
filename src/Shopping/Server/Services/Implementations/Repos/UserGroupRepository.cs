@@ -30,6 +30,7 @@ namespace Shopping.Server.Services.Implementations
             var groups = await _context.UserGroups.ToListAsync();
             foreach (var group in groups)
             {
+                group.Members = await GetUsersInGroup(group.Id);
                 group.Owner = await _userRepository.GetUserByIdAsync(group.OwnerId);
             }
             return groups;
@@ -42,6 +43,7 @@ namespace Shopping.Server.Services.Implementations
             {
                 throw new ItemNotFoundException(typeof(UserGroup), id);
             }
+            group.Members = await GetUsersInGroup(group.Id);
             group.Owner = await _userRepository.GetUserByIdAsync(group.OwnerId);
             return group;
         }
@@ -111,11 +113,6 @@ namespace Shopping.Server.Services.Implementations
 
         public async Task<List<ShoppingUserModel>> GetUsersInGroup(string userGroupId)
         {
-            var group = await GetAsync(userGroupId);
-            if (group == null)
-            {
-                throw new ItemNotFoundException(typeof(UserGroup), userGroupId);
-            }
             List<ShoppingUserModel> users = new List<ShoppingUserModel>();
 
             var allAssignments = await _context.UserGroupMembers.ToListAsync();
