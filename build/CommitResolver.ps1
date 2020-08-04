@@ -38,6 +38,9 @@ foreach ($branch in $branches) {
 
     if ($commitsInBranch) {
         $changedFiles = Get-DistinctChangedFilesOfCommits $commitsInBranch
+
+        Write-Output("Changes on branch: " + $branch.Replace("origin/",""))
+        Write-Output $changedFiles
     }
 }
 
