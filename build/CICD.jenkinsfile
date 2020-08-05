@@ -5,7 +5,7 @@ pipeline {
         stage('Build') {
             steps {
 
-                echo "${WORKSPACE}!s"
+                echo "${WORKSPACE}!s-merge"
             }
         }
         stage('Test') {
