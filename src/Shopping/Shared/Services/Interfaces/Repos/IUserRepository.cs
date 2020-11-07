@@ -1,5 +1,6 @@
 ﻿using Shopping.Shared.Data;
 using Shopping.Shared.Model.Account;
+using Shopping.Shared.Results.Account;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,5 +16,6 @@ namespace Shopping.Shared.Services.Interfaces
         Task<List<string>> GetRolesOfUserAsync(ShoppingUserModel userModel);
         Task<ShoppingUserModel> GetUserAsync(ShoppingUserModel userModel);
         Task<ShoppingUserModel> UpdateUserData(string id, ShoppingUserModel updateData);
+        Task<ShoppingUserSettingsModel> UpdateUserSettingsAsync(string userId, ShoppingUserSettingsModel settingsData);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
+using Shopping.Shared.Results.Account;
 using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
@@ -57,7 +58,7 @@ namespace Shopping.Client.Services.Implementations
         public async Task<ShoppingUserModel> UpdateUserData(string id, ShoppingUserModel updateData)
         {
             var client = await _authService.GetHttpClientAsync();
-            var response = await client.PutAsJsonAsync($"{BaseAddress}/{id}",updateData);
+            var response = await client.PutAsJsonAsync($"{BaseAddress}/{id}", updateData);
 
             var resultObject = await response.Content.ReadFromJsonAsync<ShoppingUserResult>();
             if (!response.IsSuccessStatusCode)
@@ -66,6 +67,19 @@ namespace Shopping.Client.Services.Implementations
             }
 
             return resultObject.ResultData.FirstOrDefault();
+        }
+
+        public async Task<ShoppingUserSettingsModel> UpdateUserSettingsAsync(string userId, ShoppingUserSettingsModel settingsData)
+        {
+            var client = await _authService.GetHttpClientAsync();
+            var response = await client.PutAsJsonAsync($"{BaseAddress}/UpdateUserSettings/{userId}", settingsData);
+            var resultObject = await response.Content.ReadFromJsonAsync<UpdateUserSettingsResult>();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(resultObject.CompleteErrorMessage);
+            }
+            return resultObject.ResultData.FirstOrDefault();
+
         }
     }
 }

@@ -38,12 +38,7 @@ namespace Shopping.Server.Services
                 }
                 if (dbUser != null)
                 {
-                    user = new ShoppingUserModel()
-                    {
-                        Id = dbUser.Id,
-                        Email = dbUser.Email,
-                        UserName = dbUser.UserName
-                    };
+                    user = GetUserModelFromDbData(dbUser);
                 }
             }
             return user;
@@ -75,6 +70,22 @@ namespace Shopping.Server.Services
             }
 
             return result;
+        }
+
+        public ShoppingUserModel GetUserModelFromDbData(ShoppingUser dbUser)
+        {
+            return new ShoppingUserModel
+            {
+                Id = dbUser.Id,
+                Email = dbUser.Email,
+                UserName = dbUser.UserName,
+                Settings = new ShoppingUserSettingsModel
+                {
+                    FirstName = dbUser.FirstName,
+                    LastName = dbUser.LastName,
+                    StandardUserGroupId = dbUser.StandardUserGroupId
+                }
+            };
         }
     }
 }

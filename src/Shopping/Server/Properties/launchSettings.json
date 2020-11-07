@@ -19,7 +19,7 @@
     "Shopping.Server": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "database/backup",
+      "launchUrl": "lists",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

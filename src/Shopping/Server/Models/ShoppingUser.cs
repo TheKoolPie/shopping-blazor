@@ -10,5 +10,6 @@ namespace Shopping.Server.Models
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string StandardUserGroupId { get; set; }
     }
 }

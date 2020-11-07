@@ -1,6 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IAuthService AuthService
-@inject ICurrentUserProvider CurrentUserProvider
 
 <div class="container">
     <div class="row">
@@ -46,27 +45,27 @@
 </div>
 
 @code {
+
+    [Parameter]
+    public ShoppingUserModel CurrentUser { get; set; }
+
     bool IsLoading;
 
     AlertComponentModel deleteUserDataAlert;
-
-    ShoppingUserModel currentUser = new ShoppingUserModel();
     DeleteUserModel deleteUserModel = new DeleteUserModel();
 
     bool DeleteUserConfirmed = false;
 
-    protected async override Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         IsLoading = true;
-
-        currentUser = await CurrentUserProvider.GetUserAsync();
 
         IsLoading = false;
     }
 
     private async Task OnDeleteUser()
     {
-        deleteUserModel = new DeleteUserModel() { UserId = currentUser.Id };
+        deleteUserModel = new DeleteUserModel() { UserId = CurrentUser.Id };
 
         var deleteUserResult = await AuthService.DeleteUser(deleteUserModel);
         if (deleteUserResult.IsSuccessful)
