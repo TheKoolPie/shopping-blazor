@@ -1,14 +1,23 @@
 ﻿@page "/lists"
 @inject NavigationManager NavigationManager
 @inject IShoppingLists ShoppingListRepo
+@inject ICurrentUserProvider CurrentUserProvider
 @attribute [Authorize]
 
 <h3>Shopping lists</h3>
 <hr />
 <div class="row">
+    @if (CanCreateStandard)
+    {
+        <div class="col">
+            <button class="btn btn-primary" type="button" @onclick="CreateStandardList">
+                <span class="oi oi-calendar" />New standard
+            </button>
+        </div>
+    }
     <div class="col">
         <button class="btn btn-primary" type="button" @onclick="NavigateToCreatePage">
-            <span class="oi oi-plus" /> Create new
+            <span class="oi oi-plus" /> New custom
         </button>
     </div>
 </div>
@@ -66,12 +75,21 @@ else
 @code {
     private bool IsLoading = false;
     private List<ShoppingList> _shoppingLists = new List<ShoppingList>();
+    ShoppingUserModel currentUser = new ShoppingUserModel();
+    private bool CanCreateStandard = false;
+    private bool ListForTodayExists = false;
 
     protected async override Task OnInitializedAsync()
     {
         IsLoading = true;
+
+        currentUser = await CurrentUserProvider.GetUserAsync();
+
         _shoppingLists = (await ShoppingListRepo.GetAllAsync())
-            .OrderByDescending(l=>l.ListDate).ToList();
+        .OrderByDescending(l => l.ListDate).ToList();
+        ListForTodayExists = _shoppingLists.Any(l => l.ListDate.Date == DateTime.Now.Date);
+        CanCreateStandard = !string.IsNullOrEmpty(currentUser.Settings.StandardUserGroupId) && !ListForTodayExists;
+
         IsLoading = false;
     }
     private void NavigateToDetails(string id)
@@ -81,5 +99,9 @@ else
     private void NavigateToCreatePage()
     {
         NavigationManager.NavigateTo("/lists/create");
+    }
+    private void CreateStandardList()
+    {
+        NavigationManager.NavigateTo($"lists/create/{currentUser.Settings.StandardUserGroupId}/true");
     }
 }
