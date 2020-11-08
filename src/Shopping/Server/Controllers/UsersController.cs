@@ -116,7 +116,7 @@ namespace Shopping.Server.Controllers
                 result.ErrorMessages.Add("Not authorized to access this resource");
                 return Unauthorized(result);
             }
-            var updateResult = _userRepository.UpdateUserSettingsAsync(id, settings);
+            var updateResult = await _userRepository.UpdateUserSettingsAsync(id, settings);
             if (updateResult == null)
             {
                 result.IsSuccessful = false;

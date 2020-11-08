@@ -25,7 +25,7 @@ namespace Shopping.Server.Controllers
         private readonly ICurrentUserProvider _userProvider;
         private readonly IUserRepository _userRepository;
         private readonly IUserGroupShoppingLists _userGroupShoppingListAssignments;
-        public UserGroupsController(IUserGroupRepository userGroups, ICurrentUserProvider users, 
+        public UserGroupsController(IUserGroupRepository userGroups, ICurrentUserProvider users,
             IUserRepository userRepository, IUserGroupShoppingLists userGroupShoppingListAssignments)
         {
             _userGroups = userGroups;
@@ -57,6 +57,30 @@ namespace Shopping.Server.Controllers
             }
 
             return Ok(groups);
+        }
+        [HttpGet("GetAllOfUser/{id}")]
+        public async Task<ActionResult<List<UserGroup>>> GetAllOfUser(string id)
+        {
+            UserGroupResult result = new UserGroupResult();
+            if (string.IsNullOrEmpty(id))
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("No user id provided");
+                return BadRequest(result);
+            }
+            var user = await _userProvider.GetUserAsync();
+            bool isAdmin = await _userProvider.IsUserAdminAsync();
+            bool isCurrentUser = id == user.Id;
+
+            if (!(isAdmin || isCurrentUser))
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Not authorized to access");
+                return Unauthorized(result);
+            }
+            result.IsSuccessful = true;
+            result.ResultData = await _userGroups.GetAllOfUserAsync(id);
+            return Ok(result);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<UserGroup>> GetUserGroup(string id)

@@ -138,15 +138,17 @@ namespace Shopping.Server.Services.Implementations
             ShoppingUserSettingsModel result = null;
             if (dbUser != null)
             {
-                dbUser.FirstName = settingsData.FirstName.Trim();
-                dbUser.LastName = settingsData.LastName.Trim();
-                dbUser.StandardUserGroupId = settingsData.StandardUserGroupId.Trim();
-                result = new ShoppingUserSettingsModel(settingsData);
+                dbUser.FirstName = settingsData.FirstName?.Trim() ?? null;
+                dbUser.LastName = settingsData.LastName?.Trim() ?? null;
+                dbUser.StandardUserGroupId = settingsData.StandardUserGroupId?.Trim() ?? null;
                 var updateResult = await _userManager.UpdateAsync(dbUser);
                 if (!updateResult.Succeeded)
                 {
                     _logger.LogError($"Could not update user settings for user '{userId}'", updateResult.GetErrorMessagesAsList());
-                    result = null;
+                }
+                else
+                {
+                    result = settingsData;
                 }
             }
             else
