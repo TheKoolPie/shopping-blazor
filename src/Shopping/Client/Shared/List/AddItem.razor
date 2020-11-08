@@ -1,0 +1,134 @@
+﻿@inject IProducts ProductRepo
+@inject IShoppingLists ShoppingListRepo
+@if (IsAddingItem)
+{
+    <div class="row">
+        <div class="col">
+            <CustomSpinner>
+                Adding product...
+            </CustomSpinner>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-8">
+            <EditForm EditContext="AddItemEditContext" OnSubmit="OnAddItem">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <input type="search" class="form-control" id="product-search" autocomplete="off"
+                                   placeholder="Search Products..." @bind="@ProductSearchValue" @bind:event="oninput" />
+                            @if (SearchProducts != null && SearchProducts.Count > 0)
+                            {
+                                <div class="input-search-content">
+                                    @foreach (var product in SearchProducts)
+                                    {
+                                        <a @onclick="(() => OnItemSelected(product.Key))">@product.Value</a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(Item.ProductItemId))
+                {
+                    <div class="row">
+                        <div class="col">
+                            <CustomStepper id="product-amount" @bind-StepperValue="@Item.Amount" Label="Amount"
+                                           Increment="@(_availableProducts.FirstOrDefault(p => p.Id == Item.ProductItemId)?.Unit.GetStepperIncrement() ?? 0.1f)"
+                                           Minimum="0" Maximum="(float.MaxValue)" />
+                        </div>
+                        <div class="col-4">
+                            <span class="input-group-text">
+                                @(_availableProducts.FirstOrDefault(p => p.Id == Item.ProductItemId)?.Unit.GetDescription() ?? "")
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary">Add to List</button>
+                        </div>
+                    </div>
+                }
+            </EditForm>
+
+        </div>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public string ListId { get; set; }
+    [Parameter]
+    public EventCallback<ShoppingListItem> OnItemAdded { get; set; }
+
+    List<ProductItem> _availableProducts = new List<ProductItem>();
+    Dictionary<string, string> SearchProducts = new Dictionary<string, string>();
+
+    bool IsAddingItem;
+
+    string _productSearchValue;
+    string ProductSearchValue
+    {
+        get => _productSearchValue;
+        set
+        {
+            _productSearchValue = value;
+            SetSearchDictionary();
+        }
+    }
+
+    ShoppingListItem Item = new ShoppingListItem();
+    EditContext AddItemEditContext;
+
+    protected async override Task OnInitializedAsync()
+    {
+        AddItemEditContext = new EditContext(Item);
+        _availableProducts = (await ProductRepo.GetAllAsync())
+            .OrderBy(x => x.Name)
+            .ToList();
+        SetSearchDictionary();
+    }
+
+    private async Task OnAddItem()
+    {
+        IsAddingItem = true;
+
+        if (AddItemEditContext.Validate())
+        {
+            var createdItem = await ShoppingListRepo.AddOrUpdateItemAsync(ListId, Item);
+            if (createdItem != null)
+            {
+                Item = new ShoppingListItem();
+                ProductSearchValue = "";
+            }
+            await OnItemAdded.InvokeAsync(createdItem);
+        }
+
+        IsAddingItem = false;
+    }
+    private void OnItemSelected(string id)
+    {
+        Item.ProductItemId = id;
+        _productSearchValue = SearchProducts[id];
+        SearchProducts = null;
+    }
+
+    private void SetSearchDictionary()
+    {
+        SearchProducts = null;
+        Item.ProductItemId = null;
+        if (!string.IsNullOrEmpty(_productSearchValue))
+        {
+            SearchProducts = _availableProducts
+                .Where(p => p.Name.Contains(_productSearchValue, StringComparison.InvariantCultureIgnoreCase))
+                .ToDictionary(x => x.Id, x => x.Name);
+        }
+    }
+}
