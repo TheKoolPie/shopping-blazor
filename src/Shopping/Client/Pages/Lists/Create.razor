@@ -1,5 +1,6 @@
 ﻿@page "/lists/create"
 @page "/lists/create/{groupid}"
+@page "/lists/create/{groupid}/{standard:bool}"
 
 @inject IShoppingLists ShoppingListRepo
 @inject NavigationManager NavigationManager
@@ -29,6 +30,8 @@ else
             <AlertComponent Model="@AlertData" />
         </div>
     </div>
+    @if (!Standard)
+    {
     <div class="row">
         <div class="col">
             @if (IsSaving)
@@ -44,11 +47,11 @@ else
                     <DataAnnotationsValidator />
                     <div class="form-group">
                         <label for="dateInput">Date</label>
-                        <InputDate @bind-Value="list.ListDate" id="dateInput" class="form-control" />
+                        <InputDate @bind-Value="formData.ListDate" id="dateInput" class="form-control" />
                     </div>
                     <div class="form-group">
                         <label for="nameInput">Name</label>
-                        <InputText @bind-Value="list.Name" id="nameInput" class="form-control" />
+                        <InputText @bind-Value="formData.Name" id="nameInput" class="form-control" />
                     </div>
                     @if (string.IsNullOrEmpty(GroupId))
                     {
@@ -56,12 +59,12 @@ else
                         {
                             <div class="form-group">
                                 <label for="group-select">User Group</label>
-                                <InputSelect id="group-select" class="form-control" @bind-Value="@_addGroupId">
+                                <InputSelect id="group-select" class="form-control" @bind-Value="@targetGroupId">
                                     <option value="">Choose Group...</option>
                                     @foreach (var group in _availableUserGroups)
-                                                    {
+                                    {
                                         <option value="@group.Id">@group.Name</option>
-                                                    }
+                                    }
                                 </InputSelect>
                             </div>
                         }
@@ -71,39 +74,53 @@ else
             }
         </div>
     </div>
-}
+        }
+    }
 
 
 @code {
     [Parameter]
     public string GroupId { get; set; }
+    [Parameter]
+    public bool Standard { get; set; }
 
     private bool IsSaving = false;
     private bool IsLoading = false;
 
-
     private AlertComponentModel AlertData;
-    private ShoppingList list = new ShoppingList()
-    {
-        ListDate = DateTime.Now,
-        Name = $"List of {DateTime.Now.ToString("dd.MM.yy")}"
-    };
-    private EditContext editContext;
 
-    private ShoppingList createdItem;
+    private ShoppingList formData = new ShoppingList();
+    private EditContext editContext;
 
     private List<UserGroup> _availableUserGroups;
 
-    private string _addGroupId;
+
+    private string targetGroupId;
 
     protected async override Task OnInitializedAsync()
     {
         IsLoading = true;
-        _addGroupId = GroupId;
-        editContext = new EditContext(list);
-        if (string.IsNullOrEmpty(_addGroupId))
+        targetGroupId = GroupId;
+
+        if (Standard)
         {
-            _availableUserGroups = await UserGroupRepo.GetAllAsync();
+            if (string.IsNullOrEmpty(targetGroupId))
+            {
+                AlertData = AlertComponentModel.CreateErrorAlert("Could not created standard list", "UserGroup Id is missing");
+            }
+            else
+            {
+                await CreateListWorkflow(GetStandardList());
+            }
+        }
+        else
+        {
+            formData = GetStandardList();
+            editContext = new EditContext(formData);
+            if (string.IsNullOrEmpty(targetGroupId))
+            {
+                _availableUserGroups = await UserGroupRepo.GetAllAsync();
+            }
         }
         IsLoading = false;
     }
@@ -111,34 +128,65 @@ else
     private async Task HandleSubmit()
     {
         AlertData = null;
-        createdItem = null;
 
         if (editContext.Validate())
         {
             IsSaving = true;
-            createdItem = await ShoppingListRepo.CreateAsync(list);
-            if (createdItem == null)
-            {
-                AlertData = AlertComponentModel.CreateErrorAlert("Could not create list", $"This could be because you already have a list called '{list.Name}'");
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(_addGroupId))
-                {
-                    var result = await GroupListAssignments.CreateAsync(new UserGroupShoppingList()
-                    {
-                        ShoppingListId = createdItem.Id,
-                        UserGroupId = _addGroupId
-                    });
-                }
-                NavigateToLastCreatedList();
-            }
+
+            await CreateListWorkflow(formData);
+
             IsSaving = false;
         }
 
     }
-    private void NavigateToLastCreatedList()
+
+    private async Task CreateListWorkflow(ShoppingList data)
     {
-        NavigationManager.NavigateTo($"/lists/details/{createdItem.Id}");
+        var list = await CreateShoppingList(data);
+        if (list == null)
+        {
+            SetCreateErrorList();
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(targetGroupId))
+            {
+                await AssignListToUserGroup(list.Id, targetGroupId);
+            }
+            NavigateToList(list.Id);
+        }
+    }
+
+    private async Task AssignListToUserGroup(string listId, string userGroupId)
+    {
+        var result = await GroupListAssignments.CreateAsync(new UserGroupShoppingList
+        {
+            ShoppingListId = listId,
+            UserGroupId = userGroupId
+        });
+    }
+
+    private async Task<ShoppingList> CreateShoppingList(ShoppingList listData)
+    {
+        ShoppingList createdList = await ShoppingListRepo.CreateAsync(listData);
+        return createdList;
+    }
+
+    private void NavigateToList(string id)
+    {
+        NavigationManager.NavigateTo($"/lists/details/{id}");
+    }
+
+    private ShoppingList GetStandardList()
+    {
+        return new ShoppingList()
+        {
+            ListDate = DateTime.Now,
+            Name = $"List of {DateTime.Now.ToString("dd.MM.yy")}"
+        };
+    }
+    private void SetCreateErrorList()
+    {
+        AlertData = AlertComponentModel.CreateErrorAlert("Could not create list", $"This could be because you already have a list with same properties");
     }
 }

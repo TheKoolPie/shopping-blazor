@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Composition;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Shopping.Server.Models;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
+using Shopping.Shared.Results.Account;
 using Shopping.Shared.Services.Interfaces;
 
 namespace Shopping.Server.Controllers
@@ -82,11 +84,7 @@ namespace Shopping.Server.Controllers
                 result.ErrorMessages.Add($"Ids do not match");
                 return BadRequest(result);
             }
-
-            var currentUser = await _currentUserProvider.GetUserAsync();
-            bool IsCurrentUserAdmin = await _currentUserProvider.IsUserAdminAsync();
-
-            if (!(currentUser.Id == id || IsCurrentUserAdmin))
+            if (!(await IsUserAuthorized(id)))
             {
                 result.IsSuccessful = false;
                 result.ErrorMessages.Add("Not authorized to access this resource");
@@ -107,6 +105,33 @@ namespace Shopping.Server.Controllers
             result.ResultData.Add(updateResult);
 
             return Ok(result);
+        }
+        [HttpPut("UpdateUserSettings/{id}")]
+        public async Task<ActionResult<UpdateUserSettingsResult>> UpdateUserSettings(string id, [FromBody] ShoppingUserSettingsModel settings)
+        {
+            UpdateUserSettingsResult result = new UpdateUserSettingsResult();
+            if (!(await IsUserAuthorized(id)))
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Not authorized to access this resource");
+                return Unauthorized(result);
+            }
+            var updateResult = await _userRepository.UpdateUserSettingsAsync(id, settings);
+            if (updateResult == null)
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Could not update user settings");
+                return NotFound(result);
+            }
+
+            return Ok(result);
+        }
+
+        private async Task<bool> IsUserAuthorized(string targetUserId)
+        {
+            var currentUser = await _currentUserProvider.GetUserAsync();
+            bool IsCurrentUserAdmin = await _currentUserProvider.IsUserAdminAsync();
+            return currentUser.Id == targetUserId || IsCurrentUserAdmin;
         }
     }
 }

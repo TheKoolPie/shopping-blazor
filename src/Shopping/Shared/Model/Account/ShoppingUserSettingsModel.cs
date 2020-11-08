@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace Shopping.Server.Models
+namespace Shopping.Shared.Model.Account
 {
-    public class ShoppingUser : IdentityUser
+    public class ShoppingUserSettingsModel
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

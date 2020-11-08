@@ -1,0 +1,81 @@
+﻿@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            @if (IsLoading)
+            {
+                <CustomSpinner>
+                    Loading delete user component
+                </CustomSpinner>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col">
+                        <p>
+                            Do you really want to delete your account? This is not reversible.
+                            Please confirm your decision
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirmDeleteUserCheckbox" @onchange="(()=>DeleteUserConfirmed = !DeleteUserConfirmed)">
+                        <label class="form-check-label" for="confirmDeleteUserCheckbox">
+                            I am sure
+                        </label>
+                    </div>
+                </div>
+                @if (DeleteUserConfirmed)
+                {
+                    <hr />
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn btn-danger" @onclick="OnDeleteUser">
+                                <span class="oi oi-trash" /> Delete Account
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public ShoppingUserModel CurrentUser { get; set; }
+
+    bool IsLoading;
+
+    AlertComponentModel deleteUserDataAlert;
+    DeleteUserModel deleteUserModel = new DeleteUserModel();
+
+    bool DeleteUserConfirmed = false;
+
+    protected override void OnInitialized()
+    {
+        IsLoading = true;
+
+        IsLoading = false;
+    }
+
+    private async Task OnDeleteUser()
+    {
+        deleteUserModel = new DeleteUserModel() { UserId = CurrentUser.Id };
+
+        var deleteUserResult = await AuthService.DeleteUser(deleteUserModel);
+        if (deleteUserResult.IsSuccessful)
+        {
+            await AuthService.Logout();
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            deleteUserDataAlert = AlertComponentModel.CreateErrorAlert("Could not delete user", deleteUserResult.CompleteErrorMessage);
+        }
+    }
+}

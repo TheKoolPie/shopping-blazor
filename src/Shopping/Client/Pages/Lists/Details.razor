@@ -64,7 +64,7 @@
                     <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
                         <div class="row">
                             <div class="col-auto mr-auto">
-                                <button class="btn btn-primary" @onclick="OnAddItemClicked">
+                                <button class="btn btn-primary" @onclick="(()=>ShowAddItem = !ShowAddItem)">
                                     <span class="oi oi-plus"></span> Add Items
                                 </button>
                             </div>
@@ -87,7 +87,19 @@
                                 </div>
                             }
                         </div>
-
+                        @if (ShowAddItem)
+                        {
+                            <hr />
+                            @if (AddItemAlertModel != null)
+                            {
+                                <div class="row">
+                                    <div class="col">
+                                        <AlertComponent Model="AddItemAlertModel" />
+                                    </div>
+                                </div>
+                            }
+                            <AddItem ListId="@ShoppingListId" OnItemAdded="AddListItem" />
+                        }
                         <hr />
                         @if (CurrentList != null)
                         {
@@ -293,6 +305,7 @@
 
     private bool IsLoading;
     private bool IsSavingList;
+    private bool ShowAddItem;
 
     private ShoppingList CurrentList;
 
@@ -311,6 +324,7 @@
     AlertComponentModel LoadingAlertModel = null;
     AlertComponentModel AccessAlertModel = null;
     AlertComponentModel PropertyAlertModel = null;
+    AlertComponentModel AddItemAlertModel = null;
     #endregion
 
     #region Access
@@ -351,6 +365,26 @@
     {
         CurrentList = await ShoppingListRepo.GetAsync(ShoppingListId);
         CurrentListHasChanged = false;
+    }
+    private void AddListItem(ShoppingListItem item)
+    {
+        AddItemAlertModel = null;
+        if (item != null)
+        {
+            var existingItem = CurrentList.Items.FirstOrDefault(i => i.ProductItemId == item.ProductItemId);
+            if (existingItem != null)
+            {
+                existingItem.Amount = item.Amount;
+            }
+            else
+            {
+                CurrentList.Items.Add(item);
+            }
+        }
+        else
+        {
+            AddItemAlertModel = AlertComponentModel.CreateErrorAlert("Could not add item");
+        }
     }
 
     private void RemoveListItem(string id)
@@ -440,16 +474,7 @@
             AlertComponentModel.CreateErrorAlert("Assignment could not be removed");
         IsRemovingGroup = false;
     }
-    private async Task OnAddItemClicked()
-    {
-        var modalParams = new ModalParameters();
-        modalParams.Add(nameof(AddItemToList.ListId), CurrentList.Id);
 
-        var addItemModal = Modal.Show<AddItemToList>("Add Item", modalParams);
-        var result = await addItemModal.Result;
-
-        await UpdateCurrentList();
-    }
     private async Task OnDeleteList()
     {
         if (await ShoppingListRepo.DeleteByIdAsync(ShoppingListId))

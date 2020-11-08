@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Shopping.Server.Extensions;
 using Shopping.Server.Models;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
+using Shopping.Shared.Results.Account;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -123,11 +125,37 @@ namespace Shopping.Server.Services.Implementations
 
             if (!updateResult.Succeeded)
             {
-                _logger.LogError("Could not update user",updateResult.Errors.Select(e=>e.Description));
+                _logger.LogError("Could not update user", updateResult.GetErrorMessagesAsList());
                 return null;
             }
 
             return updateData;
+        }
+
+        public async Task<ShoppingUserSettingsModel> UpdateUserSettingsAsync(string userId, ShoppingUserSettingsModel settingsData)
+        {
+            var dbUser = await _userManager.FindByIdAsync(userId);
+            ShoppingUserSettingsModel result = null;
+            if (dbUser != null)
+            {
+                dbUser.FirstName = settingsData.FirstName?.Trim() ?? null;
+                dbUser.LastName = settingsData.LastName?.Trim() ?? null;
+                dbUser.StandardUserGroupId = settingsData.StandardUserGroupId?.Trim() ?? null;
+                var updateResult = await _userManager.UpdateAsync(dbUser);
+                if (!updateResult.Succeeded)
+                {
+                    _logger.LogError($"Could not update user settings for user '{userId}'", updateResult.GetErrorMessagesAsList());
+                }
+                else
+                {
+                    result = settingsData;
+                }
+            }
+            else
+            {
+                _logger.LogError($"Could not find any user with id '{userId}'");
+            }
+            return result;
         }
 
         private async Task<ShoppingUser> GetDbUserFromModelData(ShoppingUserModel userModel)

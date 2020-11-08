@@ -13,7 +13,7 @@ namespace Shopping.Server.Data
     {
         public static void SeedRoles(RoleManager<IdentityRole> roleManager, List<string> userRoleNames, ILogger logger = null)
         {
-            if (userRoleNames == null) 
+            if (userRoleNames == null)
             {
                 logger?.LogWarning("No user roles found");
             }
@@ -43,7 +43,7 @@ namespace Shopping.Server.Data
             }
             else
             {
-                ShoppingUser admin = userManager.FindByEmailAsync(settings.Email).Result;
+                ShoppingUser admin = userManager.FindByNameAsync(settings.UserName).Result;
 
                 if (admin == null)
                 {

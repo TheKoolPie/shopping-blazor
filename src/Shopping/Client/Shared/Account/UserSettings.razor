@@ -1,0 +1,122 @@
+﻿@inject IUserRepository UserRepo
+@inject IUserGroupRepository UserGroups
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            @if (IsLoading)
+            {
+                <CustomSpinner>
+                    Loading delete user component
+                </CustomSpinner>
+            }
+            else
+            {
+                @if (IsSavingSettings)
+                {
+                    <div class="row">
+                        <div class="col">
+                            <CustomSpinner>
+                                Saving Settings...
+                            </CustomSpinner>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col">
+                            <EditForm EditContext="editSettingsContext" OnSubmit="OnSettingsSave" autocomplete="off">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="firstNameInput">First Name</label>
+                                            <InputText class="form-control" id="firstNameInput" @bind-Value="userSettings.FirstName" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="lastNameInput">Last Name</label>
+                                            <InputText class="form-control" id="lastNameInput" @bind-Value="userSettings.LastName" />
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (userGroups.Count > 0)
+                                {
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label for="standardUserGroupInput">Standard User Group</label>
+                                                <InputSelect class="form-control" @bind-Value="userSettings.StandardUserGroupId" id="standardUserGroupInput">
+                                                    <option value="">None</option>
+                                                    @foreach (var group in userGroups)
+                                                                {
+                                                        <option value="@group.Id" selected="@(userSettings.StandardUserGroupId == group.Id)">@group.Name</option>
+                                                                }
+                                                </InputSelect>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                <hr />
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <button class="btn btn-primary">Update Settings</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public ShoppingUserModel CurrentUser { get; set; }
+
+    bool IsLoading;
+    bool IsSavingSettings;
+
+    AlertComponentModel updateSettingsAlert;
+
+    ShoppingUserSettingsModel userSettings = new ShoppingUserSettingsModel();
+    EditContext editSettingsContext;
+    List<UserGroup> userGroups = new List<UserGroup>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        userSettings = CurrentUser.Settings;
+        editSettingsContext = new EditContext(userSettings);
+        userGroups = await UserGroups.GetAllOfUserAsync(CurrentUser.Id);
+
+        IsLoading = false;
+    }
+
+    private async Task OnSettingsSave()
+    {
+        IsSavingSettings = true;
+
+        try
+        {
+            var result = await UserRepo.UpdateUserSettingsAsync(CurrentUser.Id, userSettings);
+        }
+        catch (Exception ex)
+        {
+            updateSettingsAlert = AlertComponentModel.CreateErrorAlert(ex.Message);
+        }
+
+        IsSavingSettings = false;
+    }
+}

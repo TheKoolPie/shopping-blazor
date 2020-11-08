@@ -1,14 +1,59 @@
-﻿
+﻿<style>
+    .home-icon {
+        font-size: 64px;
+    }
+
+    .home-card {
+        cursor: pointer;
+    }
+</style>
+@inject NavigationManager Nav
 @page "/"
 
 <h3>Home</h3>
 <div class="row">
-    <div class="col">
-
+    <AuthorizeView>
+        <Authorized>
+            <div class="col-md-2">
+                <div class="card home-card" @onclick="@(()=>Nav.NavigateTo("/lists"))">
+                    <div class="card-body">
+                        <h5 class="card-title">Lists</h5>
+                        <span class="oi oi-list home-icon" />
+                    </div>
+                </div>
+            </div>
+        </Authorized>
+    </AuthorizeView>
+    <div class="col-md-2">
+        <div class="card home-card" @onclick="@(()=>Nav.NavigateTo("/product"))">
+            <div class="card-body">
+                <h5 class="card-title">Products</h5>
+                <span class="oi oi-briefcase home-icon" />
+            </div>
+        </div>
     </div>
+    <div class="col-md-2">
+        <div class="card home-card" @onclick="@(()=>Nav.NavigateTo("/product/category"))">
+            <div class="card-body">
+                <h5 class="card-title">Categories</h5>
+                <span class="oi oi-clipboard home-icon" />
+            </div>
+        </div>
+    </div>
+    <AuthorizeView>
+        <Authorized>
+            <div class="col-md-2">
+                <div class="card home-card" @onclick="@(()=>Nav.NavigateTo("/account/manage"))">
+                    <div class="card-body">
+                        <h5 class="card-title">My Account</h5>
+                        <span class="oi oi-people home-icon" />
+                    </div>
+                </div>
+            </div>
+        </Authorized>
+    </AuthorizeView>
 </div>
 
 
 @code {
-
 }

@@ -4,42 +4,50 @@
 
 <h1>Login</h1>
 
-@if (ShowErrors)
-{
-    <div class="alert alert-danger" role="alert">
-        <p>@Error</p>
+<div class="row">
+    <div class="col">
+        <AlertComponent Model="LoginAlertModel" />
     </div>
-}
+</div>
 
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Please enter your details</h5>
-        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+        @if (IsLoggingIn) 
+        {
+            <CustomSpinner>
+                Logging in...
+            </CustomSpinner>
+        }
+        else
+        {
+            <h5 class="card-title">Please enter your details</h5>
+            <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-            <div class="form-group">
-                <label for="email">User name or Email address</label>
-                <InputText Id="email" Class="form-control" @bind-Value="loginModel.LoginName" />
-                <ValidationMessage For="@(() => loginModel.LoginName)" />
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <InputText Id="password" type="password" Class="form-control" @bind-Value="loginModel.Password" />
-                <ValidationMessage For="@(() => loginModel.Password)" />
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </EditForm>
+                <div class="form-group">
+                    <label for="email">User name or Email address</label>
+                    <InputText Id="email" Class="form-control" @bind-Value="loginModel.LoginName" />
+                    <ValidationMessage For="@(() => loginModel.LoginName)" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <InputText Id="password" type="password" Class="form-control" @bind-Value="loginModel.Password" />
+                    <ValidationMessage For="@(() => loginModel.Password)" />
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </EditForm>
+        }
     </div>
 </div>
 
 @code {
 
     private LoginModel loginModel = new LoginModel();
-    private bool ShowErrors;
-    private string Error = "";
-
+    private bool IsLoggingIn;
     private string returnUrl = "";
+
+    AlertComponentModel LoginAlertModel;
 
     protected override void OnInitialized()
     {
@@ -52,7 +60,8 @@
 
     private async Task HandleLogin()
     {
-        ShowErrors = false;
+        LoginAlertModel = null;
+        IsLoggingIn = true;
 
         var result = await AuthService.Login(loginModel);
 
@@ -64,9 +73,9 @@
         }
         else
         {
-            Error = result.CompleteErrorMessage;
-            ShowErrors = true;
+            LoginAlertModel = AlertComponentModel.CreateErrorAlert("Could not log in", result.CompleteErrorMessage);
         }
+        IsLoggingIn = false;
     }
 
 }
