@@ -1,57 +1,60 @@
 ﻿@inject IShoppingLists ShoppingListRepo
-
-<div class="row">
-    <div class="col">
-        <h5 class="card-title">Delete list</h5>
-    </div>
-    <div class="col">
-        @if (deleteBtnClicked)
-        {
-            <button type="button" class="btn btn-secondary" @onclick="(()=> {
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <h5 class="card-title">Delete list</h5>
+            </div>
+            <div class="col">
+                @if (deleteBtnClicked)
+                {
+                    <button type="button" class="btn btn-secondary" @onclick="(()=> {
                                                                             deleteBtnClicked = false;
                                                                             showDeleteBtn = false;
                                                                         })">
-                <span class="oi oi-ban" /> Cancel
-            </button>
-        }
-    </div>
-</div>
-<AlertComponent Model="DeleteError" />
-<p class="card-text">
-    @if (!deleteBtnClicked)
-    {
-        <button type="button" class="btn btn-danger" @onclick="(()=>deleteBtnClicked = !deleteBtnClicked)">
-            <span class="oi oi-trash" /> Delete list
-        </button>
-    }
-    else
-    {
-        <hr />
-        <div class="row">
-            <div class="col">
-                <div>
-                    If you delete this list all items will be deleted with it. Also all assignments to groups will be removed.
-                    Please confirm your decision, as this action is not revokeable
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" @onchange="(() => showDeleteBtn = !showDeleteBtn)" value="" id="deleteCheck">
-                    <label class="form-check-label" for="deleteCheck">I really want to to delete!</label>
-                </div>
+                        <span class="oi oi-ban" /> Cancel
+                    </button>
+                }
             </div>
         </div>
-        @if (showDeleteBtn)
-        {
-            <hr />
-            <div class="row">
-                <div class="col">
-                    <button type="button" class="btn btn-danger" @onclick="OnDeleteList">
-                        <span class="oi oi-trash" /> Delete list
-                    </button>
+        <AlertComponent Model="DeleteError" />
+        <p class="card-text">
+            @if (!deleteBtnClicked)
+            {
+                <button type="button" class="btn btn-danger" @onclick="(()=>deleteBtnClicked = !deleteBtnClicked)">
+                    <span class="oi oi-trash" /> Delete list
+                </button>
+            }
+            else
+            {
+                <hr />
+                <div class="row">
+                    <div class="col">
+                        <div>
+                            If you delete this list all items will be deleted with it. Also all assignments to groups will be removed.
+                            Please confirm your decision, as this action is not revokeable
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" @onchange="(() => showDeleteBtn = !showDeleteBtn)" value="" id="deleteCheck">
+                            <label class="form-check-label" for="deleteCheck">I really want to to delete!</label>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        }
-    }
-</p>
+                @if (showDeleteBtn)
+                {
+                    <hr />
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-danger" @onclick="OnDeleteList">
+                                <span class="oi oi-trash" /> Delete list
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+        </p>
+    </div>
+</div>
 @code {
     [Parameter]
     public string ShoppingListId { get; set; }

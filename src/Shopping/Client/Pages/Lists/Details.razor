@@ -178,35 +178,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if (_availableGroups != null && _availableGroups.Count > 0)
-                                    {
-                                        <div class="col-sm-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">Add Group to List</h5>
-                                                    <p class="card-text">Search for already existing groups, which belong to you.</p>
-                                                    <EditForm EditContext="addGroupContext" OnSubmit="OnAddGroup">
-                                                        <div class="form-group">
-                                                            <label for="group-search">Available lists</label>
-                                                            <InputSelect class="form-control" id="group-search" @bind-Value="groupIdInput.GroupId">
-                                                                <option value="">Choose Group...</option>
-                                                                @foreach (var list in _availableGroups)
-                                                                                    {
-                                                                    <option value="@list.Id">@list.Name</option>
-                                                                                    }
-                                                            </InputSelect>
-                                                        </div>
-                                                        @if (!string.IsNullOrEmpty(groupIdInput.GroupId))
-                                                        {
-                                                            <button type="submit" class="btn btn-primary">
-                                                                <span class="oi oi-plus" /> Assign group
-                                                            </button>
-                                                        }
-                                                    </EditForm>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
+                                    <div class="col-sm-6">
+                                        <AddGroupToList ShoppingListId="@ShoppingListId" AvailableGroups="@AvailableUserGroups" 
+                                                        OnGroupAssigned="InitAvailableGroups" />
+                                    </div>
                                 </div>
                                 <hr />
                                 <h5>Assigned groups</h5>
@@ -250,11 +225,7 @@
                                 <hr />
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <DeleteList ShoppingListId="@ShoppingListId" OnListDeleted="OnListDeleted"/>
-                                            </div>
-                                        </div>
+                                        <DeleteList ShoppingListId="@ShoppingListId" OnListDeleted="OnListDeleted" />
                                     </div>
                                 </div>
                             }
@@ -294,9 +265,9 @@
     #region Access
     private bool IsAddingGroup;
     private bool IsRemovingGroup;
-    private List<UserGroup> _availableGroups;
-    private GroupIdInputModel groupIdInput = new GroupIdInputModel();
-    private EditContext addGroupContext;
+    private List<UserGroup> AvailableUserGroups;
+
+
     #endregion
 
     protected override async Task OnInitializedAsync()
@@ -318,7 +289,6 @@
             if (IsOwner)
             {
                 await InitAvailableGroups();
-                addGroupContext = new EditContext(groupIdInput);
             }
         }
 
@@ -390,7 +360,7 @@
     {
         CurrentList.UserGroups = await UserGroupShoppingListsRepo.GetUserGroupsOfShoppingListAsync(ShoppingListId);
         var groupIds = CurrentList.UserGroups.Select(x => x.Id).ToList();
-        _availableGroups = (await UserGroupRepo.GetAllAsync())
+        AvailableUserGroups = (await UserGroupRepo.GetAllAsync())
             .Where(x => !groupIds.Contains(x.Id))
             .ToList();
     }
@@ -400,27 +370,7 @@
         PropertyAlertModel = null;
     }
 
-    private async Task OnAddGroup()
-    {
-        if (addGroupContext.Validate())
-        {
-            IsAddingGroup = true;
 
-            var assignment = new UserGroupShoppingList()
-            {
-                ShoppingListId = ShoppingListId,
-                UserGroupId = groupIdInput.GroupId
-            };
-
-            var result = await UserGroupShoppingListsRepo.CreateAsync(assignment);
-
-            await InitAvailableGroups();
-
-            groupIdInput = new GroupIdInputModel();
-
-            IsAddingGroup = false;
-        }
-    }
     private async Task OnRemoveGroup(string groupId)
     {
         IsRemovingGroup = true;
