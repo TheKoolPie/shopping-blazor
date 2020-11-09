@@ -58,43 +58,40 @@
             <div class="col">
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
-                        <div class="row">
-                            <div class="col-auto mr-auto">
-                                <button class="btn btn-primary" @onclick="(()=>ShowAddItem = !ShowAddItem)">
-                                    <span class="oi oi-plus"></span> Add Items
-                                </button>
-                            </div>
-                            @if (CurrentListHasChanged)
-                            {
-                                <div class="col-auto">
-                                    <button class="btn btn-primary" @onclick="OnSaveListChanges">
-                                        @if (IsSavingList)
-                                        {
-                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                            @("Saving list...")
-
-                                        }
-                                        else
-                                        {
-                                            <span class="oi oi-circle-check" />
-                                            @("Save list")
-                                        }
+                        @if (!ShowAddItem)
+                        {
+                            <div class="row">
+                                <div class="col-auto mr-auto">
+                                    <button class="btn btn-primary" @onclick="(() => ShowAddItem = !ShowAddItem)">
+                                        <span class="oi oi-plus"></span> Add Items
                                     </button>
                                 </div>
-                            }
-                        </div>
-                        @if (ShowAddItem)
-                        {
-                            <hr />
-                            @if (AddItemAlertModel != null)
-                            {
-                                <div class="row">
-                                    <div class="col">
-                                        <AlertComponent Model="AddItemAlertModel" />
+
+                                @if (CurrentListHasChanged)
+                                {
+                                    <div class="col-auto">
+                                        <button class="btn btn-primary" @onclick="OnSaveListChanges">
+                                            @if (IsSavingList)
+                                            {
+                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                @("Saving list...")
+
+                                            }
+                                            else
+                                            {
+                                                <span class="oi oi-circle-check" />
+                                                @("Save list")
+                                            }
+                                        </button>
                                     </div>
-                                </div>
-                            }
-                            <AddItem ListId="@ShoppingListId" OnItemAdded="AddListItem" />
+                                }
+                            </div>
+                            <AlertComponent Model="AddItemAlertModel" />
+
+                        }
+                        else
+                        {
+                            <AddItem ListId="@ShoppingListId" OnItemAdded="AddListItem" OnCancelPressed="(() => ShowAddItem = false)" />
                         }
                         <hr />
                         @if (CurrentList != null)
@@ -406,6 +403,7 @@
         {
             AddItemAlertModel = AlertComponentModel.CreateErrorAlert("Could not add item");
         }
+        ShowAddItem = false;
     }
 
     private void RemoveListItem(string id)
