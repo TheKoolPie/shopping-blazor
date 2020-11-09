@@ -1,14 +1,18 @@
-﻿
-<div class="input-group mb-3">
+﻿<style>
+    .disable-mobile-zoom {
+        touch-action: manipulation;
+    }
+</style>
+<div class="input-group mb-3 disable-mobile-zoom">
     <div class="input-group-prepend">
-        <button type="button" class="btn btn-primary" @onclick="DecreaseValue">
+        <button type="button" class="btn btn-primary disable-mobile-zoom" @onclick="DecreaseValue">
             <span class="oi oi-minus"></span>
         </button>
     </div>
-    <input id="@_id" type="search" class="form-control text-center" value="@(_value.ToString("F2"))"
+    <input id="@_id" type="search" class="form-control text-center disable-mobile-zoom" value="@(_value.ToString("F2"))"
            @onchange="OnValueChanged" />
     <div class="input-group-append">
-        <button type="button" class="btn btn-primary" @onclick="IncreaseValue">
+        <button type="button" class="btn btn-primary disable-mobile-zoom" @onclick="IncreaseValue">
             <span class="oi oi-plus"></span>
         </button>
     </div>
@@ -34,7 +38,7 @@
     public string Label { get; set; }
 
     [Parameter(CaptureUnmatchedValues = true)]
-    public Dictionary<string,object> InputAttributes { get; set; }
+    public Dictionary<string, object> InputAttributes { get; set; }
 
     protected override void OnInitialized()
     {

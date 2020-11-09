@@ -1,5 +1,7 @@
 ﻿@inject IProducts ProductRepo
 @inject IShoppingLists ShoppingListRepo
+@inject IJSRuntime JS
+
 @if (IsAddingItem)
 {
     <div class="row">
@@ -18,10 +20,10 @@ else
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <div class="row">
-                    <div class="col">
+                    <div class="col-8">
                         <div class="form-group">
                             <input type="search" class="form-control" id="product-search" autocomplete="off"
-                                   placeholder="Search Products..." @bind="@ProductSearchValue" @bind:event="oninput" />
+                                   placeholder="Search Products..." @bind-value="ProductSearchValue" @oninput="OnUpdateSearchInput" />
                             @if (SearchProducts != null && SearchProducts.Count > 0)
                             {
                                 <div class="input-search-content">
@@ -32,6 +34,11 @@ else
                                 </div>
                             }
                         </div>
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-secondary" type="button" @onclick="(()=>OnCancelPressed.InvokeAsync(null))">
+                            <span class="oi oi-ban" />
+                        </button>
                     </div>
                 </div>
                 @if (!string.IsNullOrEmpty(Item.ProductItemId))
@@ -67,21 +74,21 @@ else
     public string ListId { get; set; }
     [Parameter]
     public EventCallback<ShoppingListItem> OnItemAdded { get; set; }
+    [Parameter]
+    public EventCallback OnCancelPressed { get; set; }
 
     List<ProductItem> _availableProducts = new List<ProductItem>();
     Dictionary<string, string> SearchProducts = new Dictionary<string, string>();
 
     bool IsAddingItem;
 
-    string _productSearchValue;
-    string ProductSearchValue
+    string ProductSearchValue { get; set; }
+
+    private async Task OnUpdateSearchInput(ChangeEventArgs e)
     {
-        get => _productSearchValue;
-        set
-        {
-            _productSearchValue = value;
-            SetSearchDictionary();
-        }
+        ProductSearchValue = e?.Value?.ToString() ?? "";
+        SetSearchDictionary();
+        await ScrollInputIntoView();
     }
 
     ShoppingListItem Item = new ShoppingListItem();
@@ -106,7 +113,7 @@ else
             if (createdItem != null)
             {
                 Item = new ShoppingListItem();
-                ProductSearchValue = "";
+                await OnUpdateSearchInput(null);
             }
             await OnItemAdded.InvokeAsync(createdItem);
         }
@@ -116,7 +123,7 @@ else
     private void OnItemSelected(string id)
     {
         Item.ProductItemId = id;
-        _productSearchValue = SearchProducts[id];
+        ProductSearchValue = SearchProducts[id];
         SearchProducts = null;
     }
 
@@ -124,11 +131,18 @@ else
     {
         SearchProducts = null;
         Item.ProductItemId = null;
-        if (!string.IsNullOrEmpty(_productSearchValue))
+        if (!string.IsNullOrEmpty(ProductSearchValue))
         {
             SearchProducts = _availableProducts
-                .Where(p => p.Name.Contains(_productSearchValue, StringComparison.InvariantCultureIgnoreCase))
-                .ToDictionary(x => x.Id, x => x.Name);
+            .OrderBy(p => p.Name)
+            .Where(p => p.Name.Contains(ProductSearchValue, StringComparison.InvariantCultureIgnoreCase))
+            .Take(5)
+            .ToDictionary(x => x.Id, x => x.Name);
         }
+    }
+
+    private async Task ScrollInputIntoView()
+    {
+        await JS.InvokeVoidAsync("scrollElementIntoView", "product-search");
     }
 }

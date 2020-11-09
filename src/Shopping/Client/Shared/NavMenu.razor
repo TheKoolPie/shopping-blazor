@@ -8,16 +8,18 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="oi oi-person"></span>
-                <AuthorizeView>
-                    <Authorized>@context.User.Identity.Name</Authorized>
-                    <NotAuthorized>Account</NotAuthorized>
-                </AuthorizeView>
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <AuthorizeView>
-                    <Authorized>
+            <AuthorizeView>
+                <NotAuthorized>
+                    <NavLink class="nav-link" href="/account/login" Match="NavLinkMatch.All">
+                        <span class="oi oi-account-login" aria-hidden="true"></span> Log in
+                    </NavLink>
+                </NotAuthorized>
+                <Authorized>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="oi oi-person"></span>
+                        @context.User.Identity.Name
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <NavLink class="nav-link text-dark" href="/account/manage" Match="NavLinkMatch.All">
                             <span class="oi oi-spreadsheet" aria-hidden="true"></span> Manage
                         </NavLink>
@@ -28,14 +30,9 @@
                         <NavLink class="nav-link text-dark" href="/account/logout" Match="NavLinkMatch.All">
                             <span class="oi oi-account-logout" aria-hidden="true"></span> Log out
                         </NavLink>
-                    </Authorized>
-                    <NotAuthorized>
-                        <NavLink class="nav-link text-dark" href="/account/login" Match="NavLinkMatch.All">
-                            <span class="oi oi-account-login" aria-hidden="true"></span> Log in
-                        </NavLink>
-                    </NotAuthorized>
-                </AuthorizeView>
-            </div>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">

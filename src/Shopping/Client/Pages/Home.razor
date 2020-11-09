@@ -14,7 +14,7 @@
 <div class="row">
     <AuthorizeView>
         <Authorized>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <div class="card home-card" @onclick="@(()=>Nav.NavigateTo("/lists"))">
                     <div class="card-body">
                         <h5 class="card-title">Lists</h5>
@@ -24,7 +24,7 @@
             </div>
         </Authorized>
     </AuthorizeView>
-    <div class="col-md-2">
+    <div class="col-md-4">
         <div class="card home-card" @onclick="@(()=>Nav.NavigateTo("/product"))">
             <div class="card-body">
                 <h5 class="card-title">Products</h5>
@@ -32,7 +32,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4">
         <div class="card home-card" @onclick="@(()=>Nav.NavigateTo("/product/category"))">
             <div class="card-body">
                 <h5 class="card-title">Categories</h5>
@@ -42,7 +42,7 @@
     </div>
     <AuthorizeView>
         <Authorized>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <div class="card home-card" @onclick="@(()=>Nav.NavigateTo("/account/manage"))">
                     <div class="card-body">
                         <h5 class="card-title">My Account</h5>

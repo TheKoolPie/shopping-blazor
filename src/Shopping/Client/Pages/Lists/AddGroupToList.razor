@@ -1,0 +1,83 @@
+﻿@inject IUserGroupShoppingLists UserGroupShoppingListsRepo
+
+@if (IsLoading)
+{
+    <CustomSpinner>
+        Loading User Groups
+    </CustomSpinner>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Add Group to List</h5>
+            @if (AvailableGroups != null && AvailableGroups.Count > 0)
+            {
+                <p class="card-text">Search for already existing groups, which belong to you.</p>
+                <EditForm EditContext="addGroupContext" OnSubmit="OnAddGroup">
+                    <div class="form-group">
+                        <label for="group-search">Available lists</label>
+                        <InputSelect class="form-control" id="group-search" @bind-Value="groupIdInput.GroupId">
+                            <option value="">Choose Group...</option>
+                            @foreach (var list in AvailableGroups)
+                                    {
+                                <option value="@list.Id">@list.Name</option>
+                                    }
+                        </InputSelect>
+                    </div>
+                    @if (!string.IsNullOrEmpty(groupIdInput.GroupId))
+                    {
+                        <button type="submit" class="btn btn-primary">
+                            <span class="oi oi-plus" /> Assign group
+                        </button>
+                    }
+                </EditForm>
+            }
+            else
+            {
+                <p class="card-text">All available user groups alread assigned to list</p>
+            }
+        </div>
+    </div>
+}
+@code {
+    [Parameter]
+    public string ShoppingListId { get; set; }
+    [Parameter]
+    public List<UserGroup> AvailableGroups { get; set; }
+    [Parameter]
+    public EventCallback<UserGroupShoppingList> OnGroupAssigned { get; set; }
+
+    private bool IsLoading;
+    private bool IsAddingGroup;
+
+    private GroupIdInputModel groupIdInput = new GroupIdInputModel();
+    private EditContext addGroupContext;
+
+    protected override void OnInitialized()
+    {
+        IsLoading = true;
+        addGroupContext = new EditContext(groupIdInput);
+        IsLoading = false;
+    }
+
+    private async Task OnAddGroup()
+    {
+        if (addGroupContext.Validate())
+        {
+            IsAddingGroup = true;
+
+            var assignment = new UserGroupShoppingList()
+            {
+                ShoppingListId = ShoppingListId,
+                UserGroupId = groupIdInput.GroupId
+            };
+
+            var result = await UserGroupShoppingListsRepo.CreateAsync(assignment);
+            await OnGroupAssigned.InvokeAsync(result);
+            groupIdInput = new GroupIdInputModel();
+
+            IsAddingGroup = false;
+        }
+    }
+}

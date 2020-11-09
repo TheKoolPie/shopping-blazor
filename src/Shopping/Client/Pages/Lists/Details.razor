@@ -45,13 +45,9 @@
                     </a>
                     @if (IsOwner)
                     {
-                        <a class="list-group-item list-group-item-action" id="list-access-list" @onclick="OnListTabClicked"
-                           data-toggle="list" href="#list-access" role="tab">
-                            <span class="oi oi-lock-locked"></span> Access
-                        </a>
                         <a class="list-group-item list-group-item-action" id="list-properties-list" @onclick="OnListTabClicked"
                            data-toggle="list" href="#list-properties" role="tab">
-                            <span class="oi oi-cog"></span> Properties
+                            <span class="oi oi-cog"></span> Settings
                         </a>
                     }
                 </div>
@@ -62,103 +58,55 @@
             <div class="col">
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="list-overview" role="tabpanel" aria-labelledby="list-overview-list">
-                        <div class="row">
-                            <div class="col-auto mr-auto">
-                                <button class="btn btn-primary" @onclick="(()=>ShowAddItem = !ShowAddItem)">
-                                    <span class="oi oi-plus"></span> Add Items
-                                </button>
-                            </div>
-                            @if (CurrentListHasChanged)
-                            {
-                                <div class="col-auto">
-                                    <button class="btn btn-primary" @onclick="OnSaveListChanges">
-                                        @if (IsSavingList)
-                                        {
-                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                            @("Saving list...")
-
-                                        }
-                                        else
-                                        {
-                                            <span class="oi oi-circle-check" />
-                                            @("Save list")
-                                        }
+                        @if (!ShowAddItem)
+                        {
+                            <div class="row">
+                                <div class="col-auto mr-auto">
+                                    <button class="btn btn-primary" @onclick="(() => ShowAddItem = !ShowAddItem)">
+                                        <span class="oi oi-plus"></span> Add Items
                                     </button>
                                 </div>
-                            }
-                        </div>
-                        @if (ShowAddItem)
-                        {
-                            <hr />
-                            @if (AddItemAlertModel != null)
-                            {
-                                <div class="row">
-                                    <div class="col">
-                                        <AlertComponent Model="AddItemAlertModel" />
+
+                                @if (CurrentListHasChanged)
+                                {
+                                    <div class="col-auto">
+                                        <button class="btn btn-primary" @onclick="OnSaveListChanges">
+                                            @if (IsSavingList)
+                                            {
+                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                @("Saving list...")
+
+                                            }
+                                            else
+                                            {
+                                                <span class="oi oi-circle-check" />
+                                                @("Save list")
+                                            }
+                                        </button>
                                     </div>
-                                </div>
-                            }
-                            <AddItem ListId="@ShoppingListId" OnItemAdded="AddListItem" />
+                                }
+                            </div>
+                            <AlertComponent Model="AddItemAlertModel" />
+
+                        }
+                        else
+                        {
+                            <AddItem ListId="@ShoppingListId" OnItemAdded="AddListItem" OnCancelPressed="(() => ShowAddItem = false)" />
                         }
                         <hr />
                         @if (CurrentList != null)
                         {
                             <div class="row">
                                 <div class="col">
-
-                                    <table class="table table-sm">
-                                        <thead class="thead-light">
-                                            <tr class="selectable-row">
-                                                <th @onclick="(()=>SortTableByColumn(ShoppingListOverviewTableColumn.Done))">
-                                                    <span class="oi oi-circle-check" />
-                                                    <span class="@DoneSorting.Icon" />
-                                                </th>
-                                                <th @onclick="(()=>SortTableByColumn(ShoppingListOverviewTableColumn.Name))">
-                                                    Name
-                                                    <span class="@NameSorting.Icon" />
-                                                </th>
-                                                <th>Amount</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @if (CurrentList.Items.Count > 0)
-                                            {
-                                                @foreach (var item in CurrentList.Items)
-                                                {
-                                                    var opacity = item.Done ? "1" : "0";
-                                                    <tr class="selectable-row">
-                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))">
-                                                            <span style="opacity:@opacity" class="oi oi-circle-check table-check-status"></span>
-                                                        </td>
-                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Name </td>
-                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))"> @item.Amount @item.ProductItem.Unit.GetDisplayName()</td>
-                                                        <td class="d-flex justify-content-start">
-                                                            <ContextMenu>
-                                                                <ContextMenuItem OnClickCallback="@(() => RemoveListItem(item.Id))">
-                                                                    Delete
-                                                                </ContextMenuItem>
-                                                            </ContextMenu>
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <tr>
-                                                    <td colspan="5" class="text-center">No items added</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                    <ItemTable List="@CurrentList" OnListChanged="@(()=>CurrentListHasChanged = true)" />
                                 </div>
                             </div>
                         }
                     </div>
                     @if (IsOwner)
                     {
-                        <div class="tab-pane fade" id="list-access" role="tabpanel" aria-labelledby="list-access-list">
-                            <h4>Access</h4>
+                        <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
+                            <h4>Properties</h4>
                             <hr />
                             @if (IsRemovingGroup)
                             {
@@ -174,123 +122,68 @@
                             }
                             else
                             {
-                                <AlertComponent Model="@AccessAlertModel" />
+                                <AlertComponent Model="@PropertyAlertModel" />
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="card">
                                             <div class="card-body">
-                                                <h5 class="card-title">Create new</h5>
+                                                <h5 class="card-title">Create new user group</h5>
                                                 <p class="card-text">Create a new user group and automatically assign it to this list.</p>
                                                 <button class="btn btn-primary" type="button" @onclick="CreateAndAssignUserGroup">Create</button>
                                             </div>
                                         </div>
                                     </div>
-                                    @if (_availableGroups != null && _availableGroups.Count > 0)
-                                    {
-                                        <div class="col-sm-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">Add Group to List</h5>
-                                                    <p class="card-text">Search for already existing groups, which belong to you.</p>
-                                                    <EditForm EditContext="addGroupContext" OnSubmit="OnAddGroup">
-                                                        <div class="form-group">
-                                                            <label for="group-search">Available lists</label>
-                                                            <InputSelect class="form-control" id="group-search" @bind-Value="groupIdInput.GroupId">
-                                                                <option value="">Choose Group...</option>
-                                                                @foreach (var list in _availableGroups)
-                                                                                    {
-                                                                    <option value="@list.Id">@list.Name</option>
-                                                                                    }
-                                                            </InputSelect>
-                                                        </div>
-                                                        @if (!string.IsNullOrEmpty(groupIdInput.GroupId))
-                                                        {
-                                                            <button type="submit" class="btn btn-primary">
-                                                                <span class="oi oi-plus" /> Assign group
-                                                            </button>
-                                                        }
-                                                    </EditForm>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
+                                    <div class="col-sm-6">
+                                        <AddGroupToList ShoppingListId="@ShoppingListId" AvailableGroups="@AvailableUserGroups"
+                                                        OnGroupAssigned="InitAvailableGroups" />
+                                    </div>
                                 </div>
                                 <hr />
-                                <h6>Assigned groups</h6>
-                                <div class="row">
-                                    <div class="col">
-                                        @if (CurrentList.UserGroups != null)
-                                        {
-                                            <table class="table">
-                                                <thead class="thead-light">
-                                                    <tr>
-                                                        <th>Name</th>
-                                                        <th></th>
+                                <h5>Assigned groups</h5>
+                                @if (CurrentList.UserGroups != null)
+                                {
+                                    <table class="table">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (CurrentList.UserGroups.Count > 0)
+                                            {
+                                                @foreach (var group in CurrentList.UserGroups)
+                                                {
+                                                    <tr class="selectable-row">
+                                                        <td @onclick="@(() => NavigateToUserGroupDetails(group.Id))">@group.Name</td>
+                                                        <td>
+                                                            <ContextMenu>
+                                                                <ContextMenuItem OnClickCallback="@(() => OnRemoveGroup(group.Id))">
+                                                                    Remove
+                                                                </ContextMenuItem>
+                                                            </ContextMenu>
+                                                        </td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @if (CurrentList.UserGroups.Count > 0)
-                                                    {
-                                                        @foreach (var group in CurrentList.UserGroups)
-                                                        {
-                                                            <tr class="selectable-row">
-                                                                <td @onclick="@(() => NavigateToUserGroupDetails(group.Id))">@group.Name</td>
-                                                                <td>
-                                                                    <ContextMenu>
-                                                                        <ContextMenuItem OnClickCallback="@(() => OnRemoveGroup(group.Id))">
-                                                                            Remove
-                                                                        </ContextMenuItem>
-                                                                    </ContextMenu>
-                                                                </td>
-                                                            </tr>
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        <tr>
-                                                            <td colspan="2" class="text-center">
-                                                                No User Groups assigned
-                                                            </td>
-                                                        </tr>
-                                                    }
-                                                </tbody>
-                                            </table>
-                                        }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="2" class="text-center">
+                                                        No User Groups assigned
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                <hr />
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <DeleteList ShoppingListId="@ShoppingListId" OnListDeleted="OnListDeleted" />
                                     </div>
                                 </div>
                             }
-                        </div>
-                    }
-                    @if (IsOwner)
-                    {
-                        <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
-                            <h4>Properties</h4>
-                            <hr />
-                            <AlertComponent Model="@PropertyAlertModel" />
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Delete list</h5>
-                                            <p class="card-text">
-                                                If you delete this list all items will be deleted with it. Also all assignments to groups will be removed.
-                                                Please confirm your decision, as this action is not revokeable
-                                            </p>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" @onchange="(()=>showDeleteButton = !showDeleteButton)" value="" id="deleteCheck">
-                                                <label class="form-check-label" for="deleteCheck">I really want to to delete!</label>
-                                            </div>
-                                            @if (showDeleteButton)
-                                            {
-                                                <hr />
-                                                <button type="button" class="btn btn-danger" @onclick="OnDeleteList">
-                                                    <span class="oi oi-account-logout" /> Delete list
-                                                </button>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     }
                 </div>
@@ -303,36 +196,24 @@
     [Parameter]
     public string ShoppingListId { get; set; }
 
+    #region Properties
     private bool IsLoading;
     private bool IsSavingList;
     private bool ShowAddItem;
 
     private ShoppingList CurrentList;
 
-    private bool showDeleteButton = false;
-
     private bool IsOwner;
     private ShoppingUserModel currentUser;
     private bool CurrentListHasChanged = false;
 
-    #region Overview
-    private SortingModel DoneSorting = new SortingModel();
-    private SortingModel NameSorting = new SortingModel();
-    #endregion
-
-    #region Alerts
     AlertComponentModel LoadingAlertModel = null;
-    AlertComponentModel AccessAlertModel = null;
     AlertComponentModel PropertyAlertModel = null;
     AlertComponentModel AddItemAlertModel = null;
-    #endregion
 
-    #region Access
     private bool IsAddingGroup;
     private bool IsRemovingGroup;
-    private List<UserGroup> _availableGroups;
-    private GroupIdInputModel groupIdInput = new GroupIdInputModel();
-    private EditContext addGroupContext;
+    private List<UserGroup> AvailableUserGroups;
     #endregion
 
     protected override async Task OnInitializedAsync()
@@ -354,11 +235,15 @@
             if (IsOwner)
             {
                 await InitAvailableGroups();
-                addGroupContext = new EditContext(groupIdInput);
             }
         }
 
         IsLoading = false;
+    }
+
+    private void OnListDeleted()
+    {
+        NavigationManager.NavigateTo("/lists");
     }
 
     private async Task UpdateCurrentList()
@@ -366,6 +251,7 @@
         CurrentList = await ShoppingListRepo.GetAsync(ShoppingListId);
         CurrentListHasChanged = false;
     }
+
     private void AddListItem(ShoppingListItem item)
     {
         AddItemAlertModel = null;
@@ -385,26 +271,9 @@
         {
             AddItemAlertModel = AlertComponentModel.CreateErrorAlert("Could not add item");
         }
+        ShowAddItem = false;
     }
 
-    private void RemoveListItem(string id)
-    {
-        var remItem = CurrentList.Items.FirstOrDefault(i => i.Id == id);
-        if (remItem != null)
-        {
-            CurrentList.Items.Remove(remItem);
-            CurrentListHasChanged = true;
-        }
-    }
-    private void ToggleDoneStateOfItem(string id)
-    {
-        var toggleItem = CurrentList.Items.FirstOrDefault(i => i.Id == id);
-        if (toggleItem != null)
-        {
-            toggleItem.Done = !toggleItem.Done;
-            CurrentListHasChanged = true;
-        }
-    }
     private async Task OnSaveListChanges()
     {
         IsSavingList = true;
@@ -420,46 +289,19 @@
     {
         CurrentList.UserGroups = await UserGroupShoppingListsRepo.GetUserGroupsOfShoppingListAsync(ShoppingListId);
         var groupIds = CurrentList.UserGroups.Select(x => x.Id).ToList();
-        _availableGroups = (await UserGroupRepo.GetAllAsync())
+        AvailableUserGroups = (await UserGroupRepo.GetAllAsync())
             .Where(x => !groupIds.Contains(x.Id))
             .ToList();
     }
 
     private void OnListTabClicked()
     {
-        AccessAlertModel = null;
         PropertyAlertModel = null;
     }
 
-    private async Task OnAddGroup()
-    {
-        AccessAlertModel = null;
-        if (addGroupContext.Validate())
-        {
-            IsAddingGroup = true;
-
-            var assignment = new UserGroupShoppingList()
-            {
-                ShoppingListId = ShoppingListId,
-                UserGroupId = groupIdInput.GroupId
-            };
-
-            var result = await UserGroupShoppingListsRepo.CreateAsync(assignment);
-
-            await InitAvailableGroups();
-
-            AccessAlertModel = (result != null) ? AlertComponentModel.CreateSuccessAlert("Assignment successful") :
-                AlertComponentModel.CreateErrorAlert("Assignment failed");
-
-            groupIdInput = new GroupIdInputModel();
-
-            IsAddingGroup = false;
-        }
-    }
     private async Task OnRemoveGroup(string groupId)
     {
         IsRemovingGroup = true;
-        AccessAlertModel = null;
         var assignment = new UserGroupShoppingList()
         {
             ShoppingListId = ShoppingListId,
@@ -470,64 +312,16 @@
 
         await InitAvailableGroups();
 
-        AccessAlertModel = result ? AlertComponentModel.CreateSuccessAlert("Assignment removed") :
-            AlertComponentModel.CreateErrorAlert("Assignment could not be removed");
         IsRemovingGroup = false;
-    }
-
-    private async Task OnDeleteList()
-    {
-        if (await ShoppingListRepo.DeleteByIdAsync(ShoppingListId))
-        {
-            NavigationManager.NavigateTo("/lists");
-        }
-        else
-        {
-            PropertyAlertModel = AlertComponentModel.CreateErrorAlert("Could not delete list");
-        }
     }
 
     private void CreateAndAssignUserGroup()
     {
         NavigationManager.NavigateTo($"/groups/create/{ShoppingListId}");
     }
+
     private void NavigateToUserGroupDetails(string userGroupId)
     {
         NavigationManager.NavigateTo($"/groups/details/{userGroupId}");
-    }
-
-    private void SortTableByColumn(ShoppingListOverviewTableColumn column)
-    {
-        switch (column)
-        {
-            case ShoppingListOverviewTableColumn.Done:
-                {
-                    DoneSorting.Toggle();
-                    switch (DoneSorting.Type)
-                    {
-                        case SortingType.Ascending:
-                            CurrentList.Items = CurrentList.Items.OrderBy(e => e.Done).ToList();
-                            break;
-                        case SortingType.Descending:
-                            CurrentList.Items = CurrentList.Items.OrderByDescending(e => e.Done).ToList();
-                            break;
-                    }
-                }
-                break;
-            case ShoppingListOverviewTableColumn.Name:
-                {
-                    NameSorting.Toggle();
-                    switch (NameSorting.Type)
-                    {
-                        case SortingType.Ascending:
-                            CurrentList.Items = CurrentList.Items.OrderBy(e => e.ProductItem.Name).ToList();
-                            break;
-                        case SortingType.Descending:
-                            CurrentList.Items = CurrentList.Items.OrderByDescending(e => e.ProductItem.Name).ToList();
-                            break;
-                    }
-                }
-                break;
-        }
     }
 }

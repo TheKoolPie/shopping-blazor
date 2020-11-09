@@ -11,3 +11,21 @@
         }
     }
 }
+window.scrollElementIntoView = (elementId) => {
+    var element = document.getElementById(elementId);
+    if (element != null) {
+        element.scrollIntoView(
+            {
+                behavior: "smooth",
+                block: "start",
+                inline: "start"
+            }
+        );
+    }
+}
+window.focusElement = (elementId) => {
+    var element = document.getElementById(elementId);
+    if (element != null) {
+        element.focus();
+    }
+}
