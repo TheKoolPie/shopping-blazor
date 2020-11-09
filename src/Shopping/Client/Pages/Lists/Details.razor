@@ -45,13 +45,9 @@
                     </a>
                     @if (IsOwner)
                     {
-                        <a class="list-group-item list-group-item-action" id="list-access-list" @onclick="OnListTabClicked"
-                           data-toggle="list" href="#list-access" role="tab">
-                            <span class="oi oi-lock-locked"></span> Access
-                        </a>
                         <a class="list-group-item list-group-item-action" id="list-properties-list" @onclick="OnListTabClicked"
                            data-toggle="list" href="#list-properties" role="tab">
-                            <span class="oi oi-cog"></span> Properties
+                            <span class="oi oi-cog"></span> Settings
                         </a>
                     }
                 </div>
@@ -157,8 +153,8 @@
                     </div>
                     @if (IsOwner)
                     {
-                        <div class="tab-pane fade" id="list-access" role="tabpanel" aria-labelledby="list-access-list">
-                            <h4>Access</h4>
+                        <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
+                            <h4>Properties</h4>
                             <hr />
                             @if (IsRemovingGroup)
                             {
@@ -174,12 +170,12 @@
                             }
                             else
                             {
-                                <AlertComponent Model="@AccessAlertModel" />
+                                <AlertComponent Model="@PropertyAlertModel" />
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="card">
                                             <div class="card-body">
-                                                <h5 class="card-title">Create new</h5>
+                                                <h5 class="card-title">Create new user group</h5>
                                                 <p class="card-text">Create a new user group and automatically assign it to this list.</p>
                                                 <button class="btn btn-primary" type="button" @onclick="CreateAndAssignUserGroup">Create</button>
                                             </div>
@@ -216,81 +212,105 @@
                                     }
                                 </div>
                                 <hr />
-                                <h6>Assigned groups</h6>
-                                <div class="row">
-                                    <div class="col">
-                                        @if (CurrentList.UserGroups != null)
-                                        {
-                                            <table class="table">
-                                                <thead class="thead-light">
-                                                    <tr>
-                                                        <th>Name</th>
-                                                        <th></th>
+                                <h5>Assigned groups</h5>
+                                @if (CurrentList.UserGroups != null)
+                                {
+                                    <table class="table">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (CurrentList.UserGroups.Count > 0)
+                                            {
+                                                @foreach (var group in CurrentList.UserGroups)
+                                                {
+                                                    <tr class="selectable-row">
+                                                        <td @onclick="@(() => NavigateToUserGroupDetails(group.Id))">@group.Name</td>
+                                                        <td>
+                                                            <ContextMenu>
+                                                                <ContextMenuItem OnClickCallback="@(() => OnRemoveGroup(group.Id))">
+                                                                    Remove
+                                                                </ContextMenuItem>
+                                                            </ContextMenu>
+                                                        </td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @if (CurrentList.UserGroups.Count > 0)
-                                                    {
-                                                        @foreach (var group in CurrentList.UserGroups)
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="2" class="text-center">
+                                                        No User Groups assigned
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                <hr />
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <h5 class="card-title">Delete list</h5>
+                                                    </div>
+                                                    <div class="col">
+                                                        @if (deleteBtnClicked)
                                                         {
-                                                            <tr class="selectable-row">
-                                                                <td @onclick="@(() => NavigateToUserGroupDetails(group.Id))">@group.Name</td>
-                                                                <td>
-                                                                    <ContextMenu>
-                                                                        <ContextMenuItem OnClickCallback="@(() => OnRemoveGroup(group.Id))">
-                                                                            Remove
-                                                                        </ContextMenuItem>
-                                                                    </ContextMenu>
-                                                                </td>
-                                                            </tr>
+                                                            <button type="button" class="btn btn-secondary" @onclick="(()=> {
+                                                                                                                          deleteBtnClicked = false;
+                                                                                                                          showDeleteBtn = false;
+                                                                                                                      })">
+                                                                <span class="oi oi-ban" /> Cancel
+                                                            </button>
                                                         }
+                                                    </div>
+                                                </div>
+                                                <hr />
+                                                <p class="card-text">
+                                                    @if (!deleteBtnClicked)
+                                                    {
+                                                        <button type="button" class="btn btn-danger" @onclick="(()=>deleteBtnClicked = !deleteBtnClicked)">
+                                                            <span class="oi oi-trash" /> Delete list
+                                                        </button>
                                                     }
                                                     else
                                                     {
-                                                        <tr>
-                                                            <td colspan="2" class="text-center">
-                                                                No User Groups assigned
-                                                            </td>
-                                                        </tr>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <div>
+                                                                    If you delete this list all items will be deleted with it. Also all assignments to groups will be removed.
+                                                                    Please confirm your decision, as this action is not revokeable
+                                                                </div>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox" @onchange="(() => showDeleteBtn = !showDeleteBtn)" value="" id="deleteCheck">
+                                                                    <label class="form-check-label" for="deleteCheck">I really want to to delete!</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @if (showDeleteBtn)
+                                                        {
+                                                            <hr />
+                                                            <div class="row">
+                                                                <div class="col">
+                                                                    <button type="button" class="btn btn-danger" @onclick="OnDeleteList">
+                                                                        <span class="oi oi-trash" /> Delete list
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        }
                                                     }
-                                                </tbody>
-                                            </table>
-                                        }
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    @if (IsOwner)
-                    {
-                        <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
-                            <h4>Properties</h4>
-                            <hr />
-                            <AlertComponent Model="@PropertyAlertModel" />
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Delete list</h5>
-                                            <p class="card-text">
-                                                If you delete this list all items will be deleted with it. Also all assignments to groups will be removed.
-                                                Please confirm your decision, as this action is not revokeable
-                                            </p>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" @onchange="(()=>showDeleteButton = !showDeleteButton)" value="" id="deleteCheck">
-                                                <label class="form-check-label" for="deleteCheck">I really want to to delete!</label>
+                                                </p>
                                             </div>
-                                            @if (showDeleteButton)
-                                            {
-                                                <hr />
-                                                <button type="button" class="btn btn-danger" @onclick="OnDeleteList">
-                                                    <span class="oi oi-account-logout" /> Delete list
-                                                </button>
-                                            }
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
                         </div>
                     }
                 </div>
@@ -307,9 +327,10 @@
     private bool IsSavingList;
     private bool ShowAddItem;
 
-    private ShoppingList CurrentList;
+    bool deleteBtnClicked = false;
+    bool showDeleteBtn = false;
 
-    private bool showDeleteButton = false;
+    private ShoppingList CurrentList;
 
     private bool IsOwner;
     private ShoppingUserModel currentUser;
