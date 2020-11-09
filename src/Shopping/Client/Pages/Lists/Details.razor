@@ -98,52 +98,7 @@
                         {
                             <div class="row">
                                 <div class="col">
-
-                                    <table class="table table-sm">
-                                        <thead class="thead-light">
-                                            <tr class="selectable-row">
-                                                <th @onclick="(()=>SortTableByColumn(ShoppingListOverviewTableColumn.Done))">
-                                                    <span class="oi oi-circle-check" />
-                                                    <span class="@DoneSorting.Icon" />
-                                                </th>
-                                                <th @onclick="(()=>SortTableByColumn(ShoppingListOverviewTableColumn.Name))">
-                                                    Name
-                                                    <span class="@NameSorting.Icon" />
-                                                </th>
-                                                <th>Amount</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @if (CurrentList.Items.Count > 0)
-                                            {
-                                                @foreach (var item in CurrentList.Items)
-                                                {
-                                                    var opacity = item.Done ? "1" : "0";
-                                                    <tr class="selectable-row">
-                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))">
-                                                            <span style="opacity:@opacity" class="oi oi-circle-check table-check-status"></span>
-                                                        </td>
-                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))"> @item.ProductItem.Name </td>
-                                                        <td @onclick="(() => ToggleDoneStateOfItem(item.Id))"> @item.Amount @item.ProductItem.Unit.GetDisplayName()</td>
-                                                        <td class="d-flex justify-content-start">
-                                                            <ContextMenu>
-                                                                <ContextMenuItem OnClickCallback="@(() => RemoveListItem(item.Id))">
-                                                                    Delete
-                                                                </ContextMenuItem>
-                                                            </ContextMenu>
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <tr>
-                                                    <td colspan="5" class="text-center">No items added</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                    <ItemTable List="@CurrentList" OnListChanged="@(()=>CurrentListHasChanged = true)" />
                                 </div>
                             </div>
                         }
@@ -179,7 +134,7 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
-                                        <AddGroupToList ShoppingListId="@ShoppingListId" AvailableGroups="@AvailableUserGroups" 
+                                        <AddGroupToList ShoppingListId="@ShoppingListId" AvailableGroups="@AvailableUserGroups"
                                                         OnGroupAssigned="InitAvailableGroups" />
                                     </div>
                                 </div>
@@ -241,6 +196,7 @@
     [Parameter]
     public string ShoppingListId { get; set; }
 
+    #region Properties
     private bool IsLoading;
     private bool IsSavingList;
     private bool ShowAddItem;
@@ -251,23 +207,13 @@
     private ShoppingUserModel currentUser;
     private bool CurrentListHasChanged = false;
 
-    #region Overview
-    private SortingModel DoneSorting = new SortingModel();
-    private SortingModel NameSorting = new SortingModel();
-    #endregion
-
-    #region Alerts
     AlertComponentModel LoadingAlertModel = null;
     AlertComponentModel PropertyAlertModel = null;
     AlertComponentModel AddItemAlertModel = null;
-    #endregion
 
-    #region Access
     private bool IsAddingGroup;
     private bool IsRemovingGroup;
     private List<UserGroup> AvailableUserGroups;
-
-
     #endregion
 
     protected override async Task OnInitializedAsync()
@@ -305,6 +251,7 @@
         CurrentList = await ShoppingListRepo.GetAsync(ShoppingListId);
         CurrentListHasChanged = false;
     }
+
     private void AddListItem(ShoppingListItem item)
     {
         AddItemAlertModel = null;
@@ -327,24 +274,6 @@
         ShowAddItem = false;
     }
 
-    private void RemoveListItem(string id)
-    {
-        var remItem = CurrentList.Items.FirstOrDefault(i => i.Id == id);
-        if (remItem != null)
-        {
-            CurrentList.Items.Remove(remItem);
-            CurrentListHasChanged = true;
-        }
-    }
-    private void ToggleDoneStateOfItem(string id)
-    {
-        var toggleItem = CurrentList.Items.FirstOrDefault(i => i.Id == id);
-        if (toggleItem != null)
-        {
-            toggleItem.Done = !toggleItem.Done;
-            CurrentListHasChanged = true;
-        }
-    }
     private async Task OnSaveListChanges()
     {
         IsSavingList = true;
@@ -370,7 +299,6 @@
         PropertyAlertModel = null;
     }
 
-
     private async Task OnRemoveGroup(string groupId)
     {
         IsRemovingGroup = true;
@@ -391,43 +319,9 @@
     {
         NavigationManager.NavigateTo($"/groups/create/{ShoppingListId}");
     }
+
     private void NavigateToUserGroupDetails(string userGroupId)
     {
         NavigationManager.NavigateTo($"/groups/details/{userGroupId}");
-    }
-
-    private void SortTableByColumn(ShoppingListOverviewTableColumn column)
-    {
-        switch (column)
-        {
-            case ShoppingListOverviewTableColumn.Done:
-                {
-                    DoneSorting.Toggle();
-                    switch (DoneSorting.Type)
-                    {
-                        case SortingType.Ascending:
-                            CurrentList.Items = CurrentList.Items.OrderBy(e => e.Done).ToList();
-                            break;
-                        case SortingType.Descending:
-                            CurrentList.Items = CurrentList.Items.OrderByDescending(e => e.Done).ToList();
-                            break;
-                    }
-                }
-                break;
-            case ShoppingListOverviewTableColumn.Name:
-                {
-                    NameSorting.Toggle();
-                    switch (NameSorting.Type)
-                    {
-                        case SortingType.Ascending:
-                            CurrentList.Items = CurrentList.Items.OrderBy(e => e.ProductItem.Name).ToList();
-                            break;
-                        case SortingType.Descending:
-                            CurrentList.Items = CurrentList.Items.OrderByDescending(e => e.ProductItem.Name).ToList();
-                            break;
-                    }
-                }
-                break;
-        }
     }
 }
