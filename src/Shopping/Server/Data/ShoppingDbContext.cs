@@ -24,6 +24,7 @@ namespace Shopping.Server.Data
         public DbSet<UserGroupMembers> UserGroupMembers { get; set; }
         public DbSet<StoreChain> StoreChains { get; set; }
         public DbSet<Store> Stores { get; set; }
+        public DbSet<StoreProductCategory> StoreProductCategories { get; set; }
 
         public ShoppingDbContext() : base() { }
         public ShoppingDbContext(DbContextOptions<ShoppingDbContext> options) : base(options)
