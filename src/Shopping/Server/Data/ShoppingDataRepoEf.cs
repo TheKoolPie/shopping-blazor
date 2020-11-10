@@ -19,6 +19,8 @@ namespace Shopping.Server.Data
         private EfDataSet<UserGroupShoppingList> _userGroupShoppingLists { get; set; }
         private EfDataSet<ShoppingListItem> _shoppinglistItems { get; set; }
         private EfDataSet<UserGroupMembers> _userGroupMembers { get; set; }
+        private EfDataSet<StoreChain> _storeChains { get; set; }
+        private EfDataSet<Store> _stores { get; set; }
 
         public ShoppingDataRepoEf(ShoppingDbContext context)
         {
@@ -31,6 +33,8 @@ namespace Shopping.Server.Data
             _userGroupShoppingLists = new EfDataSet<UserGroupShoppingList>(_context.UserGroupShoppingLists);
             _shoppinglistItems = new EfDataSet<ShoppingListItem>(_context.ShoppingListItems);
             _userGroupMembers = new EfDataSet<UserGroupMembers>(_context.UserGroupMembers);
+            _storeChains = new EfDataSet<StoreChain>(_context.StoreChains);
+            _stores = new EfDataSet<Store>(_context.Stores);
         }
 
 
@@ -47,6 +51,10 @@ namespace Shopping.Server.Data
         public IDataSet<ShoppingListItem> ShoppingListItems => _shoppinglistItems;
 
         public IDataSet<UserGroupMembers> UserGroupMembers => _userGroupMembers;
+
+        public IDataSet<StoreChain> StoreChains => _storeChains;
+
+        public IDataSet<Store> Stores => _stores;
 
         public async Task SaveChangesAsync()
         {

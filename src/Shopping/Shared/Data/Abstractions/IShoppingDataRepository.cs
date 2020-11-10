@@ -15,6 +15,8 @@ namespace Shopping.Shared.Data.Abstractions
         IDataSet<UserGroupShoppingList> UserGroupShoppingLists { get; }
         IDataSet<ShoppingListItem> ShoppingListItems { get; }
         IDataSet<UserGroupMembers> UserGroupMembers { get; }
+        IDataSet<StoreChain> StoreChains { get; }
+        IDataSet<Store> Stores { get; }
 
         Task SaveChangesAsync();
     }

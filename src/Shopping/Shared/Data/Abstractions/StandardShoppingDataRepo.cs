@@ -12,6 +12,8 @@ namespace Shopping.Shared.Data.Abstractions
         private StandardDataSet<UserGroupShoppingList> _userGroupShoppingList;
         private StandardDataSet<ShoppingListItem> _shoppinglistItems;
         private StandardDataSet<UserGroupMembers> _userGroupMembers;
+        private StandardDataSet<StoreChain> _storeChains;
+        private StandardDataSet<Store> _stores;
 
         public StandardShoppingDataRepo()
         {
@@ -22,6 +24,8 @@ namespace Shopping.Shared.Data.Abstractions
             _userGroupShoppingList = new StandardDataSet<UserGroupShoppingList>();
             _shoppinglistItems = new StandardDataSet<ShoppingListItem>();
             _userGroupMembers = new StandardDataSet<UserGroupMembers>();
+            _storeChains = new StandardDataSet<StoreChain>();
+            _stores = new StandardDataSet<Store>();
         }
 
         public IDataSet<ProductCategory> Categories => _categories;
@@ -37,6 +41,10 @@ namespace Shopping.Shared.Data.Abstractions
         public IDataSet<ShoppingListItem> ShoppingListItems => _shoppinglistItems;
 
         public IDataSet<UserGroupMembers> UserGroupMembers => _userGroupMembers;
+
+        public IDataSet<StoreChain> StoreChains => _storeChains;
+
+        public IDataSet<Store> Stores => _stores;
 
         public async Task SaveChangesAsync()
         {
