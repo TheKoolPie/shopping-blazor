@@ -1,0 +1,166 @@
+﻿@page "/store/create-store"
+@page "/store/create-store/{StoreChainId}"
+
+@inject IStoreRepository StoreRepo
+@inject IStoreChainRepository StoreChainRepo
+@inject IProductCategories ProductCatRepo
+@inject NavigationManager NavManager
+@attribute [Authorize]
+
+<h3>Create - Store</h3>
+<hr />
+<div class="row">
+    <div class="col">
+        @if (IsLoading)
+        {
+            <CustomSpinner>
+                Loading data...
+            </CustomSpinner>
+        }
+        else
+        {
+            <AlertComponent Model="@CreateAlert" />
+            <EditForm EditContext="createEditContext" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <CustomValidator @ref="customValidator" />
+                <ValidationSummary />
+
+                @if (StoreChains != null && StoreChains.Count > 0)
+                {
+                    <div class="form-group">
+                        <label for="chainInput">Store chain</label>
+                        <InputSelect id="chainInput" class="form-group" @bind-Value="createModel.StoreChainId">
+                            <option value="">Choose store chain...</option>
+                            @foreach (var chain in StoreChains)
+                                    {
+                                <option value="@chain.StoreChainId">@chain.Name</option>
+                                    }
+                        </InputSelect>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        <label for="chainInput">Store chain</label>
+                        <InputText id="chainInput" class="form-group" @bind-Value="createModel.StoreChainId" disabled />
+                    </div>
+                }
+                <div class="form-group">
+                    <label for="nameInput">Name</label>
+                    <InputText @bind-Value="createModel.Name" id="nameInput" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="priceCatInput">Price category</label>
+                    <InputSelect id="priceCatInput" class="form-control" @bind-Value="createModel.Category">
+                        @foreach (var cat in Enum.GetValues(typeof(PriceCategory)).Cast<PriceCategory>())
+                            {
+                            <option value="@cat">@($"{cat.GetDescription()} ({cat.GetPriceCatString()})")</option>
+                            }
+                    </InputSelect>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="streetInput">Street</label>
+                            <InputText @bind-Value="createModel.Street" id="streetInput" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="housenrInput">House Number</label>
+                            <InputText @bind-Value="createModel.HouseNumber" id="housenrInput" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="postalCodeInput">Postalcode</label>
+                            <InputText @bind-Value="createModel.PostalCode" id="postalCodeInput" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="cityInput">City</label>
+                            <InputText @bind-Value="createModel.City" id="cityInput" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">Create Store</button>
+                    </div>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public string StoreChainId { get; set; }
+
+    bool IsLoading;
+
+    List<ProductCategory> ProductCategories;
+    List<StoreChain> StoreChains;
+    AlertComponentModel CreateAlert;
+    StoreCreateViewModel createModel = new StoreCreateViewModel();
+    EditContext createEditContext;
+
+    CustomValidator customValidator;
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        createEditContext = new EditContext(createModel);
+        ProductCategories = await ProductCatRepo.GetAllAsync();
+        if (string.IsNullOrEmpty(StoreChainId))
+        {
+            StoreChains = await StoreChainRepo.GetAllAsync();
+        }
+        else
+        {
+            createModel.StoreChainId = StoreChainId;
+        }
+
+        IsLoading = false;
+    }
+    private async Task HandleValidSubmit()
+    {
+        CreateAlert = null;
+        customValidator.ClearErrors();
+        Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+
+        var isStoreChainSelected = !string.IsNullOrEmpty(createModel.StoreChainId);
+        var nameHasValue = !string.IsNullOrEmpty(createModel.Name);
+
+        if (!isStoreChainSelected && !nameHasValue)
+        {
+            errors.Add(nameof(createModel.Name),
+                new List<string> { "If no store chain is used, a name for the store is needed" });
+        }
+
+        if (errors.Count() > 0)
+        {
+            customValidator.DisplayErrors(errors);
+        }
+        else
+        {
+            var store = createModel.ToEntity();
+            var created = await StoreRepo.CreateAsync(store);
+            if (created != null)
+            {
+                NavManager.NavigateTo("/store");
+            }
+            else
+            {
+                CreateAlert = AlertComponentModel.CreateErrorAlert("Error", "Could not create store");
+            }
+        }
+    }
+}

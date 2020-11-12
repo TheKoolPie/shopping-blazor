@@ -6,6 +6,7 @@ using Shopping.Shared.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -31,7 +32,10 @@ namespace Shopping.Client.Services.Implementations.Base
             var client = await _authService.GetHttpClientAsync();
 
             var response = await client.GetAsync(_baseUri);
-
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new UnauthorizedAccessException();
+            }
             var result = await response.Content.ReadFromJsonAsync<TResult>();
 
             if (response.IsSuccessStatusCode && result.IsSuccessful)
@@ -50,7 +54,10 @@ namespace Shopping.Client.Services.Implementations.Base
             var client = await _authService.GetHttpClientAsync();
 
             var response = await client.GetAsync($"{_baseUri}/{id}");
-
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new UnauthorizedAccessException();
+            }
             var result = await response.Content.ReadFromJsonAsync<TResult>();
 
             if (response.IsSuccessStatusCode && result.IsSuccessful)
@@ -70,6 +77,11 @@ namespace Shopping.Client.Services.Implementations.Base
 
             var response = await client.PostAsJsonAsync<TEntity>(_baseUri, item);
 
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             var result = await response.Content.ReadFromJsonAsync<TResult>();
 
             if (response.IsSuccessStatusCode && result.IsSuccessful)
@@ -88,7 +100,10 @@ namespace Shopping.Client.Services.Implementations.Base
             var client = await _authService.GetHttpClientAsync();
 
             var response = await client.PutAsJsonAsync<TEntity>($"{_baseUri}/{id}", item);
-
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new UnauthorizedAccessException();
+            }
             var result = await response.Content.ReadFromJsonAsync<TResult>();
 
             if (response.IsSuccessStatusCode && result.IsSuccessful)
@@ -107,7 +122,10 @@ namespace Shopping.Client.Services.Implementations.Base
             var client = await _authService.GetHttpClientAsync();
 
             var response = await client.DeleteAsync($"{_baseUri}/{id}");
-
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new UnauthorizedAccessException();
+            }
             var result = await response.Content.ReadFromJsonAsync<TResult>();
 
             if (!response.IsSuccessStatusCode || !result.IsSuccessful)

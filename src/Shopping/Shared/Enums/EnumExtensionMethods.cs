@@ -61,7 +61,7 @@ namespace Shopping.Shared.Enums
         public static string GetPriceCatString(this PriceCategory category)
         {
             int value = (int)category;
-            return new String('$', value + 1);
+            return new String('€', value + 1);
         }
 
     }

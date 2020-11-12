@@ -1,9 +1,86 @@
 ﻿@page "/store"
 
 @inject IStoreRepository StoreRepo
+@inject IStoreChainRepository StoreChainRepo
 @inject NavigationManager NavigationManager
 
+
+<h3>Store chains</h3>
+<div class="row">
+    <div class="col">
+        <button class="btn btn-primary" type="button" @onclick="@(()=>NavigationManager.NavigateTo("/store/create-chain"))">
+            <span class="oi oi-plus" /> Create Store chain
+        </button>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col">
+        @if (IsLoading)
+        {
+            <CustomSpinner>
+                Loading store chains...
+            </CustomSpinner>
+        }
+        else
+        {
+            @if (DbStoreChains != null)
+            {
+                @if (DbStoreChains.Count > 0)
+                {
+                    <div class="row">
+                        <div class="col">
+                            <input type="search" class="form-control"
+                                   @bind="StoreChainSearchInput" @bind:event="oninput"
+                                   placeholder="Search for store...." />
+                        </div>
+                    </div>
+                    <hr />
+                }
+                <table class="table table-sm">
+                    <thead class="thead-light">
+                        <tr class="selectable-row">
+                            <th></th>
+                            <th>€</th>
+                            <th>Name</th>
+                            <th><span class="oi oi-globe" /></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (LocalStoreChains.Count > 0)
+                        {
+                            @foreach (var chain in LocalStoreChains)
+                            {
+                                <tr class="selectable-row" @onclick="@(()=>OnStoreChainRowClicked(chain.StoreChainId))">
+                                    <td></td>
+                                    <td>@chain.PriceCategory.GetPriceCatString()</td>
+                                    <td>@chain.Name</td>
+                                    <td>@chain.Url</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td class="text-center" colspan="4">No store chains found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+    </div>
+</div>
+<hr />
 <h3>Stores</h3>
+<div class="row">
+    <div class="col">
+        <button class="btn btn-primary" type="button" @onclick="@(()=>NavigationManager.NavigateTo("/store/create-store"))">
+            <span class="oi oi-plus" /> Create Store
+        </button>
+    </div>
+</div>
+<hr />
 <div class="row">
     <div class="col">
         @if (IsLoading)
@@ -14,9 +91,9 @@
         }
         else
         {
-            @if (LocalStores != null)
+            @if (DbStores != null)
             {
-                @if (LocalStores.Count > 0)
+                @if (DbStores.Count > 0)
                 {
                     <div class="row">
                         <div class="col">
@@ -31,11 +108,9 @@
                     <thead class="thead-light">
                         <tr class="selectable-row">
                             <th></th>
+                            <th>€</th>
                             <th>Name</th>
-                            <th>Prices</th>
                             <th>Street</th>
-                            <th>Nr</th>
-                            <th>PLZ</th>
                             <th>City</th>
                         </tr>
                     </thead>
@@ -44,13 +119,11 @@
                         {
                             @foreach (var store in LocalStores)
                             {
-                                <tr @onclick="@(()=>OnRowClicked(store.StoreId))">
+                                <tr class="selectable-row" @onclick="@(()=>OnRowClicked(store.StoreId))">
                                     <td></td>
-                                    <td>@store.Name</td>
                                     <td>@store.PriceCategory.GetPriceCatString()</td>
-                                    <td>@store.Street</td>
-                                    <td>@store.HouseNumber</td>
-                                    <td>@store.PostalCode</td>
+                                    <td>@store.Name</td>
+                                    <td>@($"{store.Street}, {store.HouseNumber}")</td>
                                     <td>@store.City</td>
                                 </tr>
                             }
@@ -73,6 +146,20 @@
     private List<Store> DbStores;
     private List<Store> LocalStores;
 
+    private List<StoreChain> DbStoreChains;
+    private List<StoreChain> LocalStoreChains;
+
+    string _storeChainSearchInput;
+    string StoreChainSearchInput
+    {
+        get => _storeChainSearchInput;
+        set
+        {
+            _storeChainSearchInput = value;
+            OnSearchStoreChainInputChanged();
+
+        }
+    }
 
     string _searchInput;
     string SearchInput
@@ -90,9 +177,37 @@
         IsLoading = true;
 
         DbStores = await StoreRepo.GetAllAsync();
+        DbStoreChains = await StoreChainRepo.GetAllAsync();
+        foreach (var store in DbStores)
+        {
+            if (!string.IsNullOrEmpty(store.StoreChainId))
+            {
+                store.StoreChain = DbStoreChains.FirstOrDefault(s => s.StoreChainId == store.StoreChainId);
+            }
+        }
+        foreach (var chain in DbStoreChains)
+        {
+            chain.Stores = DbStores
+                .Where(s => !string.IsNullOrEmpty(s.StoreChainId) && s.StoreChainId == chain.StoreChainId)
+                .ToList();
+        }
         LocalStores = new List<Store>(DbStores);
+        LocalStoreChains = new List<StoreChain>(DbStoreChains);
 
         IsLoading = false;
+    }
+
+    private void OnSearchStoreChainInputChanged()
+    {
+        LocalStoreChains = new List<StoreChain>(DbStoreChains);
+        if (!string.IsNullOrEmpty(_storeChainSearchInput))
+        {
+            LocalStoreChains = LocalStoreChains
+                .Where(s =>
+                    s.Name.Contains(_storeChainSearchInput, StringComparison.InvariantCultureIgnoreCase)
+                )
+                .ToList();
+        }
     }
 
     private void OnSearchInputChanged()
@@ -113,6 +228,10 @@
     }
     private void OnRowClicked(string id)
     {
-        NavigationManager.NavigateTo($"/store/{id}");
+        NavigationManager.NavigateTo($"/store/details-store/{id}");
+    }
+    private void OnStoreChainRowClicked(string id)
+    {
+        NavigationManager.NavigateTo($"/store/details-chain/{id}");
     }
 }

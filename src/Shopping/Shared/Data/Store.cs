@@ -24,6 +24,8 @@ namespace Shopping.Shared.Data
         {
             StoreId = Guid.NewGuid().ToString();
             CreatedAt = DateTime.Now;
+            CreatorId = "";
+            StoreChainId = "";
         }
     }
 }
