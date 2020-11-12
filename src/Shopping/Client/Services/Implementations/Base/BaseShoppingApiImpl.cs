@@ -21,7 +21,7 @@ namespace Shopping.Client.Services.Implementations.Base
 
         public BaseShoppingApiImpl(string baseUri, IAuthService authService, ILogger logger)
         {
-            _baseUri = baseUri;
+            _baseUri = "api/" + baseUri;
             _authService = authService;
             _logger = logger;
         }

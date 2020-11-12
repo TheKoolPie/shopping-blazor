@@ -15,7 +15,7 @@ namespace Shopping.Client.Services.Implementations
     public class ProductCategoryApiAccess : BaseShoppingApiImpl<ProductCategory, ProductCategoryResult>, IProductCategories
     {
         public ProductCategoryApiAccess(IAuthService authService, ILogger<ProductCategoryApiAccess> logger)
-            : base("api/ProductCategory", authService, logger)
+            : base("ProductCategory", authService, logger)
         {
         }
 

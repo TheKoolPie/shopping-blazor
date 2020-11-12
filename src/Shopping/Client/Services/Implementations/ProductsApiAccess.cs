@@ -9,7 +9,7 @@ namespace Shopping.Client.Services.Implementations
     public class ProductsApiAccess : BaseShoppingApiImpl<ProductItem,ProductItemResult>, IProducts
     {
         public ProductsApiAccess(IAuthService authService, ILogger<ProductsApiAccess> logger) 
-            : base("api/Product",authService, logger)
+            : base("Product",authService, logger)
         {
         }
     }

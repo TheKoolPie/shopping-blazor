@@ -6,7 +6,6 @@ using Shopping.Shared.Results.Entities;
 using Shopping.Shared.Services.Interfaces;
 using Shopping.Shared.Services.Interfaces.Repos;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Shopping.Server.Controllers
@@ -14,38 +13,39 @@ namespace Shopping.Server.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class StoreChainController : ControllerBase
+    public class StoreController : ControllerBase
     {
-        private readonly IStoreChainRepository _storeChainRepository;
+        private readonly IStoreRepository _storeRepository;
         private readonly ICurrentUserProvider _currentUserProvider;
 
-        public StoreChainController(IStoreChainRepository storeChainRepository, ICurrentUserProvider currentUserProvider)
+        public StoreController(IStoreRepository storeRepository, ICurrentUserProvider currentUserProvider)
         {
-            _storeChainRepository = storeChainRepository;
+            _storeRepository = storeRepository;
             _currentUserProvider = currentUserProvider;
         }
+
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<StoreChainResult>> GetStoreChains()
+        public async Task<ActionResult<StoreResult>> GetStores()
         {
-            List<StoreChain> chains = await _storeChainRepository.GetAllAsync();
-            var result = new StoreChainResult
+            var stores = await _storeRepository.GetAllAsync();
+            var result = new StoreResult
             {
                 IsSuccessful = true,
-                ResultData = chains
+                ResultData = stores
             };
             return Ok(result);
         }
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<StoreChainResult>> GetStoreChain(string id)
+        public async Task<ActionResult<StoreResult>> GetStore(string id)
         {
-            StoreChainResult result = new StoreChainResult();
+            StoreResult result = new StoreResult();
             try
             {
-                var chain = await _storeChainRepository.GetAsync(id);
+                var store = await _storeRepository.GetAsync(id);
                 result.IsSuccessful = true;
-                result.ResultData.Add(chain);
+                result.ResultData.Add(store);
             }
             catch (ItemNotFoundException e)
             {
@@ -56,16 +56,16 @@ namespace Shopping.Server.Controllers
             return Ok(result);
         }
         [HttpPost]
-        public async Task<ActionResult<StoreChainResult>> CreateStoreChain(StoreChain chain)
+        public async Task<ActionResult<StoreResult>> CreateStore(Store store)
         {
             var user = await _currentUserProvider.GetUserAsync();
-            chain.CreatedAt = DateTime.Now;
-            chain.CreatorId = user.Id;
+            store.CreatedAt = DateTime.Now;
+            store.CreatorId = user.Id;
 
-            StoreChainResult result = new StoreChainResult();
+            StoreResult result = new StoreResult();
             try
             {
-                StoreChain created = await _storeChainRepository.CreateAsync(chain);
+                var created = await _storeRepository.CreateAsync(store);
                 result.IsSuccessful = true;
                 result.ResultData.Add(created);
             }
@@ -82,18 +82,18 @@ namespace Shopping.Server.Controllers
             return Ok(result);
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult<StoreChainResult>> UpdateStoreChain(string id, [FromBody] StoreChain chain)
+        public async Task<ActionResult<StoreResult>> UpdateStore(string id, [FromBody] Store store)
         {
-            StoreChainResult result = new StoreChainResult();
-            if (id != chain.StoreChainId)
+            StoreResult result = new StoreResult();
+            if (id != store.StoreId)
             {
                 result.IsSuccessful = false;
-                result.ErrorMessages.Add("Id does not match with object id");
+                result.ErrorMessages.Add("Id does not mathc with object id");
                 return BadRequest(result);
             }
             try
             {
-                var update = await _storeChainRepository.UpdateAsync(id, chain);
+                var update = await _storeRepository.UpdateAsync(id, store);
                 result.IsSuccessful = true;
                 result.ResultData.Add(update);
             }
@@ -114,15 +114,14 @@ namespace Shopping.Server.Controllers
                 throw e;
             }
             return Ok(result);
-
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult<StoreChainResult>> DeleteUserGroup(string id)
+        public async Task<ActionResult<StoreResult>> DeleteResult(string id)
         {
-            StoreChainResult result = new StoreChainResult();
+            StoreResult result = new StoreResult();
             try
             {
-                result.IsSuccessful = await _storeChainRepository.DeleteByIdAsync(id);
+                result.IsSuccessful = await _storeRepository.DeleteByIdAsync(id);
             }
             catch (ItemNotFoundException e)
             {
@@ -135,5 +134,6 @@ namespace Shopping.Server.Controllers
             }
             return Ok(result);
         }
+
     }
 }

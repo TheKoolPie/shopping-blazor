@@ -10,6 +10,6 @@ namespace Shopping.Client.Services.Implementations
     public class StoreChainApiAccess : BaseShoppingApiImpl<StoreChain, StoreChainResult>, IStoreChainRepository
     {
         public StoreChainApiAccess(IAuthService authService, ILogger<StoreChainApiAccess> logger)
-            : base("api/StoreChain", authService, logger) { }
+            : base("StoreChain", authService, logger) { }
     }
 }

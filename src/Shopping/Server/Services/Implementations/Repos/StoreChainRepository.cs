@@ -37,9 +37,7 @@ namespace Shopping.Server.Services.Implementations.Repos
             {
                 throw new ItemNotFoundException(typeof(StoreChain), id);
             }
-
             //Delete Stores also?
-
             _context.StoreChains.Remove(existing);
             bool result = false;
             try
@@ -96,16 +94,6 @@ namespace Shopping.Server.Services.Implementations.Repos
             return !(withOutItem.Any(s =>
                 s.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase)
                 ));
-        }
-
-
-
-        public async Task<List<Store>> GetStoresOfChain(string chainId)
-        {
-            var storesOfChain = await _context.Stores.ToListAsync();
-            return storesOfChain
-                .Where(s => !string.IsNullOrEmpty(s.StoreChainId) && s.StoreChainId == chainId)
-                .ToList();
         }
     }
 }
