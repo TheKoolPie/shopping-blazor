@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Shopping.Client.Services.Implementations.Base
 {
     public class BaseShoppingApiImpl<TEntity, TResult> : ICRUDAccess<TEntity>
-        where TEntity : BaseItem
+        where TEntity : class
         where TResult : BaseResult<TEntity>
     {
         private readonly string _baseUri;

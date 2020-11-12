@@ -21,6 +21,7 @@ using Shopping.Shared.Services;
 using Shopping.Shared.Data.Abstractions;
 using Shopping.Shared.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
+using Shopping.Server.Filter;
 
 namespace Shopping.Server
 {
@@ -44,7 +45,7 @@ namespace Shopping.Server
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddDbContext<ShoppingDbContext>(o => 
+            services.AddDbContext<ShoppingDbContext>(o =>
             o.UseMySql(Configuration.GetConnectionString("Shopping_Azure")));
 
             services.AddHealthChecks();
@@ -74,7 +75,10 @@ namespace Shopping.Server
                 o.AddPolicy(ShoppingUserPolicies.IsDatabaseManager, ShoppingUserPolicies.IsDatabaseManagerPolicy());
             });
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(o =>
+            {
+                o.Filters.Add(typeof(ApiResponseExceptionFilter));
+            });
             services.AddRazorPages();
             services.AddHttpContextAccessor();
 
@@ -106,8 +110,7 @@ namespace Shopping.Server
                 app.UseWebAssemblyDebugging();
             }
             else
-            {
-                app.UseExceptionHandler("/Error");
+            { 
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
