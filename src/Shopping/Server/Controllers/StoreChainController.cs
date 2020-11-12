@@ -4,7 +4,6 @@ using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Results.Entities;
 using Shopping.Shared.Services.Interfaces;
-using Shopping.Shared.Services.Interfaces.Repos;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

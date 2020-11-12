@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Results.Entities;
+using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
-using Shopping.Shared.Services.Interfaces.Repos;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Shopping.Server.Controllers
@@ -102,7 +99,7 @@ namespace Shopping.Server.Controllers
             StoreProductCategoryResult result = new StoreProductCategoryResult();
             try
             {
-                result.IsSuccessful = await _storeProductCatRepository.DeleteAsync(id);
+                result.IsSuccessful = await _storeProductCatRepository.DeleteByIdAsync(id);
             }
             catch (ItemNotFoundException e)
             {

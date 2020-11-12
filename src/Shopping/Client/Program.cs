@@ -26,7 +26,7 @@ namespace Shopping.Client
             builder.Services.AddBlazoredModal();
 
             builder.Services.AddBlazoredLocalStorage();
-            builder.Services.AddAuthorizationCore(o=> 
+            builder.Services.AddAuthorizationCore(o =>
             {
                 o.AddPolicy(ShoppingUserPolicies.IsAdmin, ShoppingUserPolicies.IsAdminPolicy());
                 o.AddPolicy(ShoppingUserPolicies.IsProductModifier, ShoppingUserPolicies.IsProductModifierPolicy());
@@ -47,6 +47,9 @@ namespace Shopping.Client
             builder.Services.AddTransient<IShoppingLists, ShoppingListsApiAccess>();
             builder.Services.AddTransient<IUserGroupRepository, UserGroupsApiAccess>();
             builder.Services.AddTransient<IUserGroupShoppingLists, UserGroupsShoppingListsApiAccess>();
+            builder.Services.AddTransient<IStoreRepository, StoreApiAccess>();
+            builder.Services.AddTransient<IStoreChainRepository, StoreChainApiAccess>();
+            builder.Services.AddTransient<IStoreProductCatRepository, StoreProductCatApiAccess>();
 
             builder.Services.AddTransient<IUserRepository, UserRepositoryApiAccess>();
             builder.Services.AddTransient<ICurrentUserProvider, CurrentUserApiAccess>();

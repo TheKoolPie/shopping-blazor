@@ -2,8 +2,6 @@
 using Shopping.Shared.Data.Abstractions;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Services.Interfaces;
-using Shopping.Shared.Services.Interfaces.Repos;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

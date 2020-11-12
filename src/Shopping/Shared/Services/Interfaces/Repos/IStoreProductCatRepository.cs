@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Shopping.Shared.Services.Interfaces.Repos
+namespace Shopping.Shared.Services.Interfaces
 {
     public interface IStoreProductCatRepository
     {
@@ -11,6 +11,6 @@ namespace Shopping.Shared.Services.Interfaces.Repos
         Task<List<StoreProductCategory>> GetAssignmentsByStoreIdAsync(string storeId);
         Task<StoreProductCategory> CreateAsync(StoreProductCategory storeProductCat);
         Task<StoreProductCategory> UpdateAsync(string assignmentId, StoreProductCategory storeProductCat);
-        Task<bool> DeleteAsync(string assignmentId);
+        Task<bool> DeleteByIdAsync(string assignmentId);
     }
 }

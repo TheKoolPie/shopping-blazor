@@ -1,8 +1,6 @@
 ﻿using Shopping.Shared.Data;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace Shopping.Shared.Services.Interfaces.Repos
+namespace Shopping.Shared.Services.Interfaces
 {
     public interface IStoreChainRepository : ICRUDAccess<StoreChain>
     {

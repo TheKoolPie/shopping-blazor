@@ -1,0 +1,118 @@
+﻿@page "/store"
+
+@inject IStoreRepository StoreRepo
+@inject NavigationManager NavigationManager
+
+<h3>Stores</h3>
+<div class="row">
+    <div class="col">
+        @if (IsLoading)
+        {
+            <CustomSpinner>
+                Loading stores...
+            </CustomSpinner>
+        }
+        else
+        {
+            @if (LocalStores != null)
+            {
+                @if (LocalStores.Count > 0)
+                {
+                    <div class="row">
+                        <div class="col">
+                            <input type="search" class="form-control"
+                                   @bind="SearchInput" @bind:event="oninput"
+                                   placeholder="Search for store...." />
+                        </div>
+                    </div>
+                    <hr />
+                }
+                <table class="table table-sm">
+                    <thead class="thead-light">
+                        <tr class="selectable-row">
+                            <th></th>
+                            <th>Name</th>
+                            <th>Prices</th>
+                            <th>Street</th>
+                            <th>Nr</th>
+                            <th>PLZ</th>
+                            <th>City</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (LocalStores.Count > 0)
+                        {
+                            @foreach (var store in LocalStores)
+                            {
+                                <tr @onclick="@(()=>OnRowClicked(store.StoreId))">
+                                    <td></td>
+                                    <td>@store.Name</td>
+                                    <td>@store.PriceCategory.GetPriceCatString()</td>
+                                    <td>@store.Street</td>
+                                    <td>@store.HouseNumber</td>
+                                    <td>@store.PostalCode</td>
+                                    <td>@store.City</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td class="text-center" colspan="7">No stores found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+
+    </div>
+</div>
+@code {
+    private bool IsLoading;
+    private List<Store> DbStores;
+    private List<Store> LocalStores;
+
+
+    string _searchInput;
+    string SearchInput
+    {
+        get => _searchInput;
+        set
+        {
+            _searchInput = value;
+            OnSearchInputChanged();
+        }
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        DbStores = await StoreRepo.GetAllAsync();
+        LocalStores = new List<Store>(DbStores);
+
+        IsLoading = false;
+    }
+
+    private void OnSearchInputChanged()
+    {
+        LocalStores = new List<Store>(DbStores);
+        if (!string.IsNullOrEmpty(_searchInput))
+        {
+            LocalStores = LocalStores
+                .Where(s =>
+                    s.Name.Contains(_searchInput, StringComparison.InvariantCultureIgnoreCase) ||
+                    s.Street.Contains(_searchInput, StringComparison.InvariantCultureIgnoreCase) ||
+                    s.HouseNumber.Contains(_searchInput, StringComparison.InvariantCultureIgnoreCase) ||
+                    s.PostalCode.ToString().Contains(_searchInput, StringComparison.InvariantCultureIgnoreCase) ||
+                    s.City.Contains(_searchInput, StringComparison.InvariantCultureIgnoreCase)
+                )
+                .ToList();
+        }
+    }
+    private void OnRowClicked(string id)
+    {
+        NavigationManager.NavigateTo($"/store/{id}");
+    }
+}

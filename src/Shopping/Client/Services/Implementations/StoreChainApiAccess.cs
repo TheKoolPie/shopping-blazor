@@ -3,7 +3,7 @@ using Shopping.Client.Services.Implementations.Base;
 using Shopping.Shared.Data;
 using Shopping.Shared.Results.Entities;
 using Shopping.Shared.Services;
-using Shopping.Shared.Services.Interfaces.Repos;
+using Shopping.Shared.Services.Interfaces;
 
 namespace Shopping.Client.Services.Implementations
 {

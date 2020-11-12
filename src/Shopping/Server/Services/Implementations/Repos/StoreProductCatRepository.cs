@@ -1,7 +1,8 @@
 ﻿using Shopping.Shared.Data;
 using Shopping.Shared.Data.Abstractions;
 using Shopping.Shared.Exceptions;
-using Shopping.Shared.Services.Interfaces.Repos;
+using Shopping.Shared.Services;
+using Shopping.Shared.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -66,7 +67,7 @@ namespace Shopping.Server.Services.Implementations.Repos
             return existing;
         }
 
-        public async Task<bool> DeleteAsync(string assignmentId)
+        public async Task<bool> DeleteByIdAsync(string assignmentId)
         {
             bool result = false;
             try

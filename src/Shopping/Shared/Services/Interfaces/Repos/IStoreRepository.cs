@@ -1,6 +1,6 @@
 ﻿using Shopping.Shared.Data;
 
-namespace Shopping.Shared.Services.Interfaces.Repos
+namespace Shopping.Shared.Services.Interfaces
 {
     public interface IStoreRepository : ICRUDAccess<Store>
     {

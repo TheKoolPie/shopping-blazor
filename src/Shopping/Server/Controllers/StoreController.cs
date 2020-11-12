@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Results.Entities;
+using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
-using Shopping.Shared.Services.Interfaces.Repos;
 using System;
 using System.Threading.Tasks;
 

@@ -22,6 +22,7 @@ using Shopping.Shared.Data.Abstractions;
 using Shopping.Shared.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
 using Shopping.Server.Filter;
+using Shopping.Server.Services.Implementations.Repos;
 
 namespace Shopping.Server
 {
@@ -98,6 +99,9 @@ namespace Shopping.Server
             services.AddTransient<IProducts, ProductRepository>();
             services.AddTransient<IShoppingLists, ShoppingListRepository>();
             services.AddTransient<IUserGroupShoppingLists, UserGroupShoppingListRepository>();
+            services.AddTransient<IStoreChainRepository, StoreChainRepository>();
+            services.AddTransient<IStoreRepository, StoreRepository>();
+            services.AddTransient<IStoreProductCatRepository, StoreProductCatRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -110,7 +114,7 @@ namespace Shopping.Server
                 app.UseWebAssemblyDebugging();
             }
             else
-            { 
+            {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
