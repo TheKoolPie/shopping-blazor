@@ -9,7 +9,7 @@ namespace Shopping.Server.Data.EntityBuilders
     {
         public void Configure(EntityTypeBuilder<StoreProductCategory> builder)
         {
-            builder.HasKey(s => new { s.ProductCategoryId, s.StoreId });
+            builder.HasKey(s => s.StoreProductCategoryId);
             builder.HasOne(s => s.Store)
                 .WithOne()
                 .IsRequired();

@@ -4,6 +4,7 @@ namespace Shopping.Shared.Data
 {
     public class StoreProductCategory
     {
+        public string StoreProductCategoryId { get; set; }
         public string StoreId { get; set; }
         public Store Store { get; set; }
         public string ProductCategoryId { get; set; }
@@ -13,6 +14,7 @@ namespace Shopping.Shared.Data
         public DateTime CreatedAt { get; set; }
         public StoreProductCategory()
         {
+            StoreProductCategoryId = Guid.NewGuid().ToString();
             CreatedAt = DateTime.Now;
         }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
@@ -6,6 +7,8 @@ using Shopping.Shared.Results.Entities;
 using Shopping.Shared.Services.Interfaces;
 using Shopping.Shared.Services.Interfaces.Repos;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Shopping.Server.Controllers
@@ -13,59 +16,37 @@ namespace Shopping.Server.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class StoreController : ControllerBase
+    public class StoreProductCategoryController : ControllerBase
     {
-        private readonly IStoreRepository _storeRepository;
+        private readonly IStoreProductCatRepository _storeProductCatRepository;
         private readonly ICurrentUserProvider _currentUserProvider;
-
-        public StoreController(IStoreRepository storeRepository, ICurrentUserProvider currentUserProvider)
+        public StoreProductCategoryController(IStoreProductCatRepository storeProductCatRepository, ICurrentUserProvider currentUserProvider)
         {
-            _storeRepository = storeRepository;
+            _storeProductCatRepository = storeProductCatRepository;
             _currentUserProvider = currentUserProvider;
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<StoreResult>> GetStores()
+        public async Task<ActionResult<StoreProductCategoryResult>> GetAssignmentsByStoreId(string id)
         {
-            var stores = await _storeRepository.GetAllAsync();
-            var result = new StoreResult
+            var assignments = await _storeProductCatRepository.GetAssignmentsByStoreIdAsync(id);
+            var result = new StoreProductCategoryResult
             {
                 IsSuccessful = true,
-                ResultData = stores
+                ResultData = assignments
             };
             return Ok(result);
         }
-        [HttpGet("{id}")]
-        [AllowAnonymous]
-        public async Task<ActionResult<StoreResult>> GetStore(string id)
-        {
-            StoreResult result = new StoreResult();
-            try
-            {
-                var store = await _storeRepository.GetAsync(id);
-                result.IsSuccessful = true;
-                result.ResultData.Add(store);
-            }
-            catch (ItemNotFoundException e)
-            {
-                result.IsSuccessful = false;
-                result.ErrorMessages.Add(e.Message);
-                return NotFound(result);
-            }
-            return Ok(result);
-        }
         [HttpPost]
-        public async Task<ActionResult<StoreResult>> CreateStore(Store store)
+        public async Task<ActionResult<StoreProductCategoryResult>> CreateAssignment(StoreProductCategory assignment)
         {
-            var user = await _currentUserProvider.GetUserAsync();
-            store.CreatedAt = DateTime.Now;
-            store.CreatorId = user.Id;
+            assignment.CreatedAt = DateTime.Now;
 
-            StoreResult result = new StoreResult();
+            StoreProductCategoryResult result = new StoreProductCategoryResult();
             try
             {
-                var created = await _storeRepository.CreateAsync(store);
+                var created = await _storeProductCatRepository.CreateAsync(assignment);
                 result.IsSuccessful = true;
                 result.ResultData.Add(created);
             }
@@ -82,18 +63,18 @@ namespace Shopping.Server.Controllers
             return Ok(result);
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult<StoreResult>> UpdateStore(string id, [FromBody] Store store)
+        public async Task<ActionResult<StoreProductCategoryResult>> UpdateAssignment(string id, [FromBody] StoreProductCategory assignment)
         {
-            StoreResult result = new StoreResult();
-            if (id != store.StoreId)
+            StoreProductCategoryResult result = new StoreProductCategoryResult();
+            if (id != assignment.StoreProductCategoryId)
             {
                 result.IsSuccessful = false;
-                result.ErrorMessages.Add("Id does not mathc with object id");
+                result.ErrorMessages.Add("Id does not match value in object");
                 return BadRequest(result);
             }
             try
             {
-                var update = await _storeRepository.UpdateAsync(id, store);
+                var update = await _storeProductCatRepository.UpdateAsync(id, assignment);
                 result.IsSuccessful = true;
                 result.ResultData.Add(update);
             }
@@ -107,7 +88,7 @@ namespace Shopping.Server.Controllers
             {
                 result.IsSuccessful = false;
                 result.ErrorMessages.Add(e.Message);
-                return Conflict(result);
+                return NotFound(result);
             }
             catch (Exception e)
             {
@@ -116,12 +97,12 @@ namespace Shopping.Server.Controllers
             return Ok(result);
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult<StoreResult>> DeleteResult(string id)
+        public async Task<ActionResult<StoreProductCategoryResult>> DeleteAssignment(string id)
         {
-            StoreResult result = new StoreResult();
+            StoreProductCategoryResult result = new StoreProductCategoryResult();
             try
             {
-                result.IsSuccessful = await _storeRepository.DeleteByIdAsync(id);
+                result.IsSuccessful = await _storeProductCatRepository.DeleteAsync(id);
             }
             catch (ItemNotFoundException e)
             {
@@ -135,6 +116,5 @@ namespace Shopping.Server.Controllers
             }
             return Ok(result);
         }
-
     }
 }

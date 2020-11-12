@@ -128,6 +128,7 @@ namespace Shopping.Server.Controllers
             {
                 result.IsSuccessful = false;
                 result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
             }
             catch (Exception e)
             {
