@@ -1,0 +1,78 @@
+﻿@page "/store/create-chain"
+
+@inject IStoreChainRepository StoreChainRepo
+@inject NavigationManager NavManager
+
+@attribute [Authorize]
+
+<h3>Create - Store chain</h3>
+<hr />
+<div class="row">
+    <div class="col">
+        @if (IsLoading)
+        {
+            <CustomSpinner>
+                Loading data...
+            </CustomSpinner>
+        }
+        else
+        {
+            <AlertComponent Model="@CreateAlert" />
+            <EditForm Model="@createEditContext" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-group">
+                    <label for="store-chain-name-input">Name</label>
+                    <InputText @bind-Value="vm.Name" id="store-chain-name-input" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="store-chain-priceCatInput">Price category</label>
+                    <InputSelect id="store-chain-priceCatInput" class="form-control" @bind-Value="vm.Category">
+                        @foreach (var cat in Enum.GetValues(typeof(PriceCategory)).Cast<PriceCategory>())
+                            {
+                            <option value="@cat">@($"{cat.GetDescription()} ({cat.GetPriceCatString()})")</option>
+                            }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label for="store-chain-url-input">Website</label>
+                    <InputText @bind-Value="vm.Url" id="store-chain-url-input" class="form-control" />
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+@code {
+    bool IsLoading;
+
+    AlertComponentModel CreateAlert;
+
+    StoreChainCreateViewModel vm = new StoreChainCreateViewModel();
+    EditContext createEditContext;
+
+    protected override void OnInitialized()
+    {
+        IsLoading = true;
+        createEditContext = new EditContext(vm);
+        IsLoading = false;
+    }
+    private async Task HandleValidSubmit()
+    {
+        var chain = vm.ToEntity();
+        var created = await StoreChainRepo.CreateAsync(chain);
+        if (created != null)
+        {
+            NavManager.NavigateTo("/store");
+        }
+        else
+        {
+            CreateAlert = AlertComponentModel.CreateErrorAlert("Could not create store chain");
+        }
+    }
+}

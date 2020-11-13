@@ -1,4 +1,5 @@
 ﻿using Shopping.Shared.Data;
+using System.Security;
 
 namespace Shopping.Client.Models
 {
@@ -15,6 +16,14 @@ namespace Shopping.Client.Models
             store.PriceCategory = vm.Category;
             store.StoreChainId = vm.StoreChainId;
             return store;
+        }
+        public static StoreChain ToEntity(this StoreChainCreateViewModel vm)
+        {
+            var chain = new StoreChain();
+            chain.Name = vm.Name;
+            chain.PriceCategory = vm.Category;
+            chain.Url = vm.Url;
+            return chain;
         }
     }
 }
