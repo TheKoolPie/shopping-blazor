@@ -18,6 +18,11 @@ namespace Shopping.Client.Services.Implementations
         {
         }
 
+        public async Task<bool> DeleteAllOfStore(string storeId)
+        {
+            return await SendDelete($"{_baseUri}/AllOfStore/{storeId}");
+        }
+
         public Task<List<StoreProductCategory>> GetAssignmentsByStoreIdAsync(string storeId)
         {
             throw new NotImplementedException();

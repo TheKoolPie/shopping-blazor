@@ -12,5 +12,6 @@ namespace Shopping.Shared.Services.Interfaces
         Task<StoreProductCategory> CreateAsync(StoreProductCategory storeProductCat);
         Task<StoreProductCategory> UpdateAsync(string assignmentId, StoreProductCategory storeProductCat);
         Task<bool> DeleteByIdAsync(string assignmentId);
+        Task<bool> DeleteAllOfStore(string storeId);
     }
 }

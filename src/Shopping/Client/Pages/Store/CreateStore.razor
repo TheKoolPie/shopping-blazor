@@ -3,8 +3,10 @@
 
 @inject IStoreRepository StoreRepo
 @inject IStoreChainRepository StoreChainRepo
+@inject IStoreProductCatRepository StoreProductCatRepo
 @inject IProductCategories ProductCatRepo
 @inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
 @attribute [Authorize]
 
 <h3>Create - Store</h3>
@@ -29,7 +31,7 @@
                 {
                     <div class="form-group">
                         <label for="chainInput">Store chain</label>
-                        <InputSelect id="chainInput" class="form-group" @bind-Value="createModel.StoreChainId">
+                        <InputSelect id="chainInput" class="form-control" @bind-Value="createModel.StoreChainId">
                             <option value="">Choose store chain...</option>
                             @foreach (var chain in StoreChains)
                                     {
@@ -87,6 +89,46 @@
                     </div>
                 </div>
                 <hr />
+                <h5>Product Category Sorting</h5>
+                <p>
+                    In this section you can decide in which order the different categories can be collected.
+                    This order is only valid for this specific store an can be changed at any time.
+                </p>
+                <div class="container disable-mobile-zoom">
+                    @foreach (var item in LocalProductCategories)
+                    {
+                        bool disableUp = catCount == 0;
+                        bool disableDown = catCount == LocalProductCategories.Count() - 1;
+                        string rowCss = "";
+                        if (item.Id == lastMovedId)
+                        {
+                            rowCss += "selected-row";
+                        }
+                        string iconStyle = "font-size:18pt;";
+                        catCount++;
+                        <div class="row rounded disable-mobile-zoom @rowCss" style="padding: 5px;">
+                            <div class="col">
+                                @item.Name
+                            </div>
+                            <div class="col-2">
+                                <button id="@($"btn-up-{item.Id}")" type="button" class="btn btn-primary disable-mobile-zoom"
+                                        disabled="@(disableUp)"
+                                        @onclick="@(()=>MoveCatUp(item.Id))">
+                                    <span class="oi oi-arrow-thick-top" style="@iconStyle" />
+                                </button>
+                            </div>
+                            <div class="col-2">
+                                <button id="@($"btn-down-{item.Id}")" type="button" class="btn btn-primary disable-mobile-zoom"
+                                        disabled="@(disableDown)"
+                                        @onclick="@(()=>MoveCatDown(item.Id))">
+                                    <span class="oi oi-arrow-thick-bottom" style="@iconStyle" />
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <hr />
                 <div class="row">
                     <div class="col">
                         <button type="submit" class="btn btn-primary">Create</button>
@@ -105,7 +147,12 @@
 
     bool IsLoading;
 
-    List<ProductCategory> ProductCategories;
+    int catCount = 0;
+    string lastMovedId = "";
+
+    List<ProductCategory> DbProductCategories;
+    ProductCategory[] LocalProductCategories;
+
     List<StoreChain> StoreChains;
     AlertComponentModel CreateAlert;
     StoreCreateViewModel createModel = new StoreCreateViewModel();
@@ -118,7 +165,12 @@
         IsLoading = true;
 
         createEditContext = new EditContext(createModel);
-        ProductCategories = await ProductCatRepo.GetAllAsync();
+        DbProductCategories = await ProductCatRepo.GetAllAsync();
+        LocalProductCategories = (new List<ProductCategory>(DbProductCategories))
+            .OrderBy(s => s.Name)
+            .ToArray();
+
+
         if (string.IsNullOrEmpty(StoreChainId))
         {
             StoreChains = await StoreChainRepo.GetAllAsync();
@@ -152,15 +204,78 @@
         else
         {
             var store = createModel.ToEntity();
+            if (string.IsNullOrEmpty(store.Name))
+            {
+                var selectedChain = StoreChains.FirstOrDefault(c => c.StoreChainId == store.StoreChainId);
+                store.Name = selectedChain.Name;
+            }
+
             var created = await StoreRepo.CreateAsync(store);
             if (created != null)
             {
-                NavManager.NavigateTo("/store");
+                bool errorInCreation = false;
+                List<StoreProductCategory> createdAssignments = new List<StoreProductCategory>();
+                for (int i = 0; i < LocalProductCategories.Count(); i++)
+                {
+                    var cat = LocalProductCategories[i];
+                    var assignment = new StoreProductCategory();
+                    assignment.ProductCategoryId = cat.Id;
+                    assignment.StoreId = created.StoreId;
+                    assignment.RankingValue = i;
+
+                    var singleAssignment = await StoreProductCatRepo.CreateAsync(assignment);
+                    if (singleAssignment == null)
+                    {
+                        await StoreProductCatRepo.DeleteAllOfStore(created.StoreId);
+                        CreateAlert = AlertComponentModel.CreateErrorAlert("Error",
+                            "Could not create product category assignments. Store was created.");
+                        errorInCreation = true;
+                        break;
+                    }
+
+                }
+                if (!errorInCreation)
+                {
+                    NavManager.NavigateTo("/store");
+                }
             }
             else
             {
                 CreateAlert = AlertComponentModel.CreateErrorAlert("Could not create store");
             }
         }
+    }
+
+    private async Task MoveCatUp(string targetId)
+    {
+        await JSRuntime.InvokeVoidAsync("unfocusElement", $"btn-up-{targetId}");
+        lastMovedId = targetId;
+        int currentIndex = Array.FindIndex(LocalProductCategories, s => s.Id == targetId);
+
+        if (currentIndex != 0)
+        {
+            SwitchArrayPosition(currentIndex, currentIndex - 1);
+        }
+        await JSRuntime.InvokeVoidAsync("unfocusElement", $"btn-up-{targetId}");
+    }
+    private async Task MoveCatDown(string targetId)
+    {
+        await JSRuntime.InvokeVoidAsync("unfocusElement", $"btn-down-{targetId}");
+        lastMovedId = targetId;
+        int currentIndex = Array.FindIndex(LocalProductCategories, s => s.Id == targetId);
+        if (currentIndex < LocalProductCategories.Count() - 1)
+        {
+            SwitchArrayPosition(currentIndex, currentIndex + 1);
+        }
+        await JSRuntime.InvokeVoidAsync("unfocusElement", $"btn-down-{targetId}");
+    }
+
+    private void SwitchArrayPosition(int currentIndex, int targetIndex)
+    {
+        catCount = 0;
+        var currentItem = LocalProductCategories[currentIndex];
+        LocalProductCategories[currentIndex] = LocalProductCategories[targetIndex];
+        LocalProductCategories[targetIndex] = currentItem;
+        currentItem = null;
     }
 }

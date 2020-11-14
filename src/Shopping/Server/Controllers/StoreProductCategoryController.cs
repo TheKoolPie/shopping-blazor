@@ -113,5 +113,25 @@ namespace Shopping.Server.Controllers
             }
             return Ok(result);
         }
+        [HttpDelete("AllOfStore/{id}")]
+        public async Task<ActionResult<StoreProductCategoryResult>> DeleteAllOfStore(string id)
+        {
+            StoreProductCategoryResult result = new StoreProductCategoryResult();
+            try
+            {
+                result.IsSuccessful = await _storeProductCatRepository.DeleteAllOfStore(id);
+            }
+            catch (ItemNotFoundException e)
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return Ok(result);
+        }
     }
 }

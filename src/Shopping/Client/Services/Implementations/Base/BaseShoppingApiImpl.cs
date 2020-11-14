@@ -16,7 +16,7 @@ namespace Shopping.Client.Services.Implementations.Base
         where TEntity : class
         where TResult : BaseResult<TEntity>
     {
-        private readonly string _baseUri;
+        protected readonly string _baseUri;
         private readonly IAuthService _authService;
         private readonly ILogger _logger;
 
@@ -119,9 +119,14 @@ namespace Shopping.Client.Services.Implementations.Base
 
         public async Task<bool> DeleteByIdAsync(string id)
         {
+            return await SendDelete($"{_baseUri}/{id}");
+        }
+
+        protected async Task<bool> SendDelete(string uri)
+        {
             var client = await _authService.GetHttpClientAsync();
 
-            var response = await client.DeleteAsync($"{_baseUri}/{id}");
+            var response = await client.DeleteAsync(uri);
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 throw new UnauthorizedAccessException();

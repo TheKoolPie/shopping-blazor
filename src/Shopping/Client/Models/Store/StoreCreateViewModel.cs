@@ -18,4 +18,6 @@ namespace Shopping.Client.Models
         [Required(ErrorMessage = "City name is needed")]
         public string City { get; set; }
     }
+
+    
 }

@@ -11,11 +11,11 @@ namespace Shopping.Server.Data.EntityBuilders
         {
             builder.HasKey(s => s.StoreProductCategoryId);
             builder.HasOne(s => s.Store)
-                .WithOne()
-                .IsRequired();
+                .WithMany()
+                .OnDelete(DeleteBehavior.Cascade);
             builder.HasOne(s => s.ProductCategory)
-                .WithOne()
-                .IsRequired();
+                .WithMany()
+                .OnDelete(DeleteBehavior.Cascade);
             builder.Property(s => s.RankingValue)
                 .IsRequired();
 

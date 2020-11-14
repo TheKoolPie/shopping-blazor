@@ -1,7 +1,6 @@
 ﻿using Shopping.Shared.Data;
 using Shopping.Shared.Data.Abstractions;
 using Shopping.Shared.Exceptions;
-using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,6 +83,25 @@ namespace Shopping.Server.Services.Implementations.Repos
             return result;
         }
 
+        public async Task<bool> DeleteAllOfStore(string storeId)
+        {
+            var allAssignmentsOfStore = await GetAssignmentsByStoreIdAsync(storeId);
+
+            foreach (var assignment in allAssignmentsOfStore)
+            {
+                _context.StoreProductCategories.Remove(assignment);
+            }
+            bool result = false;
+            try
+            {
+                await _context.SaveChangesAsync();
+                result = true;
+            }
+            catch { result = false; }
+
+            return result;
+        }
+
         private bool AssignmentExists(StoreProductCategory storeProductCat)
         {
             var assignments = _context.StoreProductCategories.ToList();
@@ -92,5 +110,7 @@ namespace Shopping.Server.Services.Implementations.Repos
                 a.StoreId == storeProductCat.StoreId
             );
         }
+
+
     }
 }
