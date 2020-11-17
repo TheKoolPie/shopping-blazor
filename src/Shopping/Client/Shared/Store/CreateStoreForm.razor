@@ -1,0 +1,225 @@
+﻿@inject IProductCategories ProductCategoryRepo
+@inject IStoreChainRepository StoreChainRepo
+@inject IJSRuntime JSRuntime
+
+@if (IsLoading)
+{
+    <CustomSpinner>
+        Loading data...
+    </CustomSpinner>
+}
+else
+{
+
+    <EditForm EditContext="eContext" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <CustomValidator @ref="storeValidator" />
+        <ValidationSummary />
+        @if (StoreChains != null && StoreChains.Count > 0)
+        {
+            <div class="form-group">
+                <label for="chainInput">Store chain</label>
+                <InputSelect id="chainInput" class="form-control" @bind-Value="ViewModel.StoreChainId">
+                    <option value="">Choose store chain...</option>
+                    @foreach (var chain in StoreChains)
+                            {
+                        <option value="@chain.StoreChainId">@chain.Name</option>
+                            }
+                </InputSelect>
+            </div>
+        }
+        <div class="form-group">
+            <label for="nameInput">Name</label>
+            <InputText @bind-Value="ViewModel.Name" id="nameInput" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="priceCatInput">Price category</label>
+            <InputSelect id="priceCatInput" class="form-control" @bind-Value="ViewModel.Category">
+                @foreach (var cat in Enum.GetValues(typeof(PriceCategory)).Cast<PriceCategory>())
+                    {
+                    <option value="@cat">@($"{cat.GetDescription()} ({cat.GetPriceCatString()})")</option>
+                    }
+            </InputSelect>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="streetInput">Street</label>
+                    <InputText @bind-Value="ViewModel.Street" id="streetInput" class="form-control" />
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="housenrInput">House Number</label>
+                    <InputText @bind-Value="ViewModel.HouseNumber" id="housenrInput" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="postalCodeInput">Postalcode</label>
+                    <InputText @bind-Value="ViewModel.PostalCode" id="postalCodeInput" class="form-control" />
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="cityInput">City</label>
+                    <InputText @bind-Value="ViewModel.City" id="cityInput" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <hr />
+        <h5>Product Category Sorting</h5>
+        <p>
+            In this section you can decide in which order the different categories can be collected.
+            This order is only valid for this specific store an can be changed at any time.
+        </p>
+        <div class="container disable-mobile-zoom">
+            @foreach (var item in StoreProductCatAssignments)
+            {
+                bool disableUp = catCount == 0;
+                bool disableDown = catCount == StoreProductCatAssignments.Count() - 1;
+                string rowCss = "";
+                if (item.ProductCategoryId == lastMovedId)
+                {
+                    rowCss += "selected-row";
+                }
+                string iconStyle = "font-size:18pt;";
+                catCount++;
+                <div class="row rounded disable-mobile-zoom @rowCss" style="padding: 5px;">
+                    <div class="col">
+                        @getNameOfCategory(item.ProductCategoryId)
+                    </div>
+                    <div class="col-2">
+                        <button id="@($"btn-up-{item.ProductCategoryId}")" type="button" class="btn btn-primary disable-mobile-zoom"
+                                disabled="@(disableUp)"
+                                @onclick="@(()=>MoveCatUp(item.ProductCategoryId))">
+                            <span class="oi oi-arrow-thick-top" style="@iconStyle" />
+                        </button>
+                    </div>
+                    <div class="col-2">
+                        <button id="@($"btn-down-{item.ProductCategoryId}")" type="button" class="btn btn-primary disable-mobile-zoom"
+                                disabled="@(disableDown)"
+                                @onclick="@(()=>MoveCatDown(item.ProductCategoryId))">
+                            <span class="oi oi-arrow-thick-bottom" style="@iconStyle" />
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <hr />
+        <div class="row">
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public StoreCreateViewModel ViewModel { get; set; }
+    [Parameter]
+    public List<StoreProductCategory> StoreProductCatAssignments { get; set; }
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    bool IsLoading;
+
+    int catCount = 0;
+    string lastMovedId = "";
+
+    List<StoreChain> StoreChains;
+    List<ProductCategory> ProductCategories;
+
+    EditContext eContext;
+
+    CustomValidator storeValidator;
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        StoreChains = await StoreChainRepo.GetAllAsync();
+        ProductCategories = await ProductCategoryRepo.GetAllAsync();
+        eContext = new EditContext(ViewModel);
+
+        IsLoading = false;
+    }
+    private async Task HandleValidSubmit()
+    {
+        storeValidator.ClearErrors();
+        var isStoreChainSelected = !string.IsNullOrEmpty(ViewModel.StoreChainId);
+        var nameHasValue = !string.IsNullOrEmpty(ViewModel.Name);
+        Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+
+        if (!isStoreChainSelected && !nameHasValue)
+        {
+            errors.Add(nameof(ViewModel.Name),
+                new List<string> { "If no store chain is used, a name for the store is needed" });
+        }
+
+        if (errors.Count() > 0)
+        {
+            storeValidator.DisplayErrors(errors);
+        }
+        else
+        {
+
+            await OnValidSubmit.InvokeAsync(null);
+        }
+    }
+
+    private async Task MoveCatUp(string targetId)
+    {
+        await JSRuntime.InvokeVoidAsync("unfocusElement", $"btn-up-{targetId}");
+        lastMovedId = targetId;
+        int currentIndex = StoreProductCatAssignments.FindIndex(s => s.ProductCategoryId == targetId);
+
+        if (currentIndex != 0)
+        {
+            SwitchArrayPosition(currentIndex, currentIndex - 1);
+        }
+        await JSRuntime.InvokeVoidAsync("unfocusElement", $"btn-up-{targetId}");
+    }
+    private async Task MoveCatDown(string targetId)
+    {
+        await JSRuntime.InvokeVoidAsync("unfocusElement", $"btn-down-{targetId}");
+        lastMovedId = targetId;
+
+        int currentIndex = StoreProductCatAssignments.FindIndex(s => s.ProductCategoryId == targetId);
+        if (currentIndex < StoreProductCatAssignments.Count() - 1)
+        {
+            SwitchArrayPosition(currentIndex, currentIndex + 1);
+        }
+        await JSRuntime.InvokeVoidAsync("unfocusElement", $"btn-down-{targetId}");
+    }
+
+    private void SwitchArrayPosition(int currentIndex, int targetIndex)
+    {
+        catCount = 0;
+        var currentItem = StoreProductCatAssignments[currentIndex];
+        StoreProductCatAssignments[currentIndex] = StoreProductCatAssignments[targetIndex];
+        StoreProductCatAssignments[targetIndex] = currentItem;
+
+        UpdateRankingValues();
+
+        currentItem = null;
+    }
+
+    private string getNameOfCategory(string id)
+    {
+        return ProductCategories.FirstOrDefault(c => c.Id == id).Name;
+    }
+
+    private void UpdateRankingValues()
+    {
+        for(int i = 0; i < StoreProductCatAssignments.Count; i++)
+        {
+            StoreProductCatAssignments[i].RankingValue = i;
+        }
+    }
+
+}

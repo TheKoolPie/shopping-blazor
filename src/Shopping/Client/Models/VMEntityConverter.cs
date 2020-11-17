@@ -17,6 +17,19 @@ namespace Shopping.Client.Models
             store.StoreChainId = vm.StoreChainId;
             return store;
         }
+        public static StoreCreateViewModel ToCreateViewModel(this Store model)
+        {
+            var vm = new StoreCreateViewModel();
+            vm.Name = model.Name;
+            vm.Street = model.Street;
+            vm.HouseNumber = model.HouseNumber;
+            vm.PostalCode = model.PostalCode.ToString();
+            vm.City = model.City;
+            vm.Category = model.PriceCategory;
+            vm.StoreChainId = model.StoreChainId;
+
+            return vm;
+        }
         public static StoreChain ToEntity(this StoreChainCreateViewModel vm)
         {
             var chain = new StoreChain();

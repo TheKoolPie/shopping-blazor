@@ -1,0 +1,66 @@
+﻿@page "/store/details-store/{id}"
+
+@inject IStoreRepository StoreRepo
+@inject IStoreChainRepository StoreChainRepo
+@inject IStoreProductCatRepository StoreProductCatRepo
+
+@attribute [Authorize]
+
+<div class="row">
+    <div class="col">
+        @if (IsLoading)
+        {
+            <CustomSpinner>
+                Loading store data...
+            </CustomSpinner>
+        }
+        else
+        {
+
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    bool IsLoading;
+    bool IsEdit;
+
+    AlertComponentModel errorModel;
+
+    Store CurrentStore;
+    StoreCreateViewModel vm = new StoreCreateViewModel();
+    List<StoreProductCategory> ProductCatAssignments;
+
+    EditContext editContext;
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        if (!string.IsNullOrEmpty(Id))
+        {
+            CurrentStore = await StoreRepo.GetAsync(Id);
+            if (!string.IsNullOrEmpty(CurrentStore.StoreChainId))
+            {
+                CurrentStore.StoreChain = await StoreChainRepo.GetAsync(CurrentStore.StoreChainId);
+            }
+            ProductCatAssignments = await StoreProductCatRepo.GetAssignmentsByStoreIdAsync(CurrentStore.StoreId);
+            vm = CurrentStore.ToCreateViewModel();
+            editContext = new EditContext(vm);
+        }
+        else
+        {
+            errorModel = AlertComponentModel.CreateErrorAlert("No ID provided");
+        }
+
+
+
+        IsLoading = false;
+    }
+
+    private async Task HandleValidSubmit()
+    { }
+}
