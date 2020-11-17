@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ namespace Shopping.Client.Services.Implementations.Base
     {
         protected readonly string _baseUri;
         private readonly IAuthService _authService;
-        private readonly ILogger _logger;
+        protected readonly ILogger _logger;
 
         public BaseShoppingApiImpl(string baseUri, IAuthService authService, ILogger logger)
         {
@@ -29,91 +30,113 @@ namespace Shopping.Client.Services.Implementations.Base
 
         public async Task<List<TEntity>> GetAllAsync()
         {
-            var client = await _authService.GetHttpClientAsync();
+            var client = await GetApiClient();
 
             var response = await client.GetAsync(_baseUri);
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                throw new UnauthorizedAccessException();
-            }
-            var result = await response.Content.ReadFromJsonAsync<TResult>();
 
-            if (response.IsSuccessStatusCode && result.IsSuccessful)
+            CheckForUnauthorized(response);
+
+            if (response.IsSuccessStatusCode)
             {
-                return result.ResultData;
+                var result = await response.Content.ReadFromJsonAsync<TResult>();
+                if (result.IsSuccessful)
+                {
+                    return result.ResultData;
+                }
+                else
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
             }
             else
             {
-                _logger.LogError(result.CompleteErrorMessage);
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
             }
+
             return null;
         }
 
         public async Task<TEntity> GetAsync(string id)
         {
-            var client = await _authService.GetHttpClientAsync();
+            var client = await GetApiClient();
 
             var response = await client.GetAsync($"{_baseUri}/{id}");
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                throw new UnauthorizedAccessException();
-            }
-            var result = await response.Content.ReadFromJsonAsync<TResult>();
 
-            if (response.IsSuccessStatusCode && result.IsSuccessful)
+            CheckForUnauthorized(response);
+
+            if (response.IsSuccessStatusCode)
             {
-                return result.ResultData.FirstOrDefault();
+                var result = await response.Content.ReadFromJsonAsync<TResult>();
+                if (result.IsSuccessful)
+                {
+                    return result.ResultData.FirstOrDefault();
+                }
+                else
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
             }
             else
             {
-                _logger.LogError(result.CompleteErrorMessage);
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
             }
+
             return null;
         }
 
         public async Task<TEntity> CreateAsync(TEntity item)
         {
-            var client = await _authService.GetHttpClientAsync();
+            var client = await GetApiClient();
 
             var response = await client.PostAsJsonAsync<TEntity>(_baseUri, item);
 
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                throw new UnauthorizedAccessException();
-            }
+            CheckForUnauthorized(response);
 
-            var result = await response.Content.ReadFromJsonAsync<TResult>();
-
-            if (response.IsSuccessStatusCode && result.IsSuccessful)
+            if (response.IsSuccessStatusCode)
             {
-                return result.ResultData.FirstOrDefault();
+                var result = await response.Content.ReadFromJsonAsync<TResult>();
+                if (result.IsSuccessful)
+                {
+                    return result.ResultData.FirstOrDefault();
+                }
+                else
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
             }
             else
             {
-                _logger.LogError(result.CompleteErrorMessage);
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
             }
+
             return null;
         }
 
         public async Task<TEntity> UpdateAsync(string id, TEntity item)
         {
-            var client = await _authService.GetHttpClientAsync();
+            var client = await GetApiClient();
 
             var response = await client.PutAsJsonAsync<TEntity>($"{_baseUri}/{id}", item);
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                throw new UnauthorizedAccessException();
-            }
-            var result = await response.Content.ReadFromJsonAsync<TResult>();
 
-            if (response.IsSuccessStatusCode && result.IsSuccessful)
+            CheckForUnauthorized(response);
+
+            if (response.IsSuccessStatusCode)
             {
-                return result.ResultData.FirstOrDefault();
+                var result = await response.Content.ReadFromJsonAsync<TResult>();
+                if (result.IsSuccessful)
+                {
+                    return result.ResultData.FirstOrDefault();
+                }
+                else
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
             }
             else
             {
-                _logger.LogError(result.CompleteErrorMessage);
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
             }
+
             return null;
         }
 
@@ -124,21 +147,41 @@ namespace Shopping.Client.Services.Implementations.Base
 
         protected async Task<bool> SendDelete(string uri)
         {
-            var client = await _authService.GetHttpClientAsync();
+            var client = await GetApiClient();
 
             var response = await client.DeleteAsync(uri);
+
+            CheckForUnauthorized(response);
+
+            bool deleteResult = false;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<TResult>();
+                deleteResult = result.IsSuccessful;
+                if (!deleteResult)
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
+            }
+            else
+            {
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
+            }
+            return deleteResult;
+        }
+
+        protected void CheckForUnauthorized(HttpResponseMessage response)
+        {
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 throw new UnauthorizedAccessException();
             }
-            var result = await response.Content.ReadFromJsonAsync<TResult>();
+        }
 
-            if (!response.IsSuccessStatusCode || !result.IsSuccessful)
-            {
-                _logger.LogError(result.CompleteErrorMessage);
-            }
-
-            return response.IsSuccessStatusCode && result.IsSuccessful;
+        protected async Task<HttpClient> GetApiClient()
+        {
+            return await _authService.GetHttpClientAsync();
         }
 
         public bool ItemAlreadyExists(TEntity item)

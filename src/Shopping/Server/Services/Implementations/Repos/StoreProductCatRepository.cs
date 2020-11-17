@@ -47,15 +47,27 @@ namespace Shopping.Server.Services.Implementations.Repos
         {
             if (AssignmentExists(storeProductCat))
             {
-                throw new ItemAlreadyExistsException(typeof(StoreProductCategory),
-                    $"[StoreId:{storeProductCat.StoreId}, ProductCategoryId:{storeProductCat.ProductCategoryId}]");
+                throw new ItemAlreadyExistsException(typeof(StoreProductCategory), storeProductCat.StoreProductCategoryId);
             }
             _context.StoreProductCategories.Add(storeProductCat);
             await _context.SaveChangesAsync();
 
             return storeProductCat;
         }
+        public async Task<List<StoreProductCategory>> CreateAsync(List<StoreProductCategory> storeProductCats)
+        {
+            foreach (var assignment in storeProductCats)
+            {
+                if (AssignmentExists(assignment))
+                {
+                    throw new ItemAlreadyExistsException(typeof(StoreProductCategory), assignment.StoreProductCategoryId);
+                }
+                _context.StoreProductCategories.Add(assignment);
+            }
+            await _context.SaveChangesAsync();
 
+            return storeProductCats;
+        }
         public async Task<StoreProductCategory> UpdateAsync(string assignmentId, StoreProductCategory storeProductCat)
         {
             var existing = await GetAsync(assignmentId);
@@ -106,8 +118,9 @@ namespace Shopping.Server.Services.Implementations.Repos
         {
             var assignments = _context.StoreProductCategories.ToList();
             return assignments.Any(a =>
-                a.ProductCategoryId == storeProductCat.ProductCategoryId &&
-                a.StoreId == storeProductCat.StoreId
+                a.StoreProductCategoryId == storeProductCat.StoreProductCategoryId ||
+                (a.ProductCategoryId == storeProductCat.ProductCategoryId &&
+                a.StoreId == storeProductCat.StoreId)
             );
         }
 

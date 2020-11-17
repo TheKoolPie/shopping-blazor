@@ -6,7 +6,7 @@ using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
@@ -16,6 +16,32 @@ namespace Shopping.Client.Services.Implementations
         public StoreProductCatApiAccess(IAuthService authService, ILogger<StoreProductCatApiAccess> logger)
             : base("StoreProductCategory", authService, logger)
         {
+        }
+
+        public async Task<List<StoreProductCategory>> CreateAsync(List<StoreProductCategory> storeProductCats)
+        {
+            var client = await GetApiClient();
+
+            var response = await client.PostAsJsonAsync($"{_baseUri}/CreateAssignments", storeProductCats);
+            CheckForUnauthorized(response);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<StoreProductCategoryResult>();
+                if (result.IsSuccessful)
+                {
+                    return result.ResultData;
+                }
+                else
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
+            }
+            else
+            {
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
+            }
+            return null;
         }
 
         public async Task<bool> DeleteAllOfStore(string storeId)

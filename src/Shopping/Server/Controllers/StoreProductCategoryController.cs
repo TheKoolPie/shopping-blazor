@@ -6,6 +6,7 @@ using Shopping.Shared.Results.Entities;
 using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Shopping.Server.Controllers
@@ -56,6 +57,33 @@ namespace Shopping.Server.Controllers
             catch (Exception e)
             {
                 throw e;
+            }
+            return Ok(result);
+        }
+        [HttpPost("CreateAssignments")]
+        public async Task<ActionResult<StoreProductCategoryResult>> CreateAssignments(List<StoreProductCategory> assignments)
+        {
+            StoreProductCategoryResult result = new StoreProductCategoryResult();
+            foreach(var assignment in assignments)
+            {
+                assignment.CreatedAt = DateTime.Now;
+                try
+                {
+                    var created = await _storeProductCatRepository.CreateAsync(assignment);
+                    result.IsSuccessful = true;
+                    result.ResultData.Add(created);
+                }
+                catch(ItemAlreadyExistsException e)
+                {
+                    result.IsSuccessful = false;
+                    result.ResultData = null;
+                    result.ErrorMessages.Add(e.Message);
+                    return Conflict(result);
+                }
+                catch(Exception e)
+                {
+                    throw e;
+                }
             }
             return Ok(result);
         }

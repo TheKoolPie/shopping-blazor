@@ -19,6 +19,12 @@
                 Loading data...
             </CustomSpinner>
         }
+        else if (IsCreating)
+        {
+            <CustomSpinner>
+                Creating store...
+            </CustomSpinner>
+        }
         else
         {
             <AlertComponent Model="@CreateAlert" />
@@ -146,6 +152,7 @@
     public string StoreChainId { get; set; }
 
     bool IsLoading;
+    bool IsCreating;
 
     int catCount = 0;
     string lastMovedId = "";
@@ -184,6 +191,7 @@
     }
     private async Task HandleValidSubmit()
     {
+        IsCreating = true;
         CreateAlert = null;
         customValidator.ClearErrors();
         Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
@@ -213,30 +221,22 @@
             var created = await StoreRepo.CreateAsync(store);
             if (created != null)
             {
-                bool errorInCreation = false;
-                List<StoreProductCategory> createdAssignments = new List<StoreProductCategory>();
+                List<StoreProductCategory> targetAssignments = new List<StoreProductCategory>();
                 for (int i = 0; i < LocalProductCategories.Count(); i++)
                 {
                     var cat = LocalProductCategories[i];
-                    var assignment = new StoreProductCategory();
-                    assignment.ProductCategoryId = cat.Id;
-                    assignment.StoreId = created.StoreId;
-                    assignment.RankingValue = i;
-
-                    var singleAssignment = await StoreProductCatRepo.CreateAsync(assignment);
-                    if (singleAssignment == null)
+                    var assignment = new StoreProductCategory
                     {
-                        await StoreProductCatRepo.DeleteAllOfStore(created.StoreId);
-                        CreateAlert = AlertComponentModel.CreateErrorAlert("Error",
-                            "Could not create product category assignments. Store was created.");
-                        errorInCreation = true;
-                        break;
-                    }
-
+                        ProductCategoryId = cat.Id,
+                        StoreId = created.StoreId,
+                        RankingValue = i
+                    };
+                    targetAssignments.Add(assignment);
                 }
-                if (!errorInCreation)
+                var createdAssignments = await StoreProductCatRepo.CreateAsync(targetAssignments);
+                if (createdAssignments == null)
                 {
-                    NavManager.NavigateTo("/store");
+                    CreateAlert = AlertComponentModel.CreateErrorAlert("Could not create assignments, Store was created");
                 }
             }
             else
@@ -244,6 +244,11 @@
                 CreateAlert = AlertComponentModel.CreateErrorAlert("Could not create store");
             }
         }
+        if (CreateAlert == null)
+        {
+            NavManager.NavigateTo("/store");
+        }
+        IsCreating = false;
     }
 
     private async Task MoveCatUp(string targetId)
