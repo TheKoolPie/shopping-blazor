@@ -3,6 +3,7 @@
 @inject IStoreRepository StoreRepo
 @inject IStoreChainRepository StoreChainRepo
 @inject IStoreProductCatRepository StoreProductCatRepo
+@inject IProductCategories ProductCatRepo
 
 @attribute [Authorize]
 
@@ -16,7 +17,10 @@
         }
         else
         {
-
+            <AlertComponent Model="@ErrorModel" />
+            <CreateStoreForm ViewModel="vm"
+                             StoreProductCatAssignments="ProductCatAssignments"
+                             OnValidSubmit="HandleValidSubmit" />
         }
     </div>
 </div>
@@ -28,13 +32,11 @@
     bool IsLoading;
     bool IsEdit;
 
-    AlertComponentModel errorModel;
+    AlertComponentModel ErrorModel;
 
     Store CurrentStore;
-    StoreCreateViewModel vm = new StoreCreateViewModel();
+    StoreCreateViewModel vm;
     List<StoreProductCategory> ProductCatAssignments;
-
-    EditContext editContext;
 
     protected async override Task OnInitializedAsync()
     {
@@ -47,16 +49,30 @@
             {
                 CurrentStore.StoreChain = await StoreChainRepo.GetAsync(CurrentStore.StoreChainId);
             }
+            ProductCatAssignments = new List<StoreProductCategory>();
             ProductCatAssignments = await StoreProductCatRepo.GetAssignmentsByStoreIdAsync(CurrentStore.StoreId);
+            if (ProductCatAssignments.Count == 0)
+            {
+                var DbProductCategories = await ProductCatRepo.GetAllAsync();
+                foreach (var category in DbProductCategories.OrderBy(c => c.Name))
+                {
+                    var assignment = new StoreProductCategory
+                    {
+                        ProductCategoryId = category.Id
+                    };
+                    ProductCatAssignments.Add(assignment);
+                }
+            }
+            else
+            {
+                ProductCatAssignments = ProductCatAssignments.OrderBy(a => a.RankingValue).ToList();
+            }
             vm = CurrentStore.ToCreateViewModel();
-            editContext = new EditContext(vm);
         }
         else
         {
-            errorModel = AlertComponentModel.CreateErrorAlert("No ID provided");
+            ErrorModel = AlertComponentModel.CreateErrorAlert("No ID provided");
         }
-
-
 
         IsLoading = false;
     }

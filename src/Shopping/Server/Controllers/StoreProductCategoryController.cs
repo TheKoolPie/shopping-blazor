@@ -26,16 +26,24 @@ namespace Shopping.Server.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
+        public async Task<ActionResult<StoreProductCategoryResult>> GetAssignment(string id)
+        {
+            var assignment = await _storeProductCatRepository.GetAsync(id);
+            var result = new StoreProductCategoryResult();
+            result.IsSuccessful = true;
+            result.ResultData.Add(assignment);
+            return Ok(result);
+        }
+        [HttpGet("GetByStoreId/{id}")]
         public async Task<ActionResult<StoreProductCategoryResult>> GetAssignmentsByStoreId(string id)
         {
             var assignments = await _storeProductCatRepository.GetAssignmentsByStoreIdAsync(id);
-            var result = new StoreProductCategoryResult
-            {
-                IsSuccessful = true,
-                ResultData = assignments
-            };
+            var result = new StoreProductCategoryResult();
+            result.IsSuccessful = true;
+            result.ResultData = assignments;
             return Ok(result);
         }
+
         [HttpPost]
         public async Task<ActionResult<StoreProductCategoryResult>> CreateAssignment(StoreProductCategory assignment)
         {
@@ -64,7 +72,7 @@ namespace Shopping.Server.Controllers
         public async Task<ActionResult<StoreProductCategoryResult>> CreateAssignments(List<StoreProductCategory> assignments)
         {
             StoreProductCategoryResult result = new StoreProductCategoryResult();
-            foreach(var assignment in assignments)
+            foreach (var assignment in assignments)
             {
                 assignment.CreatedAt = DateTime.Now;
                 try
@@ -73,14 +81,14 @@ namespace Shopping.Server.Controllers
                     result.IsSuccessful = true;
                     result.ResultData.Add(created);
                 }
-                catch(ItemAlreadyExistsException e)
+                catch (ItemAlreadyExistsException e)
                 {
                     result.IsSuccessful = false;
                     result.ResultData = null;
                     result.ErrorMessages.Add(e.Message);
                     return Conflict(result);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     throw e;
                 }

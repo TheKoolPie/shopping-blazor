@@ -49,9 +49,29 @@ namespace Shopping.Client.Services.Implementations
             return await SendDelete($"{_baseUri}/AllOfStore/{storeId}");
         }
 
-        public Task<List<StoreProductCategory>> GetAssignmentsByStoreIdAsync(string storeId)
+        public async Task<List<StoreProductCategory>> GetAssignmentsByStoreIdAsync(string storeId)
         {
-            throw new NotImplementedException();
+            var client = await GetApiClient();
+            var response = await client.GetAsync($"{_baseUri}/GetByStoreId/{storeId}");
+            CheckForUnauthorized(response);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<StoreProductCategoryResult>();
+                if (result.IsSuccessful)
+                {
+                    return result.ResultData;
+                }
+                else
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
+            }
+            else
+            {
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
+            }
+
+            return null;
         }
 
         public Task<StoreProductCategory> GetAsync(string storeId, string productCatId)
