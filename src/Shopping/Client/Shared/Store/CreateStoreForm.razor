@@ -15,7 +15,7 @@ else
         <DataAnnotationsValidator />
         <CustomValidator @ref="storeValidator" />
         <ValidationSummary />
-        @if (StoreChains != null && StoreChains.Count > 0)
+        @if (!StoreChains.IsNullOrEmpty())
         {
             <div class="form-group">
                 <label for="chainInput">Store chain</label>

@@ -27,5 +27,10 @@ namespace Shopping.Shared.Data
             CreatorId = "";
             StoreChainId = "";
         }
+
+        public string getAddress()
+        {
+            return $"{Street} {HouseNumber}, {PostalCode} {City}";
+        }
     }
 }

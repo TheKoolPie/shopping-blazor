@@ -28,6 +28,11 @@
                 <h4>@CurrentList.Name</h4>
             </div>
             <div class="col-auto">
+                <button class="btn btn-light" @onclick="OnSortListByStore">
+                    <span class="oi oi-sort-descending" />
+                </button>
+            </div>
+            <div class="col-auto">
                 <button class="btn btn-light" @onclick="UpdateCurrentList">
                     <span class="oi oi-reload" />
                 </button>
@@ -73,14 +78,14 @@
                                         <button class="btn btn-primary" @onclick="OnSaveListChanges">
                                             @if (IsSavingList)
                                             {
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                @("Saving list...")
+                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                                                @(" Saving list...")
 
                                             }
                                             else
                                             {
                                                 <span class="oi oi-circle-check" />
-                                                @("Save list")
+                                                @(" Save list")
                                             }
                                         </button>
                                     </div>
@@ -238,11 +243,25 @@
     {
         NavigationManager.NavigateTo("/lists");
     }
+    private async Task OnSortListByStore()
+    {
+        var modalParams = new ModalParameters();
+        modalParams.Add(nameof(SortShoppingListByStore.List), CurrentList);
+        var sortByStoreModal = Modal.Show<SortShoppingListByStore>("Select store to sort by", modalParams);
+        var result = await sortByStoreModal.Result;
 
+        if (!result.Cancelled)
+        {
+            var sortedList = result.Data as ShoppingList;
+            CurrentList = sortedList;
+        }
+    }
     private async Task UpdateCurrentList()
     {
+        IsLoading = true;
         CurrentList = await ShoppingListRepo.GetAsync(ShoppingListId);
         CurrentListHasChanged = false;
+        IsLoading = false;
     }
 
     private void AddListItem(ShoppingListItem item)
