@@ -114,12 +114,6 @@
                                     Removing user group...
                                 </CustomSpinner>
                             }
-                            else if (IsAddingGroup)
-                            {
-                                <CustomSpinner>
-                                    Adding user group...
-                                </CustomSpinner>
-                            }
                             else
                             {
                                 <AlertComponent Model="@PropertyAlertModel" />
@@ -211,7 +205,6 @@
     AlertComponentModel PropertyAlertModel = null;
     AlertComponentModel AddItemAlertModel = null;
 
-    private bool IsAddingGroup;
     private bool IsRemovingGroup;
     private List<UserGroup> AvailableUserGroups;
     #endregion

@@ -35,6 +35,7 @@ namespace Shopping.Server.Controllers
             return Ok(result);
         }
         [HttpGet("GetByStoreId/{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<StoreProductCategoryResult>> GetAssignmentsByStoreId(string id)
         {
             var assignments = await _storeProductCatRepository.GetAssignmentsByStoreIdAsync(id);

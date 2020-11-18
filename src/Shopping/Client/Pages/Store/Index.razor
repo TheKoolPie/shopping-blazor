@@ -6,13 +6,17 @@
 
 
 <h3>Store chains</h3>
-<div class="row">
-    <div class="col">
-        <button class="btn btn-primary" type="button" @onclick="@(()=>NavigationManager.NavigateTo("/store/create-chain"))">
-            <span class="oi oi-plus" /> Create Store chain
-        </button>
-    </div>
-</div>
+<AuthorizeView>
+    <Authorized>
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary" type="button" @onclick="@(()=>NavigationManager.NavigateTo("/store/create-chain"))">
+                    <span class="oi oi-plus" /> Create Store chain
+                </button>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
 <hr />
 <div class="row">
     <div class="col">
@@ -73,13 +77,17 @@
 </div>
 <hr />
 <h3>Stores</h3>
-<div class="row">
-    <div class="col">
-        <button class="btn btn-primary" type="button" @onclick="@(()=>NavigationManager.NavigateTo("/store/create-store"))">
-            <span class="oi oi-plus" /> Create Store
-        </button>
-    </div>
-</div>
+<AuthorizeView>
+    <Authorized>
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary" type="button" @onclick="@(()=>NavigationManager.NavigateTo("/store/create-store"))">
+                    <span class="oi oi-plus" /> Create Store
+                </button>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
 <hr />
 <div class="row">
     <div class="col">

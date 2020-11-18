@@ -5,7 +5,20 @@
 @inject IStoreProductCatRepository StoreProductCatRepo
 @inject IProductCategories ProductCatRepo
 
-@attribute [Authorize]
+<h3>Details of Store</h3>
+<hr />
+<AuthorizeView>
+    <Authorized>
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary" type="button" @onclick="OnEditClicked">
+                    <span class="oi oi-pencil"/> Edit
+                </button>
+            </div>
+        </div>
+        <hr />
+    </Authorized>
+</AuthorizeView>
 
 <div class="row">
     <div class="col">
@@ -17,10 +30,75 @@
         }
         else
         {
-            <AlertComponent Model="@ErrorModel" />
-            <CreateStoreForm ViewModel="vm"
-                             StoreProductCatAssignments="ProductCatAssignments"
-                             OnValidSubmit="HandleValidSubmit" />
+            if (IsEdit)
+            {
+                <AlertComponent Model="@ErrorModel" />
+                <CreateStoreForm ViewModel="vm"
+                                 StoreProductCatAssignments="ProductCatAssignments"
+                                 OnValidSubmit="HandleValidSubmit" />
+            }
+            else
+            {
+                @if (!string.IsNullOrEmpty(CurrentStore.StoreChainId))
+                {
+                    <div class="form-group">
+                        <label>Store chain</label>
+                        <input class="form-control" value="@CurrentStore.StoreChain.Name" readonly />
+                    </div>
+                }
+                <div class="form-group">
+                    <label>Name</label>
+                    <input class="form-control" value="@CurrentStore.Name" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Price category</label>
+                    <input class="form-control" value="@CurrentStore.PriceCategory.GetPriceCatString()" readonly />
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Street</label>
+                            <input class="form-control" value="@CurrentStore.Street" readonly />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>House Number</label>
+                            <input class="form-control" value="@CurrentStore.HouseNumber" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Postalcode</label>
+                            <input class="form-control" value="@CurrentStore.PostalCode" readonly />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>City</label>
+                            <input class="form-control" value="@CurrentStore.City" readonly />
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <h5>Product Category Sorting</h5>
+                <hr />
+                <div class="container">
+                    @foreach (var item in ProductCatAssignments)
+                    {
+                        <div class="row rounded">
+                            <div class="col-2">
+                                # @(item.RankingValue+1)
+                            </div>
+                            <div class="col">
+                                @GetProductCategoryName(item.ProductCategoryId)
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         }
     </div>
 </div>
@@ -37,6 +115,7 @@
     Store CurrentStore;
     StoreCreateViewModel vm;
     List<StoreProductCategory> ProductCatAssignments;
+    List<ProductCategory> ProductCategories;
 
     protected async override Task OnInitializedAsync()
     {
@@ -49,16 +128,17 @@
             {
                 CurrentStore.StoreChain = await StoreChainRepo.GetAsync(CurrentStore.StoreChainId);
             }
+            ProductCategories = await ProductCatRepo.GetAllAsync();
             ProductCatAssignments = new List<StoreProductCategory>();
             ProductCatAssignments = await StoreProductCatRepo.GetAssignmentsByStoreIdAsync(CurrentStore.StoreId);
             if (ProductCatAssignments.Count == 0)
             {
-                var DbProductCategories = await ProductCatRepo.GetAllAsync();
-                foreach (var category in DbProductCategories.OrderBy(c => c.Name))
+
+                foreach (var category in ProductCategories.OrderBy(c => c.Name))
                 {
                     var assignment = new StoreProductCategory
                     {
-                        ProductCategoryId = category.Id
+                        ProductCategoryId = category.Id,
                     };
                     ProductCatAssignments.Add(assignment);
                 }
@@ -75,6 +155,15 @@
         }
 
         IsLoading = false;
+    }
+
+    private string GetProductCategoryName(string id)
+    {
+        return ProductCategories.FirstOrDefault(i => i.Id == id).Name;
+    }
+    private void OnEditClicked()
+    {
+        IsEdit = !IsEdit;
     }
 
     private async Task HandleValidSubmit()
