@@ -29,3 +29,9 @@ window.focusElement = (elementId) => {
         element.focus();
     }
 }
+window.unfocusElement = (elementId) => {
+    var el = document.getElementById(elementId);
+    if (el != null) {
+        el.blur();
+    }
+}

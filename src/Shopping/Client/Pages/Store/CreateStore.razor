@@ -1,0 +1,106 @@
+﻿@page "/store/create-store"
+
+@inject IStoreRepository StoreRepo
+@inject IStoreChainRepository StoreChainRepo
+@inject IStoreProductCatRepository StoreProductCatRepo
+@inject IProductCategories ProductCatRepo 
+
+@inject NavigationManager NavManager
+@attribute [Authorize]
+
+<h3>Create - Store</h3>
+<hr />
+<div class="row">
+    <div class="col">
+        @if (IsLoading)
+        {
+            <CustomSpinner>
+                Loading data...
+            </CustomSpinner>
+        }
+        else if (IsCreating)
+        {
+            <CustomSpinner>
+                Creating store...
+            </CustomSpinner>
+        }
+        else
+        {
+            <AlertComponent Model="@ErrorModel" />
+            <CreateStoreForm ViewModel="createModel"
+                             StoreProductCatAssignments="StoreProductCatAssignments"
+                             OnValidSubmit="HandleValidSubmit" />
+        }
+    </div>
+</div>
+
+
+
+@code {
+    bool IsLoading;
+    bool IsCreating;
+
+    StoreCreateViewModel createModel = new StoreCreateViewModel();
+    List<StoreProductCategory> StoreProductCatAssignments;
+
+    List<StoreChain> StoreChains;
+
+    AlertComponentModel ErrorModel;
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        StoreChains = await StoreChainRepo.GetAllAsync();
+        var DbProductCategories = await ProductCatRepo.GetAllAsync();
+        StoreProductCatAssignments = new List<StoreProductCategory>();
+        foreach (var category in DbProductCategories.OrderBy(c => c.Name))
+        {
+            var assignment = new StoreProductCategory
+            {
+                ProductCategoryId = category.Id
+            };
+            StoreProductCatAssignments.Add(assignment);
+        }
+
+
+        IsLoading = false;
+    }
+    private async Task HandleValidSubmit()
+    {
+        IsCreating = true;
+        ErrorModel = null;
+
+        var store = createModel.ToEntity();
+        if (string.IsNullOrEmpty(store.Name))
+        {
+            var selectedChain = StoreChains.FirstOrDefault(c => c.StoreChainId == store.StoreChainId);
+            store.Name = selectedChain.Name;
+        }
+
+        var created = await StoreRepo.CreateAsync(store);
+        if (created != null)
+        {
+            foreach(var assignment in StoreProductCatAssignments)
+            {
+                assignment.StoreId = created.StoreId;
+            }
+            var createdAssignments = await StoreProductCatRepo.CreateAsync(StoreProductCatAssignments);
+            if(createdAssignments == null)
+            {
+                ErrorModel = AlertComponentModel.CreateErrorAlert("Assignments could not be created. Store was created");
+            }
+        }
+        else
+        {
+            ErrorModel = AlertComponentModel.CreateErrorAlert("Could not create store");
+        }
+
+        if (ErrorModel == null)
+        {
+            NavManager.NavigateTo("/store");
+        }
+        IsCreating = false;
+    }
+
+}

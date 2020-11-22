@@ -1,8 +1,11 @@
 
-trigger:
+pr:
   branches:
     include:
-      - '*'
+    - '*'
+  paths:
+    include:
+    - src/*
 
 pool:
   vmImage: 'vs2017-win2016'

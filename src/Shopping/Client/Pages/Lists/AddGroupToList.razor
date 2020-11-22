@@ -3,7 +3,13 @@
 @if (IsLoading)
 {
     <CustomSpinner>
-        Loading User Groups
+        Loading User Groups...
+    </CustomSpinner>
+}
+else if (IsAddingGroup)
+{
+    <CustomSpinner>
+        Adding group...
     </CustomSpinner>
 }
 else

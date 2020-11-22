@@ -5,7 +5,7 @@ using Shopping.Client.Provider;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
-using Shopping.Shared.Services;
+using Shopping.Shared.Services.Interfaces;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -92,7 +92,7 @@ namespace Shopping.Client.Services.Implementations
                 var token = await _tokenProvider.GetTokenAsync();
                 if (string.IsNullOrEmpty(token))
                 {
-                    _logger.LogError($"Could not find access token");
+                    _logger.LogWarning($"Could not find access token");
                 }
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
             }

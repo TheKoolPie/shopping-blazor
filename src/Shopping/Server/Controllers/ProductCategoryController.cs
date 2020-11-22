@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Linq;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Shopping.Server.Data;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
-using Shopping.Shared.Services;
+using Shopping.Shared.Services.Interfaces;
 
 namespace Shopping.Server.Controllers
 {

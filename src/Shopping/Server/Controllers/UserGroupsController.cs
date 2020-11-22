@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Shopping.Server.Models;
-using Shopping.Server.Services;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
@@ -24,14 +19,12 @@ namespace Shopping.Server.Controllers
         private readonly IUserGroupRepository _userGroups;
         private readonly ICurrentUserProvider _userProvider;
         private readonly IUserRepository _userRepository;
-        private readonly IUserGroupShoppingLists _userGroupShoppingListAssignments;
         public UserGroupsController(IUserGroupRepository userGroups, ICurrentUserProvider users,
-            IUserRepository userRepository, IUserGroupShoppingLists userGroupShoppingListAssignments)
+            IUserRepository userRepository)
         {
             _userGroups = userGroups;
             _userProvider = users;
             _userRepository = userRepository;
-            _userGroupShoppingListAssignments = userGroupShoppingListAssignments;
         }
 
         [HttpGet]

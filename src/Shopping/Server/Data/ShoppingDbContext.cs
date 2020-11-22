@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shopping.Client.Pages;
+using Shopping.Server.Data.EntityBuilders;
 using Shopping.Shared;
 using Shopping.Shared.Data;
 using Shopping.Shared.Data.Abstractions;
@@ -7,6 +8,7 @@ using Shopping.Shared.Model.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Shopping.Server.Data
@@ -20,6 +22,9 @@ namespace Shopping.Server.Data
         public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
         public DbSet<UserGroupShoppingList> UserGroupShoppingLists { get; set; }
         public DbSet<UserGroupMembers> UserGroupMembers { get; set; }
+        public DbSet<StoreChain> StoreChains { get; set; }
+        public DbSet<Store> Stores { get; set; }
+        public DbSet<StoreProductCategory> StoreProductCategories { get; set; }
 
         public ShoppingDbContext() : base() { }
         public ShoppingDbContext(DbContextOptions<ShoppingDbContext> options) : base(options)
@@ -29,6 +34,7 @@ namespace Shopping.Server.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
 }

@@ -1,10 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Shopping.Server.Data;
-using Shopping.Shared.Data;
+﻿using Shopping.Shared.Data;
 using Shopping.Shared.Data.Abstractions;
 using Shopping.Shared.Exceptions;
-using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;

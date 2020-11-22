@@ -46,3 +46,20 @@
 .selectable-row {
     cursor: pointer;
 }
+
+.selectable {
+    cursor: pointer;
+}
+
+.disable-mobile-zoom {
+    touch-action: manipulation;
+}
+
+.greyed-out {
+    opacity: 0.1;
+}
+
+.selected-row {
+    background-color: rgba(58,6,71,0.1);
+}
+

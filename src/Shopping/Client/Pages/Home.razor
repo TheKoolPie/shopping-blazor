@@ -40,6 +40,14 @@
             </div>
         </div>
     </div>
+    <div class="col-md-4">
+        <div class="card home-card" @onclick="@(()=>Nav.NavigateTo("/store"))">
+            <div class="card-body">
+                <h5 class="card-title">Store</h5>
+                <span class="oi oi-cart home-icon" />
+            </div>
+        </div>
+    </div>
     <AuthorizeView>
         <Authorized>
             <div class="col-md-4">

@@ -1,0 +1,208 @@
+﻿@page "/store/details-store/{id}"
+
+@inject IStoreRepository StoreRepo
+@inject IStoreChainRepository StoreChainRepo
+@inject IStoreProductCatRepository StoreProductCatRepo
+@inject IProductCategories ProductCatRepo
+
+<h3>Details of Store</h3>
+<hr />
+<AuthorizeView>
+    <Authorized>
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary" type="button" @onclick="OnEditClicked">
+                    <span class="oi oi-pencil" /> Edit
+                </button>
+            </div>
+        </div>
+        <hr />
+    </Authorized>
+</AuthorizeView>
+
+<div class="row">
+    <div class="col">
+        @if (IsLoading)
+        {
+            <CustomSpinner>
+                Loading store data...
+            </CustomSpinner>
+        }
+        else if (IsUpdating)
+        {
+            <CustomSpinner>
+                Is updating...
+            </CustomSpinner>
+        }
+        else
+        {
+            if (IsEdit)
+            {
+                <AlertComponent Model="@ErrorModel" />
+                <CreateStoreForm ViewModel="vm"
+                                 StoreProductCatAssignments="ProductCatAssignments"
+                                 OnValidSubmit="HandleValidSubmit"
+                                 OnAssignmentOrderChanged="HandleAssignmentOrderChanged"
+                                 IsEdit="true" />
+            }
+            else
+            {
+                @if (!string.IsNullOrEmpty(CurrentStore.StoreChainId))
+                {
+                    <div class="form-group">
+                        <label>Store chain</label>
+                        <input class="form-control" value="@CurrentStore.StoreChain.Name" readonly />
+                    </div>
+                }
+                <div class="form-group">
+                    <label>Name</label>
+                    <input class="form-control" value="@CurrentStore.Name" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Price category</label>
+                    <input class="form-control" value="@CurrentStore.PriceCategory.GetPriceCatString()" readonly />
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Street</label>
+                            <input class="form-control" value="@CurrentStore.Street" readonly />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>House Number</label>
+                            <input class="form-control" value="@CurrentStore.HouseNumber" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Postalcode</label>
+                            <input class="form-control" value="@CurrentStore.PostalCode" readonly />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>City</label>
+                            <input class="form-control" value="@CurrentStore.City" readonly />
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <h5>Product Category Sorting</h5>
+                <hr />
+                <div class="container">
+                    @foreach (var item in ProductCatAssignments)
+                    {
+                        <div class="row rounded">
+                            <div class="col-2">
+                                # @(item.RankingValue+1)
+                            </div>
+                            <div class="col">
+                                @GetProductCategoryName(item.ProductCategoryId)
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    bool IsLoading;
+    bool IsEdit;
+    bool IsUpdating;
+    bool AssignmentOrderChanged;
+
+    AlertComponentModel ErrorModel;
+
+    Store CurrentStore;
+    StoreCreateViewModel vm;
+    List<StoreProductCategory> ProductCatAssignments;
+    List<ProductCategory> ProductCategories;
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        AssignmentOrderChanged = false;
+        if (!string.IsNullOrEmpty(Id))
+        {
+            CurrentStore = await StoreRepo.GetAsync(Id);
+            if (!string.IsNullOrEmpty(CurrentStore.StoreChainId))
+            {
+                CurrentStore.StoreChain = await StoreChainRepo.GetAsync(CurrentStore.StoreChainId);
+            }
+            ProductCategories = await ProductCatRepo.GetAllAsync();
+            ProductCatAssignments = new List<StoreProductCategory>();
+            ProductCatAssignments = await StoreProductCatRepo.GetAssignmentsByStoreIdAsync(CurrentStore.StoreId);
+            if (ProductCatAssignments.Count == 0)
+            {
+
+                foreach (var category in ProductCategories.OrderBy(c => c.Name))
+                {
+                    var assignment = new StoreProductCategory
+                    {
+                        ProductCategoryId = category.Id,
+                    };
+                    ProductCatAssignments.Add(assignment);
+                }
+            }
+            else
+            {
+                ProductCatAssignments = ProductCatAssignments.OrderBy(a => a.RankingValue).ToList();
+            }
+            vm = CurrentStore.ToCreateViewModel();
+        }
+        else
+        {
+            ErrorModel = AlertComponentModel.CreateErrorAlert("No ID provided");
+        }
+
+        IsLoading = false;
+    }
+
+    private void HandleAssignmentOrderChanged()
+    {
+        AssignmentOrderChanged = true;
+    }
+
+
+    private string GetProductCategoryName(string id)
+    {
+        return ProductCategories.FirstOrDefault(i => i.Id == id).Name;
+    }
+    private void OnEditClicked()
+    {
+        IsEdit = !IsEdit;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        IsUpdating = true;
+        var entity = vm.ToEntity();
+        var result = await StoreRepo.UpdateAsync(CurrentStore.StoreId, entity);
+        if (result == null)
+        {
+            ErrorModel = AlertComponentModel.CreateErrorAlert("Could not update store data");
+        }
+        else
+        {
+            if (AssignmentOrderChanged)
+            {
+                var assignmentResult = await StoreProductCatRepo.UpdateOfStore(CurrentStore.StoreId, ProductCatAssignments);
+                if (assignmentResult == null)
+                {
+                    ErrorModel = AlertComponentModel.CreateErrorAlert("Could not update assignments");
+                }
+            }
+        }
+
+        IsUpdating = false;
+    }
+}

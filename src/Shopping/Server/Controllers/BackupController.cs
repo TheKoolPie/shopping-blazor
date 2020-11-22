@@ -8,7 +8,6 @@ using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.IO;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Shopping.Server.Controllers

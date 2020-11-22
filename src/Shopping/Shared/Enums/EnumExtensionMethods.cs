@@ -58,6 +58,11 @@ namespace Shopping.Shared.Enums
             }
             return stepperValue;
         }
+        public static string GetPriceCatString(this PriceCategory category)
+        {
+            int value = (int)category;
+            return new String('€', value + 1);
+        }
 
     }
 }
