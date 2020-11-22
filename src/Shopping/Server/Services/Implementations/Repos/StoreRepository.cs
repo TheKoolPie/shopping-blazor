@@ -84,7 +84,7 @@ namespace Shopping.Server.Services.Implementations.Repos
             var stores = _context.Stores.ToList();
             return stores.Any(s =>
                 s.StoreId == item.StoreId ||
-                IsSameAddress(s, item)
+                (s.Name == item.Name && IsSameAddress(s, item))
                 );
         }
 
