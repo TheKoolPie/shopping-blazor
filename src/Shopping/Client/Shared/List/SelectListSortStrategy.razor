@@ -88,50 +88,50 @@
 </div>
 
 @code {
-    [CascadingParameter]
-    BlazoredModalInstance BlazoredModal { get; set; }
+        [CascadingParameter]
+        BlazoredModalInstance BlazoredModal { get; set; }
 
-    bool IsLoading;
-    bool IsValidStrategySelected;
+        bool IsLoading;
+        bool IsValidStrategySelected;
 
-    ShoppingListSortingStrategy _selectedStrategy;
-    ShoppingListSortingStrategy SelectedStrategy
+        ShoppingListSortingStrategy _selectedStrategy;
+        ShoppingListSortingStrategy SelectedStrategy
     {
-        get => _selectedStrategy;
-        set
+            get => _selectedStrategy;
+            set
         {
-            _selectedStrategy = value;
-            SetIsValidStrategySelected();
+                _selectedStrategy = value;
+                SetIsValidStrategySelected();
+            }
         }
-    }
 
-    string _selectedStoreChainId;
-    string SelectedStoreChainId
+        string _selectedStoreChainId;
+        string SelectedStoreChainId
     {
-        get => _selectedStoreChainId;
-        set
+            get => _selectedStoreChainId;
+            set
         {
-            _selectedStoreChainId = value;
-            OnStoreChainSelectionChanged();
-            SetIsValidStrategySelected();
+                _selectedStoreChainId = value;
+                OnStoreChainSelectionChanged();
+                SetIsValidStrategySelected();
+            }
         }
-    }
-    string _selectedStoreId;
-    string SelectedStoreId
+        string _selectedStoreId;
+        string SelectedStoreId
     {
-        get => _selectedStoreId;
-        set
+            get => _selectedStoreId;
+            set
         {
-            _selectedStoreId = value;
-            SetIsValidStrategySelected();
+                _selectedStoreId = value;
+                SetIsValidStrategySelected();
+            }
         }
-    }
 
-    List<StoreChain> StoreChains;
-    List<Store> Stores;
-    List<Store> LocalStoreBackUp;
+        List<StoreChain> StoreChains;
+        List<Store> Stores;
+        List<Store> LocalStoreBackUp;
 
-    EditContext context;
+        EditContext context;
 
     protected async override Task OnInitializedAsync()
     {
@@ -172,7 +172,17 @@
 
     private async Task OnOkClick()
     {
-
+        IShoppingListSortStrategy strategy = null;
+        switch (SelectedStrategy)
+        {
+            case ShoppingListSortingStrategy.None:
+                strategy = null;
+                break;
+            case ShoppingListSortingStrategy.Store:
+                strategy = await GetStoreStrategy();
+                break;
+        }
+        BlazoredModal.Close(ModalResult.Ok<IShoppingListSortStrategy>(strategy));
     }
 
     private async Task<IShoppingListSortStrategy> GetStoreStrategy()
