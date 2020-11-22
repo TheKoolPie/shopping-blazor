@@ -89,7 +89,7 @@ else
                 catCount++;
                 <div class="row rounded disable-mobile-zoom @rowCss" style="padding: 5px;">
                     <div class="col">
-                        @getNameOfCategory(item.ProductCategoryId)
+                        @GetNameOfCategory(item.ProductCategoryId)
                     </div>
                     <div class="col-2">
                         <button id="@($"btn-up-{item.ProductCategoryId}")" type="button" class="btn btn-primary disable-mobile-zoom"
@@ -112,9 +112,21 @@ else
         <hr />
         <div class="row">
             <div class="col">
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="submit" class="btn btn-primary">
+                    @if (!IsEdit)
+                    {
+                        @("Create")
+                    }
+                    else
+                    {
+                        @("Update")
+                    }
+                </button>
+
             </div>
+
         </div>
+
     </EditForm>
 }
 
@@ -125,8 +137,13 @@ else
     public List<StoreProductCategory> StoreProductCatAssignments { get; set; }
     [Parameter]
     public EventCallback OnValidSubmit { get; set; }
+    [Parameter]
+    public EventCallback OnAssignmentOrderChanged { get; set; }
+    [Parameter]
+    public bool IsEdit { get; set; }
 
     bool IsLoading;
+    bool AssignmentsChanged;
 
     int catCount = 0;
     string lastMovedId = "";
@@ -141,6 +158,8 @@ else
     protected async override Task OnInitializedAsync()
     {
         IsLoading = true;
+
+        AssignmentsChanged = false;
 
         StoreChains = await StoreChainRepo.GetAllAsync();
         ProductCategories = await ProductCategoryRepo.GetAllAsync();
@@ -180,7 +199,7 @@ else
 
         if (currentIndex != 0)
         {
-            SwitchArrayPosition(currentIndex, currentIndex - 1);
+            await SwitchArrayPosition(currentIndex, currentIndex - 1);
         }
         await JSRuntime.InvokeVoidAsync("unfocusElement", $"btn-up-{targetId}");
     }
@@ -192,13 +211,14 @@ else
         int currentIndex = StoreProductCatAssignments.FindIndex(s => s.ProductCategoryId == targetId);
         if (currentIndex < StoreProductCatAssignments.Count() - 1)
         {
-            SwitchArrayPosition(currentIndex, currentIndex + 1);
+            await SwitchArrayPosition(currentIndex, currentIndex + 1);
         }
         await JSRuntime.InvokeVoidAsync("unfocusElement", $"btn-down-{targetId}");
     }
 
-    private void SwitchArrayPosition(int currentIndex, int targetIndex)
+    private async Task SwitchArrayPosition(int currentIndex, int targetIndex)
     {
+
         catCount = 0;
         var currentItem = StoreProductCatAssignments[currentIndex];
         StoreProductCatAssignments[currentIndex] = StoreProductCatAssignments[targetIndex];
@@ -207,16 +227,17 @@ else
         UpdateRankingValues();
 
         currentItem = null;
+        await OnAssignmentOrderChanged.InvokeAsync(null);
     }
 
-    private string getNameOfCategory(string id)
+    private string GetNameOfCategory(string id)
     {
         return ProductCategories.FirstOrDefault(c => c.Id == id).Name;
     }
 
     private void UpdateRankingValues()
     {
-        for(int i = 0; i < StoreProductCatAssignments.Count; i++)
+        for (int i = 0; i < StoreProductCatAssignments.Count; i++)
         {
             StoreProductCatAssignments[i].RankingValue = i;
         }

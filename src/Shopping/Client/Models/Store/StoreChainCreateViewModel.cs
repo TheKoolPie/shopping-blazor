@@ -9,6 +9,7 @@ namespace Shopping.Client.Models
 {
     public class StoreChainCreateViewModel
     {
+        public string StoreChainId { get; set; }
         [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }
         [Required(ErrorMessage = "Price category is required")]

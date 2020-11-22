@@ -78,5 +78,31 @@ namespace Shopping.Client.Services.Implementations
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<StoreProductCategory>> UpdateOfStore(string storeId, List<StoreProductCategory> assignments)
+        {
+            var client = await GetApiClient();
+
+            var response = await client.PutAsJsonAsync($"{_baseUri}/UpdateOfStore/{storeId}", assignments);
+            CheckForUnauthorized(response);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<StoreProductCategoryResult>();
+                if (result.IsSuccessful)
+                {
+                    return result.ResultData;
+                }
+                else
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
+            }
+            else
+            {
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
+            }
+            return null;
+        }
     }
 }

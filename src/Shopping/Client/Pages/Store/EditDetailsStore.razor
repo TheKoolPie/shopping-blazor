@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col">
                 <button class="btn btn-primary" type="button" @onclick="OnEditClicked">
-                    <span class="oi oi-pencil"/> Edit
+                    <span class="oi oi-pencil" /> Edit
                 </button>
             </div>
         </div>
@@ -28,6 +28,12 @@
                 Loading store data...
             </CustomSpinner>
         }
+        else if (IsUpdating)
+        {
+            <CustomSpinner>
+                Is updating...
+            </CustomSpinner>
+        }
         else
         {
             if (IsEdit)
@@ -35,7 +41,9 @@
                 <AlertComponent Model="@ErrorModel" />
                 <CreateStoreForm ViewModel="vm"
                                  StoreProductCatAssignments="ProductCatAssignments"
-                                 OnValidSubmit="HandleValidSubmit" />
+                                 OnValidSubmit="HandleValidSubmit"
+                                 OnAssignmentOrderChanged="HandleAssignmentOrderChanged"
+                                 IsEdit="true" />
             }
             else
             {
@@ -109,6 +117,8 @@
 
     bool IsLoading;
     bool IsEdit;
+    bool IsUpdating;
+    bool AssignmentOrderChanged;
 
     AlertComponentModel ErrorModel;
 
@@ -120,7 +130,7 @@
     protected async override Task OnInitializedAsync()
     {
         IsLoading = true;
-
+        AssignmentOrderChanged = false;
         if (!string.IsNullOrEmpty(Id))
         {
             CurrentStore = await StoreRepo.GetAsync(Id);
@@ -157,6 +167,12 @@
         IsLoading = false;
     }
 
+    private void HandleAssignmentOrderChanged()
+    {
+        AssignmentOrderChanged = true;
+    }
+
+
     private string GetProductCategoryName(string id)
     {
         return ProductCategories.FirstOrDefault(i => i.Id == id).Name;
@@ -167,5 +183,26 @@
     }
 
     private async Task HandleValidSubmit()
-    { }
+    {
+        IsUpdating = true;
+        var entity = vm.ToEntity();
+        var result = await StoreRepo.UpdateAsync(CurrentStore.StoreId, entity);
+        if (result == null)
+        {
+            ErrorModel = AlertComponentModel.CreateErrorAlert("Could not update store data");
+        }
+        else
+        {
+            if (AssignmentOrderChanged)
+            {
+                var assignmentResult = await StoreProductCatRepo.UpdateOfStore(CurrentStore.StoreId, ProductCatAssignments);
+                if (assignmentResult == null)
+                {
+                    ErrorModel = AlertComponentModel.CreateErrorAlert("Could not update assignments");
+                }
+            }
+        }
+
+        IsUpdating = false;
+    }
 }

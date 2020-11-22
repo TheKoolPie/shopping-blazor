@@ -8,6 +8,7 @@ namespace Shopping.Client.Models
         public static Store ToEntity(this StoreCreateViewModel vm)
         {
             var store = new Store();
+            store.StoreId = vm.StoreId;
             store.Name = vm.Name;
             store.Street = vm.Street;
             store.HouseNumber = vm.HouseNumber;
@@ -20,6 +21,7 @@ namespace Shopping.Client.Models
         public static StoreCreateViewModel ToCreateViewModel(this Store model)
         {
             var vm = new StoreCreateViewModel();
+            vm.StoreId = model.StoreId;
             vm.Name = model.Name;
             vm.Street = model.Street;
             vm.HouseNumber = model.HouseNumber;

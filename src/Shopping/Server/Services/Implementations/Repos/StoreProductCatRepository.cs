@@ -124,6 +124,24 @@ namespace Shopping.Server.Services.Implementations.Repos
             );
         }
 
+        public async Task<List<StoreProductCategory>> UpdateOfStore(string storeId, List<StoreProductCategory> assignments)
+        {
+            var assignmentsOfStore = (await GetAssignmentsByStoreIdAsync(storeId))
+                .OrderBy(a => a.StoreProductCategoryId);
 
+            foreach (var assignment in assignmentsOfStore)
+            {
+                var updatedAssignment = assignments.FirstOrDefault(a => a.StoreProductCategoryId == assignment.StoreProductCategoryId);
+                if (updatedAssignment == null)
+                {
+                    throw new ItemNotFoundException(typeof(StoreProductCategory), assignment.StoreProductCategoryId);
+                }
+                assignment.RankingValue = updatedAssignment.RankingValue;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return assignmentsOfStore.ToList();
+        }
     }
 }

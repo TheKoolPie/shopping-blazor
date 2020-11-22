@@ -5,6 +5,7 @@ namespace Shopping.Client.Models
 {
     public class StoreCreateViewModel
     {
+        public string StoreId { get; set; }
         public string Name { get; set; }
         public string StoreChainId { get; set; }
         public PriceCategory Category { get; set; }

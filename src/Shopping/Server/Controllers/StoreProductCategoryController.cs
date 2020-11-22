@@ -7,6 +7,7 @@ using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Shopping.Server.Controllers
@@ -111,6 +112,40 @@ namespace Shopping.Server.Controllers
                 var update = await _storeProductCatRepository.UpdateAsync(id, assignment);
                 result.IsSuccessful = true;
                 result.ResultData.Add(update);
+            }
+            catch (ItemNotFoundException e)
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
+            }
+            catch (ItemAlreadyExistsException e)
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return Ok(result);
+        }
+        [HttpPut("UpdateOfStore/{id}")]
+        public async Task<ActionResult<StoreProductCategoryResult>> UpdateOfStore(string id, [FromBody] List<StoreProductCategory> assignments)
+        {
+            StoreProductCategoryResult result = new StoreProductCategoryResult();
+            if (assignments.Any(a => a.StoreId != id))
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Id does not match value in object");
+                return BadRequest(result);
+            }
+            try
+            {
+                var update = await _storeProductCatRepository.UpdateOfStore(id, assignments);
+                result.IsSuccessful = true;
+                result.ResultData = update;
             }
             catch (ItemNotFoundException e)
             {
