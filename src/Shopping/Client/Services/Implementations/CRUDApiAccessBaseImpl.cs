@@ -1,15 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Data;
-using Shopping.Shared.Services;
+using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations

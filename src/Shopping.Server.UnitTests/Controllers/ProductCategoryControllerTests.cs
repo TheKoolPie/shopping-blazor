@@ -4,7 +4,7 @@ using Shopping.Server.Controllers;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Results;
-using Shopping.Shared.Services;
+using Shopping.Shared.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

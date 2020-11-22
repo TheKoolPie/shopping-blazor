@@ -1,0 +1,188 @@
+﻿@inject IModalService ModalService
+@inject IStoreChainRepository StoreChainRepo
+@inject IStoreRepository StoreRepo
+@inject IStoreProductCatRepository StoreProductCatRepo
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            @if (IsLoading)
+            {
+                <CustomSpinner>
+                    Prepare Store data...
+                </CustomSpinner>
+            }
+            else
+            {
+                <EditForm EditContext="context">
+                    <div class="form-group">
+                        <label for="selectStrategy">Select Sorting mode</label>
+                        <InputSelect id="selectStrategy" class="form-control" @bind-Value="SelectedStrategy">
+                            @foreach (var item in Enum.GetValues(typeof(ShoppingListSortingStrategy)).Cast<ShoppingListSortingStrategy>())
+                                {
+                                <option value="@item">
+                                    @item.GetDisplayName()
+                                </option>
+                                }
+                        </InputSelect>
+                        <hr />
+                        @switch (SelectedStrategy)
+                        {
+                            case ShoppingListSortingStrategy.None:
+                                {
+                                    <h5>No strategy selected</h5>
+                                }
+                                break;
+                            case ShoppingListSortingStrategy.Store:
+                                {
+                                    <div class="form-group">
+                                        <label id="storeChainSelect">Store Chain</label>
+                                        <InputSelect id="storeChainSelect" class="form-control"
+                                                     @bind-Value="SelectedStoreChainId">
+                                            <option value="">None</option>
+                                            @foreach (var chain in StoreChains)
+                                                            {
+                                                <option value="@chain.StoreChainId">@chain.Name</option>
+                                                            }
+                                        </InputSelect>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="storeSelect">Store</label>
+                                        <InputSelect id="storeSelect" class="form-control" @bind-Value="SelectedStoreId">
+                                            <option value="">Choose store...</option>
+                                            @foreach (var store in Stores)
+                                                            {
+                                                <option value="@store.StoreId">
+                                                    @if (string.IsNullOrEmpty(SelectedStoreChainId))
+                                                                    {
+                                                        @($"{store.Name}, ")
+                                                                    }
+                                                    @store.getAddress()
+                                                </option>
+                                                            }
+                                        </InputSelect>
+                                    </div>
+                                }
+                                break;
+
+                        }
+                        <hr />
+                        <div class="row">
+                            <div class="col">
+                                <button type="button" disabled="@(!IsValidStrategySelected)"
+                                        class="btn btn-primary" @onclick="OnOkClick">
+                                    Ok
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="btn btn-secondary" @onclick="OnCancelClick">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; }
+
+    bool IsLoading;
+    bool IsValidStrategySelected;
+
+    ShoppingListSortingStrategy _selectedStrategy;
+    ShoppingListSortingStrategy SelectedStrategy
+    {
+        get => _selectedStrategy;
+        set
+        {
+            _selectedStrategy = value;
+            SetIsValidStrategySelected();
+        }
+    }
+
+    string _selectedStoreChainId;
+    string SelectedStoreChainId
+    {
+        get => _selectedStoreChainId;
+        set
+        {
+            _selectedStoreChainId = value;
+            OnStoreChainSelectionChanged();
+            SetIsValidStrategySelected();
+        }
+    }
+    string _selectedStoreId;
+    string SelectedStoreId
+    {
+        get => _selectedStoreId;
+        set
+        {
+            _selectedStoreId = value;
+            SetIsValidStrategySelected();
+        }
+    }
+
+    List<StoreChain> StoreChains;
+    List<Store> Stores;
+    List<Store> LocalStoreBackUp;
+
+    EditContext context;
+
+    protected async override Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        StoreChains = await StoreChainRepo.GetAllAsync();
+        Stores = await StoreRepo.GetAllAsync();
+        LocalStoreBackUp = new List<Store>(Stores);
+
+        context = new EditContext(this);
+
+        IsLoading = false;
+    }
+
+    private void OnStoreChainSelectionChanged()
+    {
+        Stores = new List<Store>(LocalStoreBackUp);
+        if (!string.IsNullOrEmpty(SelectedStoreChainId))
+        {
+            Stores = Stores
+                .Where(s => s.StoreChainId == SelectedStoreChainId)
+                .ToList();
+        }
+    }
+
+    private void SetIsValidStrategySelected()
+    {
+        switch (SelectedStrategy)
+        {
+            case ShoppingListSortingStrategy.None:
+                IsValidStrategySelected = false;
+                break;
+            case ShoppingListSortingStrategy.Store:
+                IsValidStrategySelected = !string.IsNullOrEmpty(SelectedStoreId);
+                break;
+        }
+    }
+
+    private async Task OnOkClick()
+    {
+
+    }
+
+    private async Task<IShoppingListSortStrategy> GetStoreStrategy()
+    {
+        var assignmentsOfStore = await StoreProductCatRepo.GetAssignmentsByStoreIdAsync(SelectedStoreId);
+        return new SortShoppingListByStoreStrategy(assignmentsOfStore);
+    }
+
+    private void OnCancelClick()
+    {
+        BlazoredModal.Cancel();
+    }
+}

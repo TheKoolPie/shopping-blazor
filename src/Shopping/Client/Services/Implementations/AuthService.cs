@@ -5,7 +5,7 @@ using Shopping.Client.Provider;
 using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
-using Shopping.Shared.Services;
+using Shopping.Shared.Services.Interfaces;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;

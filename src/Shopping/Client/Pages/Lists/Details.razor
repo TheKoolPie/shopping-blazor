@@ -245,15 +245,13 @@
     }
     private async Task OnSortListByStore()
     {
-        var modalParams = new ModalParameters();
-        modalParams.Add(nameof(SortShoppingListByStore.List), CurrentList);
-        var sortByStoreModal = Modal.Show<SortShoppingListByStore>("Select store to sort by", modalParams);
+        var sortByStoreModal = Modal.Show<SelectListSortStrategy>("How do you want to sort your list?");
         var result = await sortByStoreModal.Result;
 
         if (!result.Cancelled)
         {
-            var sortedList = result.Data as ShoppingList;
-            CurrentList = sortedList;
+            IShoppingListSortStrategy sortStrategy = result.Data as IShoppingListSortStrategy;
+            CurrentList = sortStrategy.Sort(CurrentList);
         }
     }
     private async Task UpdateCurrentList()

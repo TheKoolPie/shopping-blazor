@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Shopping.Shared.Data;
-using Shopping.Shared.Services;
+using Shopping.Shared.Services.Interfaces;
 using Shopping.Client.Services.Implementations.Base;
 using Shopping.Shared.Results;
 

@@ -2,7 +2,7 @@
 using Shopping.Client.Services.Interfaces;
 using Shopping.Shared.Data;
 using Shopping.Shared.Results;
-using Shopping.Shared.Services;
+using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

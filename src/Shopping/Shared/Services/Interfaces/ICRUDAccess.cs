@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shopping.Shared.Services
+namespace Shopping.Shared.Services.Interfaces
 {
     public interface ICRUDAccess<T>
     {

@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Shopping.Server.Models;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
-using Shopping.Shared.Services;
+using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;

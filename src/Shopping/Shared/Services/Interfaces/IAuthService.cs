@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Shopping.Shared.Results;
 
-namespace Shopping.Shared.Services
+namespace Shopping.Shared.Services.Interfaces
 {
     public interface IAuthService
     {
