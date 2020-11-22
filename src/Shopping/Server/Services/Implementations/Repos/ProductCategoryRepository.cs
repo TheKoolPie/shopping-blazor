@@ -85,7 +85,13 @@ namespace Shopping.Server.Services.Implementations
                 throw new ItemAlreadyExistsException(typeof(ProductCategory), item.Id);
             }
             _context.Categories.Add(item);
+            
             await _context.SaveChangesAsync();
+
+            await CreateStoreCatAssignmentsForCategory(item);
+
+            await _context.SaveChangesAsync();
+
             return item;
         }
 
@@ -144,6 +150,28 @@ namespace Shopping.Server.Services.Implementations
                 .Where(i => i.Items.Any(p => p.ProductItemId == productItemId))
                 .ToList();
             return shoppinglist;
+        }
+
+        private async Task CreateStoreCatAssignmentsForCategory(ProductCategory category)
+        {
+            var assignments = await _context.StoreProductCategories.ToListAsync();
+
+            var storeIds = assignments.Select(a => a.StoreId).Distinct().ToList();
+
+            foreach (var storeId in storeIds)
+            {
+                int highestRankingValueInStore = assignments
+                    .Where(a => a.StoreId == storeId)
+                    .Select(a => a.RankingValue)
+                    .Max();
+                _context.StoreProductCategories.Add(
+                    new StoreProductCategory
+                    {
+                        ProductCategoryId = category.Id,
+                        RankingValue = highestRankingValueInStore + 1,
+                        StoreId = storeId
+                    });
+            }
         }
     }
 }

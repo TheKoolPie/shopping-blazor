@@ -37,7 +37,6 @@ namespace Shopping.Server.Services.Implementations.Repos
             {
                 throw new ItemNotFoundException(typeof(Store), id);
             }
-            //Delete Assignemnts also?
             _context.Stores.Remove(existing);
             bool result = false;
             try
