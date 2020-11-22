@@ -158,8 +158,6 @@ else
     {
         IsLoading = true;
 
-        AssignmentsChanged = false;
-
         StoreChains = await StoreChainRepo.GetAllAsync();
         ProductCategories = await ProductCategoryRepo.GetAllAsync();
         eContext = new EditContext(ViewModel);
