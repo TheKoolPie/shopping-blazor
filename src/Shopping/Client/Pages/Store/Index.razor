@@ -2,6 +2,7 @@
 
 @inject IStoreRepository StoreRepo
 @inject IStoreChainRepository StoreChainRepo
+@inject IModalService Modal
 @inject NavigationManager NavigationManager
 
 
@@ -120,6 +121,7 @@
                             <th>Name</th>
                             <th>Street</th>
                             <th>City</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,12 +129,23 @@
                         {
                             @foreach (var store in LocalStores)
                             {
-                                <tr class="selectable-row" @onclick="@(()=>OnRowClicked(store.StoreId))">
-                                    <td></td>
-                                    <td>@store.PriceCategory.GetPriceCatString()</td>
-                                    <td>@store.Name</td>
-                                    <td>@($"{store.Street}, {store.HouseNumber}")</td>
-                                    <td>@store.City</td>
+                                <tr class="selectable-row">
+                                    <td @onclick="@(()=>OnRowClicked(store.StoreId))"></td>
+                                    <td @onclick="@(()=>OnRowClicked(store.StoreId))">@store.PriceCategory.GetPriceCatString()</td>
+                                    <td @onclick="@(()=>OnRowClicked(store.StoreId))">@store.Name</td>
+                                    <td @onclick="@(()=>OnRowClicked(store.StoreId))">@($"{store.Street}, {store.HouseNumber}")</td>
+                                    <td @onclick="@(()=>OnRowClicked(store.StoreId))">@store.City</td>
+                                    <td >
+                                        <AuthorizeView>
+                                            <Authorized>
+                                                <ContextMenu>
+                                                    <ContextMenuItem OnClickCallback="@(()=>OnDeleteStore(store))">
+                                                        Delete
+                                                    </ContextMenuItem>
+                                                </ContextMenu>
+                                            </Authorized>
+                                        </AuthorizeView>
+                                    </td>
                                 </tr>
                             }
                         }
@@ -234,6 +247,31 @@
                 .ToList();
         }
     }
+
+    private async Task OnDeleteStore(Store store)
+    {
+        var modalParams = new ModalParameters();
+        modalParams.Add(nameof(DeleteStoreModal.Store), store);
+        var modal = Modal.Show<DeleteStoreModal>("Delete store", modalParams);
+        var result = await modal.Result;
+        if (!result.Cancelled)
+        {
+            if ((await StoreRepo.DeleteByIdAsync(store.StoreId)))
+            {
+                var dbItem = DbStores.FirstOrDefault(s => s.StoreId == store.StoreId);
+                if (dbItem != null)
+                {
+                    DbStores.Remove(dbItem);
+                }
+                var localItem = LocalStores.FirstOrDefault(s => s.StoreId == store.StoreId);
+                if (localItem != null)
+                {
+                    LocalStores.Remove(localItem);
+                }
+            }
+        }
+    }
+
     private void OnRowClicked(string id)
     {
         NavigationManager.NavigateTo($"/store/details-store/{id}");
