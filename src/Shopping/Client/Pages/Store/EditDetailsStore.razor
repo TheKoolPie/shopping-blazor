@@ -93,19 +93,18 @@
                 <hr />
                 <h5>Product Category Sorting</h5>
                 <hr />
-                <div class="container">
-                    @foreach (var item in ProductCatAssignments)
-                    {
-                        <div class="row rounded">
-                            <div class="col-2">
-                                # @(item.RankingValue+1)
-                            </div>
-                            <div class="col">
-                                @GetProductCategoryName(item.ProductCategoryId)
-                            </div>
+
+                @foreach (var item in ProductCatAssignments)
+                {
+                    <div class="row rounded">
+                        <div class="col-2">
+                            # @(item.RankingValue+1)
                         </div>
-                    }
-                </div>
+                        <div class="col">
+                            @GetProductCategoryName(item.ProductCategoryId)
+                        </div>
+                    </div>
+                }
             }
         }
     </div>

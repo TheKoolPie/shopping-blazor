@@ -11,7 +11,7 @@ pool:
   vmImage: 'vs2017-win2016'
 
 variables:
-  buildConfiguration: 'Debug'
+  buildConfiguration: 'Release'
 
 
 steps:
