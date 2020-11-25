@@ -3,7 +3,7 @@
 @inject IStoreRepository StoreRepo
 @inject IStoreChainRepository StoreChainRepo
 @inject IStoreProductCatRepository StoreProductCatRepo
-@inject IProductCategories ProductCatRepo 
+@inject IProductCategories ProductCatRepo
 
 @inject NavigationManager NavManager
 @attribute [Authorize]
@@ -54,15 +54,17 @@
         StoreChains = await StoreChainRepo.GetAllAsync();
         var DbProductCategories = await ProductCatRepo.GetAllAsync();
         StoreProductCatAssignments = new List<StoreProductCategory>();
-        foreach (var category in DbProductCategories.OrderBy(c => c.Name))
+        DbProductCategories = DbProductCategories.OrderBy(c => c.Name).ToList();
+        for (int i = 0; i < DbProductCategories.Count; i++)
         {
+            var cat = DbProductCategories[i];
             var assignment = new StoreProductCategory
             {
-                ProductCategoryId = category.Id
+                ProductCategoryId = cat.Id,
+                RankingValue = i
             };
             StoreProductCatAssignments.Add(assignment);
         }
-
 
         IsLoading = false;
     }
@@ -81,12 +83,12 @@
         var created = await StoreRepo.CreateAsync(store);
         if (created != null)
         {
-            foreach(var assignment in StoreProductCatAssignments)
+            foreach (var assignment in StoreProductCatAssignments)
             {
                 assignment.StoreId = created.StoreId;
             }
             var createdAssignments = await StoreProductCatRepo.CreateAsync(StoreProductCatAssignments);
-            if(createdAssignments == null)
+            if (createdAssignments == null)
             {
                 ErrorModel = AlertComponentModel.CreateErrorAlert("Assignments could not be created. Store was created");
             }
