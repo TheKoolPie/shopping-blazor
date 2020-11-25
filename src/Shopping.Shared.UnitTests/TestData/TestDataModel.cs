@@ -37,140 +37,120 @@ namespace Shopping.Shared.UnitTests.TestData
                         new ProductCategory 
                         {
                           Name= "Fleisch",
-                          ColorCode= "#e1a8a8",
                           Id= "f3c6cc51-fcbe-4056-9c35-a1ed055ca9f0",
                           CreatedAt= DateTime.Parse("2020-07-03T12:34:43.0569932+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Gemüse",
-                          ColorCode = "#96d35f",
                           Id = "8b768402-fd38-4605-8b4a-1b6519b9a4c8",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0586309+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Obst",
-                          ColorCode = "#e22400",
                           Id = "6e04fc0f-9f78-4a31-91aa-cb4c838867c0",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0603093+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Süßigkeit",
-                          ColorCode = "#52d6fc",
                           Id = "23736a14-2e67-45f8-9da8-0b15ba31a348",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0603529+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Chips",
-                          ColorCode = "#fee4a8",
                           Id = "6a1c39dd-7a45-4bb5-ae0e-ba0aa99d139f",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604165+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Milchprodukte ",
-                          ColorCode = "#cbf0ff",
                           Id = "6134c1cf-62dc-4502-9ac6-14941c2b98ff",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604248+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Sauce",
-                          ColorCode = "#ff8c82",
                           Id = "1e190d8a-f989-4b85-a61d-38b054c1c15d",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604306+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Konserven",
-                          ColorCode = "#000000",
                           Id = "bab91259-2b36-4f62-871c-857f8e2bef95",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604361+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Backwaren",
-                          ColorCode = "#a67b01",
                           Id = "4a1084ab-82d1-4838-95ef-710c811e6b06",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604459+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Teigwaren",
-                          ColorCode = "#fdc700",
                           Id = "55f92dfd-b3a8-435c-a668-ef5235174372",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604518+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Getränke",
-                          ColorCode = "#7a219e",
                           Id = "80322c66-7733-47af-9045-2b8650993490",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0604593+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Wurst",
-                          ColorCode = "#99244f",
                           Id = "d22dd97b-52e8-4bab-bb0c-cf6c53b73ee0",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0647508+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Hygiene",
-                          ColorCode = "#fefb41",
                           Id = "7eb72a7e-bf70-4d88-a765-9ad73bb35a2c",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0648154+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Reinigungsmittel",
-                          ColorCode = "#016e8f",
                           Id = "2f8d0fed-725d-47f0-b353-22f39a2ac5e8",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0648212+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Eier",
-                          ColorCode = "#ebebeb",
                           Id = "e731a8d0-3996-4711-9e1b-096d893d8c78",
                           CreatedAt = DateTime.Parse( "2020-07-03T12:34:43.0649092+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Küche",
-                          ColorCode = "#ff4015",
                           Id = "2a8f6252-cfe5-4f3b-80cb-b12707152c23",
                           CreatedAt = DateTime.Parse( "2020-06-16T19:35:04.887+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Tiefkühlgericht",
-                          ColorCode = "#0061fe",
                           Id = "42b96200-8d14-4d43-9ef4-02cc372c3e08",
                           CreatedAt = DateTime.Parse( "2020-06-21T18:56:23.265+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Baby",
-                          ColorCode = "#e292fe",
                           Id = "406728b4-545e-4182-94fa-f79fad0c02a1",
                           CreatedAt = DateTime.Parse( "2020-06-21T20:12:18.491+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Gewürze",
-                          ColorCode = "#f5ec00",
                           Id = "9048b819-c949-4fb3-843b-372c6900b336",
                           CreatedAt = DateTime.Parse( "2020-06-22T19:24:24.375+02:00"),
                         },
                         new ProductCategory
                         {
                           Name = "Nüsse",
-                          ColorCode = "#a96800",
                           Id = "543a909f-f689-4046-a44e-c3e1bb8f9c09",
                           CreatedAt = DateTime.Parse( "2020-06-25T18:15:51.808+02:00"),
                         }
@@ -185,7 +165,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "3211d9fa-df8b-4f03-987d-61c0db7236d6",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0623989+02:00"),
                             },
@@ -200,7 +179,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "2e444d07-2243-48fb-8177-abc1db15520d",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0642406+02:00"),
                             },
@@ -215,7 +193,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "18bc32a6-5821-46ce-93d9-269c81cefd92",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0642589+02:00"),
                             },
@@ -230,7 +207,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "9e4e8579-b18d-4e5a-8f90-f396aa9c294b",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.064267+02:00"),
                             },
@@ -245,7 +221,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "886e989b-4bc2-4f8f-8d56-2bf9af6c68de",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0642781+02:00"),
                             },
@@ -260,7 +235,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "ec948eaa-9bc7-4152-a4b0-d251935efc1c",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0642855+02:00"),
                             },
@@ -275,7 +249,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "6151fd9f-2336-4dae-9d3a-4d4842e788c5",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0642925+02:00"),
                             },
@@ -290,7 +263,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "7e1327c8-ba61-4214-96f0-1b41263aff26",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0642994+02:00"),
                             },
@@ -305,7 +277,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "e723ccd4-fdd9-4430-9455-7565c846caa2",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0643093+02:00"),
                             },
@@ -320,7 +291,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "11a43fb3-b312-40b5-bd00-2881fc85b621",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0643162+02:00"),
                             },
@@ -335,7 +305,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "cb4119e4-f731-459e-87f0-98a8aafc2f90",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0643234+02:00"),
                             },
@@ -350,7 +319,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "65aaeef7-d5c7-4f50-a1b3-77caba4701db",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0643327+02:00"),
                             },
@@ -365,7 +333,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "d3de94f2-f634-4a15-a4cf-2e8e785542d5",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0643397+02:00"),
                             },
@@ -380,7 +347,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "8ba613b9-0a9e-457f-a57b-b19ab4d155f6",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0643465+02:00"),
                             },
@@ -395,7 +361,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "ae36cb1b-47ea-45ed-bbd4-964152b57993",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0643535+02:00"),
                             },
@@ -410,7 +375,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c5614f22-8442-4055-9406-dda55c912d14",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0643631+02:00"),
                             },
@@ -425,7 +389,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "4b9a4b71-8aca-41ce-b270-77cee5e07779",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.06437+02:00"),
                             },
@@ -440,7 +403,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "5dcfe817-005e-430c-93d9-055b4c5bc8a5",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0643796+02:00"),
                             },
@@ -455,7 +417,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "fc589f38-49fd-489e-ba1d-4d5bafc00961",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0643871+02:00"),
                             },
@@ -470,7 +431,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "d6a6211a-fb49-4bc0-8505-6466af64fd4d",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.064394+02:00"),
                             },
@@ -485,7 +445,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "f7b85a26-8b34-43c2-aad5-d48a293da786",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0644042+02:00"),
                             },
@@ -500,7 +459,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "7e9cbb71-968c-4094-85af-8039017887e9",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0644112+02:00"),
                             },
@@ -515,7 +473,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "976a6541-3188-42bf-89af-5dccf578fca3",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0644184+02:00"),
                             },
@@ -530,7 +487,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "68de3545-8f9b-472b-ae4a-4e46ac660c73",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.064428+02:00"),
                             },
@@ -545,7 +501,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c15dec86-f7d0-4e72-90d2-bad29b8ff3a4",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0644351+02:00"),
                             },
@@ -560,7 +515,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "de7c7a5a-d6c8-4598-a6cd-71278bd9fd4c",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.064447+02:00"),
                             },
@@ -575,7 +529,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "eadb72e0-babf-495c-9a42-e64325187ef6",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0644546+02:00"),
                             },
@@ -590,7 +543,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "4bf7f3c5-12a1-402c-892e-76ccb4eb2458",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0644616+02:00"),
                             },
@@ -605,7 +557,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "2d80f632-9ad1-48b7-977c-c5f62e2334d7",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0644712+02:00"),
                             },
@@ -620,7 +571,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "73083900-e706-471d-860f-5cf2e5fc6583",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0644784+02:00"),
                             },
@@ -635,7 +585,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c8ada75e-3815-4dfe-bd11-285666f89f92",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.064491+02:00"),
                             },
@@ -650,7 +599,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "9878d3a3-609d-4ed5-acb6-787335d639a5",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0644986+02:00"),
                             },
@@ -665,7 +613,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c57b50da-3e03-4d71-b7f6-f2432ce6fd8a",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0645088+02:00"),
                             },
@@ -680,7 +627,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "2319ba75-e01a-433b-a98b-12fe1f6c5cce",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0645165+02:00"),
                             },
@@ -695,7 +641,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "2788531e-a53b-4251-abf6-d201cad87250",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0645339+02:00"),
                             },
@@ -710,7 +655,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "cef93deb-baba-4297-9659-41576412fc30",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0645419+02:00"),
                             },
@@ -725,7 +669,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "5d7eebc0-4415-48c7-91ee-4741a4611a94",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0645527+02:00"),
                             },
@@ -740,7 +683,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "bf6b4374-6fb1-4420-80c3-6a250607f7b6",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0645602+02:00"),
                             },
@@ -755,7 +697,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "3b775be0-a0b2-4790-b030-aa8f441cc2df",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0645705+02:00"),
                             },
@@ -770,7 +711,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "dd318e90-11d7-4c9a-ad2f-4f20e3eeb313",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.064578+02:00"),
                             },
@@ -785,7 +725,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "a9ccdde7-d8dc-491a-bdc3-305f94d061d4",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0645883+02:00"),
                             },
@@ -800,7 +739,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "f73e1187-1fd8-43f7-be03-e070187c7203",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0645958+02:00"),
                             },
@@ -815,7 +753,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "871d64e6-a6a8-4783-a2e9-0d12bae2d205",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0646082+02:00"),
                             },
@@ -830,7 +767,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "1d6fe6b9-f625-4afa-bb07-9ce527a20ccc",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0646158+02:00"),
                             },
@@ -845,7 +781,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c1aaaff5-fc14-4509-a5c8-4ed5125802b4",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0646262+02:00"),
                             },
@@ -860,7 +795,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c295f161-90f8-4b51-8df4-8e5be3e6b2f9",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0646338+02:00"),
                             },
@@ -875,7 +809,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "9d65715a-bb7b-478e-b751-1eeeefa33177",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0646444+02:00"),
                             },
@@ -890,7 +823,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "68700b6f-bd74-4c18-b7ca-2e4e94e63b52",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0646549+02:00"),
                             },
@@ -905,7 +837,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "08488b1d-d5c5-4952-9c1b-1953a60edf30",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0646627+02:00"),
                             },
@@ -920,7 +851,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "2d0d32e0-b183-4014-99a9-6c5c2f89fdc5",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0646729+02:00"),
                             },
@@ -935,7 +865,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "4d4ab49c-e4f9-433e-be95-43a04be2bc27",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0646809+02:00"),
                             },
@@ -950,7 +879,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "bb6ce9ff-8b7e-46ea-9a2b-859b5612060f",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0646914+02:00"),
                             },
@@ -965,7 +893,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "fc8aebaa-0402-4c4e-a86c-c858a0b3ad72",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0647021+02:00"),
                             },
@@ -980,7 +907,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "56ae52ea-f31f-4fcb-92f5-fa30bd937a1f",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0647123+02:00"),
                             },
@@ -995,7 +921,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "4cac6f1c-b3f2-455f-aaa7-30b678ec2fe4",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0647254+02:00"),
                             },
@@ -1010,7 +935,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c4eb6151-05b8-4061-b3cf-846e4f7d18b8",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0647424+02:00"),
                             },
@@ -1025,7 +949,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "1178f79d-a4e3-4fcf-a387-0c9af9ca90c3",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0647577+02:00"),
                             },
@@ -1040,7 +963,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "b09b79e2-945a-472f-9bf7-4f492a5677ab",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0647688+02:00"),
                             },
@@ -1055,7 +977,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "9ca4f77e-81d0-49a5-abf4-1286e98d321b",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0647804+02:00"),
                             },
@@ -1070,7 +991,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "7ff6ca3b-9a64-44b3-9b8c-80d88669aa97",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0647885+02:00"),
                             },
@@ -1085,7 +1005,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "97dad94d-9528-4295-98c6-aa42070e8435",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0647987+02:00"),
                             },
@@ -1100,7 +1019,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "962ad2ec-11b9-471e-a420-a3bf6869dd0f",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0648083+02:00"),
                             },
@@ -1115,7 +1033,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "08b845f2-c306-44a2-8a85-34b05770e329",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0648296+02:00"),
                             },
@@ -1130,7 +1047,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "a49602d0-ed70-46af-b24b-4eb9e2aa2998",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0648404+02:00"),
                             },
@@ -1145,7 +1061,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "e8a09ec7-c7fb-4997-a42a-5913e2240e5e",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.064848+02:00"),
                             },
@@ -1160,7 +1075,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "26402a76-1628-42f6-bc61-1af6f05dd66e",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0648565+02:00"),
                             },
@@ -1175,7 +1089,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c6604d5c-ec1c-4730-85a0-82ff20947d34",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0648639+02:00"),
                             },
@@ -1190,7 +1103,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "1ae66934-5daf-43d2-9594-018daba49de6",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0648712+02:00"),
                             },
@@ -1205,7 +1117,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "14f64696-6ab0-49ae-bc16-70a20654fe97",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0648786+02:00"),
                             },
@@ -1220,7 +1131,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "3532a0c1-526f-4ad7-a6a5-6c1ea6a856b8",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0648904+02:00"),
                             },
@@ -1235,7 +1145,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "450a70bc-8e50-4ea5-8056-79d335563b14",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0649013+02:00"),
                             },
@@ -1250,7 +1159,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "18d28213-4153-41b7-9281-93e143e58f74",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0649168+02:00"),
                             },
@@ -1265,7 +1173,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "f18ba630-228f-414f-b1ce-e49a3d54d86d",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.064928+02:00"),
                             },
@@ -1280,7 +1187,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "5103bce7-3df3-4d80-88e9-9bbf5eefe424",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0778673+02:00"),
                             },
@@ -1295,7 +1201,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "ec6b2591-92e4-4cb9-8c41-24be089716c1",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0780468+02:00"),
                             },
@@ -1310,7 +1215,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "27aff3be-48ae-43e5-bbb6-592259b9c58c",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0780598+02:00"),
                             },
@@ -1325,7 +1229,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "35bc8c7d-0cf5-4f26-b4b0-236415ef9660",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0780728+02:00"),
                             },
@@ -1340,7 +1243,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "1eba90ad-09db-4193-9e43-f7864e07a3f0",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0780838+02:00"),
                             },
@@ -1355,7 +1257,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "8e2ed4a2-ce13-46a6-8f94-d089be00de64",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0780941+02:00"),
                             },
@@ -1370,7 +1271,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "1ea9d83e-1a17-4411-b7dc-7cd3f70f2015",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0781039+02:00"),
                             },
@@ -1385,7 +1285,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "0e43c7ea-3290-49bc-9e6c-34e2d1d0cd69",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0781166+02:00"),
                             },
@@ -1400,7 +1299,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "4fc39ea2-1be1-4f00-8ee3-49ecc7dd01c7",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.078127+02:00"),
                             },
@@ -1415,7 +1313,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "a68c246d-4d12-4d6c-bcf0-cef23b9e330f",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0781367+02:00"),
                             },
@@ -1430,7 +1327,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "16aa42ae-8262-4fbe-80c3-6e4b7be70f48",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0781461+02:00"),
                             },
@@ -1445,7 +1341,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "d83244de-c4ae-44e9-9a1d-38b0a0ee2e7c",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0781555+02:00"),
                             },
@@ -1460,7 +1355,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "5fd765c6-409b-4e7e-a141-352e6f41d673",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0781654+02:00"),
                             },
@@ -1475,7 +1369,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "bf83cd9c-7b75-4f99-9b9c-f91ada741988",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0781828+02:00"),
                             },
@@ -1490,7 +1383,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "b1600a59-56d5-4a68-8b02-5e65d9e1a630",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0781925+02:00"),
                             },
@@ -1505,7 +1397,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "00df58a8-34c9-499f-863a-772298e4cefd",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0782019+02:00"),
                             },
@@ -1520,7 +1411,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "4ec91ed6-dbbc-4fda-90f7-0046ad539e31",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0782121+02:00"),
                             },
@@ -1535,7 +1425,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "dc379ea6-c755-4237-8ab6-4d411de52488",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0782214+02:00"),
                             },
@@ -1550,7 +1439,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "d57ed4a0-fcfd-45aa-a3b4-155317a1d9b0",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0782329+02:00"),
                             },
@@ -1565,7 +1453,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "79ef010c-1827-4808-b86a-82360976cebb",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0782455+02:00"),
                             },
@@ -1580,7 +1467,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c0a56f9d-d0e5-4a85-b5c2-682f0d9b0924",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0784114+02:00"),
                             },
@@ -1595,7 +1481,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "7f459226-3488-42d9-a636-97ac048051a4",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0784245+02:00"),
                             },
@@ -1610,7 +1495,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "1022ae6a-25d3-4702-b76f-1a487a51ce40",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0784339+02:00"),
                             },
@@ -1625,7 +1509,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "18f79e19-b2f7-4177-9f13-b64bdfefed7a",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0784494+02:00"),
                             },
@@ -1640,7 +1523,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "5252300c-ad8d-456b-beac-b1662dc7b83d",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0784618+02:00"),
                             },
@@ -1655,7 +1537,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "320fbff0-53c9-4fba-bfef-4515e4d4a174",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0784714+02:00"),
                             },
@@ -1670,7 +1551,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "7e7abc2a-a2fc-44af-b34d-5be2c207308e",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0784807+02:00"),
                             },
@@ -1685,7 +1565,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory 
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "dbacbf78-0ea7-4c96-ae25-7fb3be0f7edb",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0784901+02:00"),
                             },
@@ -1700,7 +1579,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "1c526ef6-4fcd-4bc6-a411-3948c5d53bb7",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0784996+02:00"),
                             },
@@ -1715,7 +1593,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "63d11c55-67bb-449e-8de8-f43c946e7c0f",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0785116+02:00"),
                             },
@@ -1730,7 +1607,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "f4f9adc3-b4dc-4f1a-8c79-6c7a4e9dc4da",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.078583+02:00"),
                             },
@@ -1745,7 +1621,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "ed7b095f-dece-4a13-b9e8-048bc33ab62a",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0785932+02:00"),
                             },
@@ -1760,7 +1635,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "f9f5d925-9503-45aa-ba86-361ff3b5d174",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0786027+02:00"),
                             },
@@ -1775,7 +1649,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "dfb123b0-8c13-4272-92bc-881bb38d470c",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0786156+02:00"),
                             },
@@ -1790,7 +1663,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "493699a9-569d-45a4-82bf-2b8b5fb52c5f",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.078625+02:00"),
                             },
@@ -1805,7 +1677,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "884b6b2f-2980-4fcb-bd56-25469e827e5b",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0786364+02:00"),
                             },
@@ -1820,7 +1691,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "20a12505-82ac-4a44-aaa5-3f6e1c30ca62",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0786458+02:00"),
                             },
@@ -1835,7 +1705,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "09448d3d-48d4-4dc7-93df-ab2064f677bb",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0786552+02:00"),
                             },
@@ -1850,7 +1719,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c2cd41d9-bd18-4b38-a91a-e3abf09cd48c",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0786646+02:00"),
                             },
@@ -1865,7 +1733,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "6970a0d1-32a4-44ef-a6a1-83dea2e21435",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0786785+02:00"),
                             },
@@ -1880,7 +1747,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "08a7b9f7-45f8-4f84-8603-c40a5dc18186",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.078688+02:00"),
                             },
@@ -1895,7 +1761,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "f18ca4b6-936e-489a-a4b7-853a6d80495e",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0786975+02:00"),
                             },
@@ -1910,7 +1775,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "b708912a-c1fd-428c-b3a1-db8b4c375d98",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0787067+02:00"),
                             },
@@ -1925,7 +1789,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "1ec62222-1fc2-4210-8828-efe0f5662d88",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0787183+02:00"),
                             },
@@ -1940,7 +1803,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "1971f249-2277-44a1-9565-9b818c2cca07",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0787277+02:00"),
                             },
@@ -1955,7 +1817,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "d5840409-a846-4b7c-aabd-597df7febc38",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0787403+02:00"),
                             },
@@ -1970,7 +1831,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "82c17133-704a-43b4-9370-3d4926bb46e2",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0787496+02:00"),
                             },
@@ -1985,7 +1845,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "772d2ebf-d8fe-49ed-b51c-57b139754464",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0787588+02:00"),
                             },
@@ -2000,7 +1859,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "842f05bf-28a8-46c0-8512-a2d8c49df02a",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0787679+02:00"),
                             },
@@ -2015,7 +1873,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "d6ca8615-20ec-43b8-8f97-bfe36fd4c779",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0787774+02:00"),
                             },
@@ -2030,7 +1887,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "3b7ab780-0541-4956-85ee-28e4f0926ee2",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0787866+02:00"),
                             },
@@ -2045,7 +1901,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "f704fb6c-312a-4c0b-b007-50843f15af44",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0787986+02:00"),
                             },
@@ -2060,7 +1915,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "82aa7747-6cb8-4fad-bb51-2486ca5dc143",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0788077+02:00"),
                             },
@@ -2075,7 +1929,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "9340c037-1a60-47bf-a49d-1533247c610d",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0788171+02:00"),
                             },
@@ -2090,7 +1943,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "29a4b98c-3da5-4d47-ae20-b5ff2d17f224",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0788376+02:00"),
                             },
@@ -2105,7 +1957,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "43543efd-7200-45ab-91b7-f04b99df42fc",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0788531+02:00"),
                             },
@@ -2120,7 +1971,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "d943f67c-6660-4ec2-931a-59e970e6ec3c",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0788655+02:00"),
                             },
@@ -2135,7 +1985,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "2686cb30-b19a-41b2-99eb-38a5711943bc",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0788772+02:00"),
                             },
@@ -2150,7 +1999,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "3abfc9c0-f94d-4407-b0b0-28e426ad445c",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0788888+02:00"),
                             },
@@ -2165,7 +2013,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c6917270-2b84-4a5b-b9dd-6e053122bbd1",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0789028+02:00"),
                             },
@@ -2180,7 +2027,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "bcefa5a2-fc53-4a94-9b7d-f1afcb2d93b5",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0789145+02:00"),
                             },
@@ -2195,7 +2041,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "dc96dca3-b47c-4659-aa65-5c89e14d7a79",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0789241+02:00"),
                             },
@@ -2210,7 +2055,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c6e9b1e2-ece7-4815-bd61-c407b00aab10",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0789341+02:00"),
                             },
@@ -2225,7 +2069,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "c8feb064-ac9f-4521-a535-2e884d09191a",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0789521+02:00"),
                             },
@@ -2240,7 +2083,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "4666f067-8b07-4d98-9cc5-1052e06a0400",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0789654+02:00"),
                             },
@@ -2255,7 +2097,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "4aa7f95c-4028-43cd-bd64-a49e59207217",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.079078+02:00"),
                             },
@@ -2270,7 +2111,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "1e530e56-7874-4506-b849-35036f2413f1",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0791015+02:00"),
                             },
@@ -2285,7 +2125,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "b6076057-e0cd-42f1-b8bc-f781ef85622e",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.079111+02:00"),
                             },
@@ -2300,7 +2139,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "cbeed5f5-f8ac-4b14-a0e2-c4352f171d7f",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0791206+02:00"),
                             },
@@ -2315,7 +2153,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "9f8fb54d-991a-4f12-85d2-d6cfa5e17b6d",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0791424+02:00"),
                             },
@@ -2330,7 +2167,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "3ed5b993-09c1-41e6-8b15-de09b551eaf3",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0792647+02:00"),
                             },
@@ -2345,7 +2181,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "ed53b8b4-ff39-41ec-b7f0-c199a02730d9",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0792748+02:00"),
                             },
@@ -2360,7 +2195,6 @@ namespace Shopping.Shared.UnitTests.TestData
                             Category = new ProductCategory
                             {
                                 Name = null,
-                                ColorCode = null,
                                 Id = "9cb425f6-4ac1-472b-8dfb-e5ad1c175c72",
                                 CreatedAt = DateTime.Parse("2020-07-03T12:34:43.0792847+02:00"),
                             },

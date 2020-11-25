@@ -85,7 +85,7 @@ namespace Shopping.Server.Services.Implementations
                 throw new ItemAlreadyExistsException(typeof(ProductCategory), item.Id);
             }
             _context.Categories.Add(item);
-            
+
             await _context.SaveChangesAsync();
 
             await CreateStoreCatAssignmentsForCategory(item);
@@ -104,7 +104,6 @@ namespace Shopping.Server.Services.Implementations
             var existing = await GetAsync(id);
 
             existing.Name = item.Name;
-            existing.ColorCode = item.ColorCode;
 
             await _context.SaveChangesAsync();
 
@@ -114,24 +113,14 @@ namespace Shopping.Server.Services.Implementations
         public bool ItemAlreadyExists(ProductCategory item)
         {
             var all = _context.Categories.ToList();
-            return all
-                    .Any(
-                        c => c.Id == item.Id ||
-                        c.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase) ||
-                        c.ColorCode.Equals(item.ColorCode, StringComparison.InvariantCultureIgnoreCase)
-                        );
+            return all.Any(c => c.Id == item.Id || c.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase));
         }
         public bool ItemCanBeUpdated(ProductCategory item)
         {
             var all = _context.Categories.ToList();
             var restWithOutCurrentItem = all.Where(c => c.Id != item.Id).ToList();
 
-            return !(restWithOutCurrentItem
-                        .Any(
-                            c => c.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase) ||
-                            c.ColorCode.Equals(item.ColorCode, StringComparison.InvariantCultureIgnoreCase)
-                            )
-                    );
+            return !(restWithOutCurrentItem.Any(c => c.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase)));
         }
 
         private async Task<List<ProductItem>> GetProductsWithCategory(string categoryId)

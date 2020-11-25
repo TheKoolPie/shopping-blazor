@@ -18,8 +18,6 @@
 }
 else
 {
-
-
     <AuthorizeView Context="Auth" Policy="@ShoppingUserPolicies.IsProductCategoryModifier">
         <div class="row">
             <div class="col">
@@ -39,14 +37,6 @@ else
                                 <div class="form-group">
                                     <label for="categoryNameInput">Name</label>
                                     <InputText id="categoryNameInput" class="form-control" @bind-Value="category.Name" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="categoryColorInput">Color</label>
-                                    <input class="form-control" type="color" @bind-value="category.ColorCode" />
                                 </div>
                             </div>
                         </div>
@@ -99,13 +89,12 @@ else
                         <tbody>
                             @foreach (var category in categories)
                             {
-                                string borderContent = $"15px solid {category.ColorCode}";
                                 <tr>
-                                    <td style="border-left: @borderContent">@category.Name</td>
+                                    <td>@category.Name</td>
                                     <td>
                                         <AuthorizeView Policy="@ShoppingUserPolicies.IsProductCategoryModifier">
                                             <ContextMenu>
-                                                <ContextMenuItem OnClickCallback="@(()=> OnEditCategory(category.Id,category.Name,category.ColorCode))">
+                                                <ContextMenuItem OnClickCallback="@(()=> OnEditCategory(category.Id,category.Name))">
                                                     Edit
                                                 </ContextMenuItem>
                                                 <ContextMenuItem OnClickCallback="@(() => OnDeleteCategory(category.Id,category.Name))">
@@ -134,8 +123,6 @@ else
 
 }
 
-
-
 @code {
 
     private AlertComponentModel AlertData;
@@ -158,7 +145,7 @@ else
     private List<ProductCategory> localBackup = null;
 
     private List<ProductCategory> categories = null;
-    private ProductCategory category = new ProductCategory() { ColorCode = "#000000" };
+    private ProductCategory category = new ProductCategory();
     private EditContext editContext;
 
     protected override async Task OnInitializedAsync()
@@ -178,8 +165,7 @@ else
     {
         AlertData = null;
         var isValid = editContext.Validate();
-        var categoryAlreadyExists = localBackup.Any(c => c.Name.Equals(category.Name, StringComparison.InvariantCultureIgnoreCase) ||
-                                                    c.ColorCode.Equals(category.ColorCode, StringComparison.InvariantCultureIgnoreCase));
+        var categoryAlreadyExists = localBackup.Any(c => c.Name.Equals(category.Name, StringComparison.InvariantCultureIgnoreCase));
         if (isValid)
         {
             if (!categoryAlreadyExists)
@@ -204,7 +190,7 @@ else
             }
             else
             {
-                SavingFailureAlert("Category name or color already exists");
+                SavingFailureAlert("Category name already exists");
             }
         }
     }
@@ -248,12 +234,11 @@ else
             DeleteEntityInLists(id);
         }
     }
-    private async Task OnEditCategory(string id, string name, string colorcode)
+    private async Task OnEditCategory(string id, string name)
     {
         var modalParams = new ModalParameters();
         modalParams.Add(nameof(EditCategory.CategoryId), id);
         modalParams.Add(nameof(EditCategory.CategoryName), name);
-        modalParams.Add(nameof(EditCategory.CategoryColorCode), colorcode);
 
         var editModal = Modal.Show<EditCategory>("Edit category", modalParams);
         var result = await editModal.Result;
@@ -266,7 +251,7 @@ else
             }
             else
             {
-                AlertData = AlertComponentModel.CreateSuccessAlert($"Successfully changed", $"Name {name} -> {resultData.Name}, Color {colorcode} -> {resultData.ColorCode}");
+                AlertData = AlertComponentModel.CreateSuccessAlert("Successfully changed", $"Name {name} -> {resultData.Name}");
                 AddOrUpdateEntityInLists(resultData);
             }
         }

@@ -2,7 +2,7 @@
 pr:
   branches:
     include:
-    - '*'
+    - 'main'
   paths:
     include:
     - src/*

@@ -10,27 +10,23 @@ namespace Shopping.Shared.Data
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "Category name is needed")]
         public string Name { get; set; }
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Farbcode is needed")]
-        public string ColorCode { get; set; }
         public ProductCategory() : base()
         {
         }
         public ProductCategory(ProductCategory category) : base(category)
         {
             Name = category.Name;
-            ColorCode = category.ColorCode;
         }
 
         public override bool Equals(object obj)
         {
             return obj is ProductCategory category &&
-                   Name == category.Name &&
-                   ColorCode == category.ColorCode;
+                   Name == category.Name;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, ColorCode);
+            return HashCode.Combine(Name);
         }
     }
 }

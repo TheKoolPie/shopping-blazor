@@ -8,7 +8,10 @@ namespace Shopping.Client.Models
         public static Store ToEntity(this StoreCreateViewModel vm)
         {
             var store = new Store();
-            store.StoreId = vm.StoreId;
+            if (!string.IsNullOrEmpty(vm.StoreId))
+            {
+                store.StoreId = vm.StoreId;
+            }
             store.Name = vm.Name;
             store.Street = vm.Street;
             store.HouseNumber = vm.HouseNumber;

@@ -66,8 +66,7 @@ else
                                         <option value="" selected>Choose Category...</option>
                                         @foreach (var category in categories)
                                                 {
-                                                    string borderContent = $"15px solid {category.ColorCode}";
-                                            <option style="border-left: @borderContent" value="@category.Id">
+                                            <option value="@category.Id">
                                                 @category.Name
                                             </option>
                                                 }
@@ -132,11 +131,10 @@ else
                         {
                             @foreach (var product in products)
                             {
-                                string borderContent = $"15px solid {product.Category.ColorCode}";
                                 <tr>
                                     <td>@product.Name</td>
                                     <td>@product.Unit.GetDisplayName()</td>
-                                    <td style="border-left: @borderContent">@product.Category.Name</td>
+                                    <td>@product.Category.Name</td>
                                     <td class="d-flex justify-content-start">
                                         <AuthorizeView Policy="@ShoppingUserPolicies.IsProductModifier">
                                             <ContextMenu>

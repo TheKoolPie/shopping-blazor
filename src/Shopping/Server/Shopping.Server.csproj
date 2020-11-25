@@ -11,6 +11,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Migrations\**" />
+    <Compile Remove="DbBackups\**" />
+    <Content Remove="Data\Migrations\**" />
+    <Content Remove="DbBackups\**" />
+    <EmbeddedResource Remove="Data\Migrations\**" />
+    <EmbeddedResource Remove="DbBackups\**" />
+    <None Remove="Data\Migrations\**" />
+    <None Remove="DbBackups\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="3.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.4" />
@@ -32,12 +43,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Client\Shopping.Client.csproj" />
     <ProjectReference Include="..\Shared\Shopping.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\Migrations\" />
-    <Folder Include="Data\Migrations\ShoppingDb\" />
-    <Folder Include="DbBackups\" />
   </ItemGroup>
 
 
