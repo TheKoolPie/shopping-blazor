@@ -30,11 +30,12 @@ else
         }
         <div class="form-group">
             <label for="nameInput">Name</label>
-            <InputText @bind-Value="ViewModel.Name" id="nameInput" class="form-control" />
+            <InputText disabled="@(!string.IsNullOrEmpty(ViewModel.StoreChainId))" @bind-Value="ViewModel.Name" id="nameInput" class="form-control" />
         </div>
         <div class="form-group">
             <label for="priceCatInput">Price category</label>
-            <InputSelect id="priceCatInput" class="form-control" @bind-Value="ViewModel.Category">
+            <InputSelect id="priceCatInput" disabled="@(!string.IsNullOrEmpty(ViewModel.StoreChainId))" 
+                         class="form-control" @bind-Value="ViewModel.Category">
                 @foreach (var cat in Enum.GetValues(typeof(PriceCategory)).Cast<PriceCategory>())
                     {
                     <option value="@cat">@($"{cat.GetDescription()} ({cat.GetPriceCatString()})")</option>
@@ -183,7 +184,10 @@ else
         }
         else
         {
-
+            if (isStoreChainSelected)
+            {
+                ViewModel.Category = StoreChains.FirstOrDefault(s => s.StoreChainId == ViewModel.StoreChainId).PriceCategory;
+            }
             await OnValidSubmit.InvokeAsync(null);
         }
     }
