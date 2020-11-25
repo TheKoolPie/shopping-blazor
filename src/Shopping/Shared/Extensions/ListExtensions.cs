@@ -23,7 +23,6 @@ namespace Shopping.Shared.Extensions
             else
             {
                 item.Name = entity.Name;
-                item.ColorCode = entity.ColorCode;
             }
         }
         public static void AddOrUpdate(this List<ProductItem> list, ProductItem entity)

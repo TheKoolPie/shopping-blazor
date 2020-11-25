@@ -14,14 +14,6 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col">
-                    <div class="form-group">
-                        <label for="editCategoryColor">Color</label>
-                        <input id="editCategoryColor" class="form-control" type="color" @bind-value="_category.ColorCode" />
-                    </div>
-                </div>
-            </div>
             <hr />
             <div class="row">
                 <div class="col">
@@ -48,8 +40,6 @@
     public string CategoryId { get; set; }
     [Parameter]
     public string CategoryName { get; set; }
-    [Parameter]
-    public string CategoryColorCode { get; set; }
 
     private ProductCategory _category;
     private EditContext editContext;
@@ -59,8 +49,7 @@
         _category = new ProductCategory()
         {
             Id = CategoryId,
-            Name = CategoryName,
-            ColorCode = CategoryColorCode
+            Name = CategoryName
         };
         editContext = new EditContext(_category);
     }
