@@ -34,7 +34,7 @@ else
         </div>
         <div class="form-group">
             <label for="priceCatInput">Price category</label>
-            <InputSelect id="priceCatInput" disabled="@(!string.IsNullOrEmpty(ViewModel.StoreChainId))" 
+            <InputSelect id="priceCatInput" disabled="@(!string.IsNullOrEmpty(ViewModel.StoreChainId))"
                          class="form-control" @bind-Value="ViewModel.Category">
                 @foreach (var cat in Enum.GetValues(typeof(PriceCategory)).Cast<PriceCategory>())
                     {
@@ -76,39 +76,38 @@ else
             In this section you can decide in which order the different categories can be collected.
             This order is only valid for this specific store an can be changed at any time.
         </p>
-        <div class="container disable-mobile-zoom">
-            @foreach (var item in StoreProductCatAssignments)
+
+        @foreach (var item in StoreProductCatAssignments)
+        {
+            bool disableUp = catCount == 0;
+            bool disableDown = catCount == StoreProductCatAssignments.Count() - 1;
+            string rowCss = "";
+            if (item.ProductCategoryId == lastMovedId)
             {
-                bool disableUp = catCount == 0;
-                bool disableDown = catCount == StoreProductCatAssignments.Count() - 1;
-                string rowCss = "";
-                if (item.ProductCategoryId == lastMovedId)
-                {
-                    rowCss += "selected-row";
-                }
-                string iconStyle = "font-size:18pt;";
-                catCount++;
-                <div class="row rounded disable-mobile-zoom @rowCss" style="padding: 5px;">
-                    <div class="col">
-                        @GetNameOfCategory(item.ProductCategoryId)
-                    </div>
-                    <div class="col-2">
-                        <button id="@($"btn-up-{item.ProductCategoryId}")" type="button" class="btn btn-primary disable-mobile-zoom"
-                                disabled="@(disableUp)"
-                                @onclick="@(()=>MoveCatUp(item.ProductCategoryId))">
-                            <span class="oi oi-arrow-thick-top" style="@iconStyle" />
-                        </button>
-                    </div>
-                    <div class="col-2">
-                        <button id="@($"btn-down-{item.ProductCategoryId}")" type="button" class="btn btn-primary disable-mobile-zoom"
-                                disabled="@(disableDown)"
-                                @onclick="@(()=>MoveCatDown(item.ProductCategoryId))">
-                            <span class="oi oi-arrow-thick-bottom" style="@iconStyle" />
-                        </button>
-                    </div>
-                </div>
+                rowCss += "selected-row";
             }
-        </div>
+            string iconStyle = "font-size:18pt;";
+            catCount++;
+            <div class="row rounded disable-mobile-zoom @rowCss" style="padding: 5px;">
+                <div class="col">
+                    @GetNameOfCategory(item.ProductCategoryId)
+                </div>
+                <div class="col-2">
+                    <button id="@($"btn-up-{item.ProductCategoryId}")" type="button" class="btn btn-primary disable-mobile-zoom"
+                            disabled="@(disableUp)"
+                            @onclick="@(()=>MoveCatUp(item.ProductCategoryId))">
+                        <span class="oi oi-arrow-thick-top" style="@iconStyle" />
+                    </button>
+                </div>
+                <div class="col-2">
+                    <button id="@($"btn-down-{item.ProductCategoryId}")" type="button" class="btn btn-primary disable-mobile-zoom"
+                            disabled="@(disableDown)"
+                            @onclick="@(()=>MoveCatDown(item.ProductCategoryId))">
+                        <span class="oi oi-arrow-thick-bottom" style="@iconStyle" />
+                    </button>
+                </div>
+            </div>
+        }
 
         <hr />
         <div class="row">
