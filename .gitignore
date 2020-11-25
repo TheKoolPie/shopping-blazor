@@ -181,6 +181,3 @@ ServiceFabricBackup/
 
 # Local History for Visual Studio
 .localhistory/
-
-Migrations/
-/src/Shopping/Server/DbBackups
