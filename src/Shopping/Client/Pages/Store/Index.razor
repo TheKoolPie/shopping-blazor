@@ -116,8 +116,6 @@
                 <table class="table table-sm">
                     <thead class="thead-light">
                         <tr class="selectable-row">
-                            <th></th>
-                            <th>€</th>
                             <th>Name</th>
                             <th>Street</th>
                             <th>City</th>
@@ -130,8 +128,6 @@
                             @foreach (var store in LocalStores)
                             {
                                 <tr class="selectable-row">
-                                    <td @onclick="@(()=>OnRowClicked(store.StoreId))"></td>
-                                    <td @onclick="@(()=>OnRowClicked(store.StoreId))">@store.PriceCategory.GetPriceCatString()</td>
                                     <td @onclick="@(()=>OnRowClicked(store.StoreId))">@store.Name</td>
                                     <td @onclick="@(()=>OnRowClicked(store.StoreId))">@($"{store.Street}, {store.HouseNumber}")</td>
                                     <td @onclick="@(()=>OnRowClicked(store.StoreId))">@store.City</td>
