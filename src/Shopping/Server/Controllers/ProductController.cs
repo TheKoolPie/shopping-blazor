@@ -139,8 +139,13 @@ namespace Shopping.Server.Controllers
             ProductItemResult result = new ProductItemResult();
             try
             {
-                await _products.DeleteByIdAsync(id);
-                result.IsSuccessful = true;
+                var deleteResult = await _products.DeleteByIdAsync(id);
+                result.IsSuccessful = deleteResult;
+                if (!result.IsSuccessful)
+                {
+                    result.ErrorMessages.Add($"Something went wrong while deleting '{id}'");
+                    return UnprocessableEntity(result);
+                }
             }
             catch (ItemNotFoundException e)
             {

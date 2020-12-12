@@ -122,6 +122,12 @@ namespace Shopping.Server.Services.Implementations
         private async Task<List<ShoppingList>> GetShoppingListsWithProduct(string productItemId)
         {
             var shoppinglist = await _context.ShoppingLists.ToListAsync();
+            foreach (var list in shoppinglist)
+            {
+                list.Items = (await _context.ShoppingListItems.ToListAsync())
+                    .Where(p => p.ProductItemId == productItemId)
+                    .ToList();
+            }
             shoppinglist = shoppinglist
                 .Where(i => i.Items.Any(p => p.ProductItemId == productItemId))
                 .ToList();
