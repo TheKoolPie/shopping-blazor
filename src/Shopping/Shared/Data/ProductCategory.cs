@@ -8,7 +8,6 @@ namespace Shopping.Shared.Data
 {
     public class ProductCategory : BaseItem
     {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Category name is needed")]
         public string Name { get; set; }
         public ProductCategory() : base()
         {

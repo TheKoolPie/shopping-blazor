@@ -7,15 +7,12 @@ namespace Shopping.Shared.Data
 {
     public class UserGroup : BaseItem
     {
-        [Required(ErrorMessage = "User group name is needed")]
         public string Name { get; set; }
         public string OwnerId { get; set; }
-        [NotMapped]
+
         public ShoppingUserModel Owner { get; set; }
 
-        [NotMapped]
         public List<ShoppingList> ShoppingLists { get; set; }
-        [NotMapped]
         public List<ShoppingUserModel> Members { get; set; }
 
         public UserGroup() : base()
