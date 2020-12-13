@@ -37,13 +37,6 @@ else
                    data-toggle="list" href="#list-actions" role="tab" @onclick="OnListTabClicked">
                     <span class="oi oi-code"></span> Actions
                 </a>
-                @if (IsOwner)
-                {
-                    <a class="list-group-item list-group-item-action" id="list-properties-list"
-                       data-toggle="list" href="#list-properties" role="tab" @onclick="OnListTabClicked">
-                        <span class="oi oi-cog"></span> Properties
-                    </a>
-                }
             </div>
         </div>
     </div>
@@ -267,6 +260,9 @@ else
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm-6">
+                                <DeleteUserGroup UserGroupId="@GroupId" OnUserGroupDeleted="OnDeleteGroup" />
+                            </div>
                         }
                         else
                         {
@@ -295,46 +291,14 @@ else
                         }
                     </div>
                 </div>
-                @if (IsOwner)
-                {
-                    <div class="tab-pane fade" id="list-properties" role="tabpanel" aria-labelledby="list-properties-list">
-                        <h4>Properties</h4>
-                        <hr />
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Delete group</h5>
-                                        <p class="card-text">
-                                            If you delete this group all assignments between shopping lists and this group will be removed.
-                                            Please confirm your decision, as this action is not revokeable
-                                        </p>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" @onchange="(()=>showLeaveButton = !showLeaveButton)" value="" id="deleteCheck">
-                                            <label class="form-check-label" for="deleteCheck">I really want to to delete!</label>
-                                        </div>
-                                        @if (showLeaveButton)
-                                        {
-                                            <hr />
-                                            <button type="button" class="btn btn-danger" @onclick="OnDeleteGroup">
-                                                <span class="oi oi-account-logout" /> Delete group
-                                            </button>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                }
             </div>
         </div>
     </div>
 }
 
 @code {
-        [Parameter]
-        public string GroupId { get; set; }
+    [Parameter]
+    public string GroupId { get; set; }
 
     private bool IsLoading;
     private bool IsAddingUser;
@@ -471,14 +435,7 @@ else
 
     private async Task OnDeleteGroup()
     {
-        if (await UserGroups.DeleteByIdAsync(GroupId))
-        {
-            Nav.NavigateTo("/groups");
-        }
-        else
-        {
-            actionsAlert = AlertComponentModel.CreateErrorAlert("Could not delete this group");
-        }
+        Nav.NavigateTo("/groups");
     }
 
     private void NavigateToListCreate()
