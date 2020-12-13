@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Shopping.Client.Services.Implementations.Base;
 using Shopping.Shared.Data;
 using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
-using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -14,19 +14,18 @@ using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class UserGroupsApiAccess : CRUDApiAccessBaseImpl<UserGroup>, IUserGroupRepository
+    public class UserGroupsApiAccess : BaseShoppingApiImpl<UserGroup,UserGroupResult>, IUserGroupRepository
     {
-        public UserGroupsApiAccess(IAuthService authService, ILogger<UserGroupsApiAccess> logger) : base(authService, logger)
+        public UserGroupsApiAccess(IAuthService authService, ILogger<UserGroupsApiAccess> logger) : base("UserGroups", authService, logger)
         {
-            BaseAddress = "api/UserGroups";
         }
 
         public async Task<UserGroup> AddUserToGroup(string userGroupId, ShoppingUserModel user)
         {
-            var client = await _authService.GetHttpClientAsync();
+            var client = await GetApiClient();
 
             var content = new StringContent(JsonConvert.SerializeObject(user), System.Text.Encoding.UTF8, "application/json");
-            var response = await client.PutAsync($"{BaseAddress}/AddUser/{userGroupId}", content);
+            var response = await client.PutAsync($"{_baseUri}/AddUser/{userGroupId}", content);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<UserGroupResult>();
@@ -49,8 +48,8 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<List<UserGroup>> GetAllOfUserAsync(string userId)
         {
-            var client = await _authService.GetHttpClientAsync();
-            var response = await client.GetAsync($"{BaseAddress}/GetAllOfUser/{userId}");
+            var client = await GetApiClient();
+            var response = await client.GetAsync($"{_baseUri}/GetAllOfUser/{userId}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -74,8 +73,8 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<List<ShoppingUserModel>> GetUsersInGroup(string userGroupId)
         {
-            var client = await _authService.GetHttpClientAsync();
-            var response = await client.GetAsync($"{BaseAddress}/GetUsersInGroup/{userGroupId}");
+            var client = await GetApiClient();
+            var response = await client.GetAsync($"{_baseUri}/GetUsersInGroup/{userGroupId}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -99,10 +98,10 @@ namespace Shopping.Client.Services.Implementations
 
         public async Task<UserGroup> RemoveUserFromGroup(string userGroupId, ShoppingUserModel user)
         {
-            var client = await _authService.GetHttpClientAsync();
+            var client = await GetApiClient();
 
             var content = new StringContent(JsonConvert.SerializeObject(user), System.Text.Encoding.UTF8, "application/json");
-            var response = await client.PutAsync($"{BaseAddress}/RemoveUser/{userGroupId}", content);
+            var response = await client.PutAsync($"{_baseUri}/RemoveUser/{userGroupId}", content);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<UserGroupResult>();

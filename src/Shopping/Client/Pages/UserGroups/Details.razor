@@ -18,6 +18,10 @@
         </CustomSpinner>
     </div>
 }
+else if (loadingErrorModel != null)
+{
+    <AlertComponent Model="@loadingErrorModel" />
+}
 else
 {
     <h3>@userGroup.Name</h3>
@@ -329,8 +333,8 @@ else
 }
 
 @code {
-    [Parameter]
-    public string GroupId { get; set; }
+        [Parameter]
+        public string GroupId { get; set; }
 
     private bool IsLoading;
     private bool IsAddingUser;
@@ -354,6 +358,7 @@ else
 
     private bool showLeaveButton = false;
 
+    private AlertComponentModel loadingErrorModel;
     private AlertComponentModel actionsAlert;
     private AlertComponentModel overviewAlert;
 
@@ -487,12 +492,19 @@ else
     private async Task InitGroup()
     {
         userGroup = await UserGroups.GetAsync(GroupId);
-        userGroup.ShoppingLists = await UserGroupShoppingLists.GetShoppingListsOfUserGroupAsync(GroupId);
+        if (userGroup == null)
+        {
+            loadingErrorModel = AlertComponentModel.CreateErrorAlert($"Could not load user group: '{GroupId}'");
+        }
+        else
+        {
+            userGroup.ShoppingLists = await UserGroupShoppingLists.GetShoppingListsOfUserGroupAsync(GroupId);
 
-        var userGroupListsId = userGroup.ShoppingLists.Select(x => x.Id).ToList();
+            var userGroupListsId = userGroup.ShoppingLists.Select(x => x.Id).ToList();
 
-        availableLists = (await ShoppingLists.GetAllAsync())
-            .Where(l => !userGroupListsId.Contains(l.Id))
-            .ToList();
+            availableLists = (await ShoppingLists.GetAllAsync())
+                .Where(l => !userGroupListsId.Contains(l.Id))
+                .ToList();
+        }
     }
 }

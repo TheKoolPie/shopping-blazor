@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.Logging;
+using Serilog.Core;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
@@ -19,17 +22,21 @@ namespace Shopping.Server.Controllers
         private readonly IUserGroupRepository _userGroups;
         private readonly ICurrentUserProvider _userProvider;
         private readonly IUserRepository _userRepository;
+        private readonly ILogger<UserGroupsController> _logger;
         public UserGroupsController(IUserGroupRepository userGroups, ICurrentUserProvider users,
-            IUserRepository userRepository)
+            IUserRepository userRepository, ILogger<UserGroupsController> logger)
         {
             _userGroups = userGroups;
             _userProvider = users;
             _userRepository = userRepository;
+            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<UserGroup>>> GetUserGroups()
+        public async Task<ActionResult<UserGroupResult>> GetUserGroups()
         {
+            UserGroupResult result = new UserGroupResult();
+
             List<UserGroup> groups = new List<UserGroup>();
             var user = await _userProvider.GetUserAsync();
 
@@ -49,10 +56,13 @@ namespace Shopping.Server.Controllers
                 group.Owner = await _userRepository.GetUserByIdAsync(group.OwnerId);
             }
 
-            return Ok(groups);
+            result.IsSuccessful = true;
+            result.ResultData = groups;
+
+            return Ok(result);
         }
         [HttpGet("GetAllOfUser/{id}")]
-        public async Task<ActionResult<List<UserGroup>>> GetAllOfUser(string id)
+        public async Task<ActionResult<UserGroupResult>> GetAllOfUser(string id)
         {
             UserGroupResult result = new UserGroupResult();
             if (string.IsNullOrEmpty(id))
@@ -76,21 +86,23 @@ namespace Shopping.Server.Controllers
             return Ok(result);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserGroup>> GetUserGroup(string id)
+        public async Task<ActionResult<UserGroupResult>> GetUserGroup(string id)
         {
-            UserGroup group = null;
+            UserGroupResult result = new UserGroupResult();
+
             var user = await _userProvider.GetUserAsync();
             try
             {
-                group = await _userGroups.GetAsync(id);
-
                 bool isAdmin = await _userProvider.IsUserAdminAsync();
-                bool isGroupMember = await _userGroups.UserIsInGroupAsync(id, user.Id);
-                if (!(isAdmin || isGroupMember))
+                bool isUserInGroup = await _userGroups.UserIsInGroupAsync(id, user.Id);
+                if (!(isAdmin || isUserInGroup))
                 {
-                    return Unauthorized();
+                    result.IsSuccessful = false;
+                    result.ErrorMessages.Add("User requesting this resource is not allowed to access");
+                    return Unauthorized(result);
                 }
 
+                var group = await _userGroups.GetAsync(id);
                 group.Owner = await _userRepository.GetUserByIdAsync(group.OwnerId);
                 foreach (var member in group.Members)
                 {
@@ -98,12 +110,18 @@ namespace Shopping.Server.Controllers
                     member.UserName = dbUser.UserName;
                     member.Email = dbUser.Email;
                 }
+
+                result.ResultData.Add(group);
+                result.IsSuccessful = true;
             }
             catch (ItemNotFoundException e)
             {
-                return NotFound(e.Message);
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
             }
-            return Ok(group);
+
+            return Ok(result);
         }
         [HttpGet("GetUsersInGroup/{id}")]
         public async Task<ActionResult<ShoppingUserResult>> GetUsersInGroup(string id)
@@ -112,10 +130,10 @@ namespace Shopping.Server.Controllers
             var user = await _userProvider.GetUserAsync();
             try
             {
-                bool isInGroup = await _userGroups.UserIsInGroupAsync(id, user.Id);
+                bool isUserInGroup = await _userGroups.UserIsInGroupAsync(id, user.Id);
                 bool isAdmin = await _userProvider.IsUserAdminAsync();
 
-                if (!isAdmin && !isInGroup)
+                if (!(isAdmin || isUserInGroup))
                 {
                     result.IsSuccessful = false;
                     result.ErrorMessages.Add("Not authorized");
@@ -136,27 +154,35 @@ namespace Shopping.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserGroup>> CreateUserGroup(UserGroup group)
+        public async Task<ActionResult<UserGroupResult>> CreateUserGroup(UserGroup group)
         {
+            UserGroupResult result = new UserGroupResult();
+
             var user = await _userProvider.GetUserAsync();
 
             group.OwnerId = user.Id;
-
-            UserGroup created = null;
             try
             {
-                created = await _userGroups.CreateAsync(group);
+                var createdGroup = await _userGroups.CreateAsync(group);
+                result.IsSuccessful = true;
+                result.ResultData.Add(createdGroup);
             }
             catch (ItemAlreadyExistsException e)
             {
-                return Conflict(e.Message);
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Item already exists");
+                result.ErrorMessages.Add(e.Message);
+                return Conflict(result);
             }
             catch (Exception e)
             {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Internal server error");
+                result.ErrorMessages.Add(e.Message);
                 throw e;
             }
 
-            return Ok(created);
+            return Ok(result);
         }
 
         [HttpPut("AddUser/{id}")]
@@ -165,7 +191,11 @@ namespace Shopping.Server.Controllers
             var result = new UserGroupResult();
 
             var currentUser = await _userProvider.GetUserAsync();
-            if (!(await _userGroups.UserIsInGroupAsync(id, currentUser.Id)))
+
+            bool isUserInGroup = await _userGroups.UserIsInGroupAsync(id, currentUser.Id);
+            bool isAdmin = await _userProvider.IsUserAdminAsync();
+
+            if (!(isAdmin || isUserInGroup))
             {
                 result.IsSuccessful = false;
                 result.ErrorMessages.Add("Not authorized");
@@ -189,6 +219,7 @@ namespace Shopping.Server.Controllers
             {
                 result.IsSuccessful = false;
                 result.ErrorMessages.Add(e.Message);
+                throw e;
             }
             return Ok(result);
         }
@@ -197,7 +228,11 @@ namespace Shopping.Server.Controllers
         {
             var result = new UserGroupResult();
             var currentUser = await _userProvider.GetUserAsync();
-            if (!(await _userGroups.UserIsInGroupAsync(id, currentUser.Id)))
+
+            bool isUserInGroup = await _userGroups.UserIsInGroupAsync(id, currentUser.Id);
+            bool isAdmin = await _userProvider.IsUserAdminAsync();
+
+            if (!(isAdmin || isUserInGroup))
             {
                 result.IsSuccessful = false;
                 result.ErrorMessages.Add("Not authorized");
@@ -221,28 +256,51 @@ namespace Shopping.Server.Controllers
             {
                 result.IsSuccessful = false;
                 result.ErrorMessages.Add(e.Message);
+                throw e;
             }
             return Ok(result);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<bool>> DeleteUserGroup(string id)
+        public async Task<ActionResult<UserGroupResult>> DeleteUserGroup(string id)
         {
-            var user = await _userProvider.GetUserAsync();
+            var result = new UserGroupResult();
+            var currentUser = await _userProvider.GetUserAsync();
+
+            bool isUserInGroup = await _userGroups.UserIsInGroupAsync(id, currentUser.Id);
+            bool isAdmin = await _userProvider.IsUserAdminAsync();
+
+            if (!(isAdmin || isUserInGroup))
+            {
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add("Not authorized");
+                return Unauthorized(result);
+            }
+
             try
             {
                 var group = await _userGroups.GetAsync(id);
-                if (!(await _userGroups.UserIsInGroupAsync(id, user.Id)))
+                if (!(await _userGroups.DeleteByIdAsync(id)))
                 {
-                    return Unauthorized();
+                    result.IsSuccessful = false;
+                    result.ErrorMessages.Add($"Could not delete item '{id}'");
+                    return UnprocessableEntity(result);
                 }
-                await _userGroups.DeleteByIdAsync(id);
+                if (!(await _userRepository.RemoveStandardUserGroupId(id)))
+                {
+                    _logger.LogWarning($"Could not remove '{id}' from at least one user");
+                }
             }
             catch (ItemNotFoundException e)
             {
-                return NotFound(e.Message);
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
             }
-            return Ok(true);
+
+            result.IsSuccessful = true;
+
+            return Ok(result);
         }
     }
 }

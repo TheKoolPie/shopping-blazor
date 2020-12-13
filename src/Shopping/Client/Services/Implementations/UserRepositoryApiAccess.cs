@@ -1,16 +1,11 @@
-﻿using Newtonsoft.Json;
-using Shopping.Client.Services.Interfaces;
-using Shopping.Shared.Model.Account;
+﻿using Shopping.Shared.Model.Account;
 using Shopping.Shared.Results;
 using Shopping.Shared.Results.Account;
-using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
@@ -83,6 +78,11 @@ namespace Shopping.Client.Services.Implementations
             }
             return resultObject.ResultData.FirstOrDefault();
 
+        }
+
+        public Task<bool> RemoveStandardUserGroupId(string userGroupId)
+        {
+            throw new NotImplementedException();
         }
     }
 }
