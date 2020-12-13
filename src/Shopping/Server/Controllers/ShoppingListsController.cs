@@ -20,15 +20,13 @@ namespace Shopping.Server.Controllers
     {
         private readonly IShoppingLists _lists;
         private readonly ICurrentUserProvider _users;
-        private readonly IUserGroupShoppingLists _userGroupShoppingLists;
         private readonly ILogger<ShoppingListsController> _logger;
 
         public ShoppingListsController(IShoppingLists lists, ICurrentUserProvider users,
-            ILogger<ShoppingListsController> logger, IUserGroupShoppingLists userGroupShoppingLists)
+            ILogger<ShoppingListsController> logger)
         {
             _lists = lists;
             _users = users;
-            _userGroupShoppingLists = userGroupShoppingLists;
             _logger = logger;
         }
 

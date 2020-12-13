@@ -39,7 +39,7 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var currentUserRepoMock = UserMocks.GetMockUserProvider(UserMocks.AdminUser);
 
-            var controller = new ShoppingListsController(shoppingListRepoMock.Object, currentUserRepoMock, null, null);
+            var controller = new ShoppingListsController(shoppingListRepoMock.Object, currentUserRepoMock, null);
 
             var response = await controller.GetLists();
 
@@ -66,7 +66,7 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var currentUserRepoMock = UserMocks.GetMockUserProvider(UserMocks.AdminUser);
 
-            var controller = new ShoppingListsController(shoppingListRepoMock.Object, currentUserRepoMock, null, null);
+            var controller = new ShoppingListsController(shoppingListRepoMock.Object, currentUserRepoMock, null);
 
             var response = await controller.GetLists();
             var result = response.Result as OkObjectResult;
@@ -95,7 +95,7 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var currentUserRepoMock = UserMocks.GetMockUserProvider(UserMocks.AdminUser);
 
-            var controller = new ShoppingListsController(shoppingListRepoMock.Object, currentUserRepoMock, null, null);
+            var controller = new ShoppingListsController(shoppingListRepoMock.Object, currentUserRepoMock, null);
 
             var response = await controller.GetLists();
             var result = response.Result as OkObjectResult;
@@ -134,7 +134,7 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var currentUserRepoMock = UserMocks.GetMockUserProvider(UserMocks.TestUser);
 
-            var controller = new ShoppingListsController(shoppingListRepoMock.Object, currentUserRepoMock, null, null);
+            var controller = new ShoppingListsController(shoppingListRepoMock.Object, currentUserRepoMock, null);
 
             var response = await controller.GetLists();
             var result = response.Result as OkObjectResult;
@@ -152,7 +152,7 @@ namespace Shopping.Server.UnitTests.Controllers
             var listRepoMock = new Mock<IShoppingLists>();
             listRepoMock.Setup(l => l.GetAsync(It.IsAny<string>())).Returns(Task.FromResult(new ShoppingList()));
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
 
             var response = await controller.GetList("");
 
@@ -169,7 +169,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.GetAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ShoppingList() { Name = testListName }));
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
 
             var response = await controller.GetList("");
             var resultObject = response.Result as OkObjectResult;
@@ -197,7 +197,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.IsOfUserAsync(testList.Id, UserMocks.TestUser.Id))
                 .Returns(Task.FromResult(true));
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
 
             var response = await controller.GetList(testListId);
             var resultObject = response.Result as OkObjectResult;
@@ -216,7 +216,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.GetAsync(testListId))
                 .Throws(new ItemNotFoundException());
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.GetList(testListId);
 
             Assert.IsType<NotFoundResult>(response.Result);
@@ -236,7 +236,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.CreateAsync(testList))
                 .Returns(Task.FromResult(testList));
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
 
             var response = await controller.CreateList(testList);
 
@@ -255,7 +255,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.CreateAsync(It.IsAny<ShoppingList>()))
                 .Throws(new ItemAlreadyExistsException());
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
 
             var response = await controller.CreateList(new ShoppingList());
 
@@ -271,7 +271,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.IsOfUserAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new ItemNotFoundException());
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
 
             var response = await controller.AddItemToList("", new ShoppingListItem());
 
@@ -286,7 +286,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.AddOrUpdateItemAsync(It.IsAny<string>(), It.IsAny<ShoppingListItem>()))
                 .Throws(new ItemNotFoundException());
 
-            var controller = new ShoppingListsController(listRepoMock.Object, UserMocks.GetMockUserProvider(UserMocks.AdminUser), null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, UserMocks.GetMockUserProvider(UserMocks.AdminUser), null);
 
             var response = await controller.AddItemToList("", new ShoppingListItem());
 
@@ -302,7 +302,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.AddOrUpdateItemAsync(It.IsAny<string>(), It.IsAny<ShoppingListItem>()))
                 .Throws(new PersistencyException());
 
-            var controller = new ShoppingListsController(listRepoMock.Object, UserMocks.GetMockUserProvider(UserMocks.AdminUser), null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, UserMocks.GetMockUserProvider(UserMocks.AdminUser), null);
 
             var response = await controller.AddItemToList("", new ShoppingListItem());
 
@@ -328,7 +328,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.AddOrUpdateItemAsync(testList.Id, item))
                 .Returns(Task.FromResult(item));
 
-            var controller = new ShoppingListsController(listRepoMock.Object, UserMocks.GetMockUserProvider(UserMocks.AdminUser), null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, UserMocks.GetMockUserProvider(UserMocks.AdminUser), null);
 
             var response = await controller.AddItemToList(testList.Id, item);
 
@@ -342,7 +342,7 @@ namespace Shopping.Server.UnitTests.Controllers
         [Fact]
         public async Task UpdateList_IdsDoNotMatch_ReturnsBadRequestResult()
         {
-            var controller = new ShoppingListsController(null, null, null, null);
+            var controller = new ShoppingListsController(null, null, null);
             var response = await controller.UpdateList("123", new ShoppingList() { Id = "abc" });
 
             Assert.IsType<BadRequestResult>(response.Result);
@@ -358,7 +358,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.UpdateAsync(It.IsAny<string>(), It.IsAny<ShoppingList>()))
                 .Throws(new ItemNotFoundException());
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.UpdateList("123", new ShoppingList() { Id = "123" });
 
             Assert.IsType<NotFoundResult>(response.Result);
@@ -375,7 +375,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.UpdateAsync(It.IsAny<string>(), It.IsAny<ShoppingList>()))
                 .Throws(new PersistencyException());
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.UpdateList("123", new ShoppingList() { Id = "123" });
 
             Assert.IsType<ConflictResult>(response.Result);
@@ -397,7 +397,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.UpdateAsync(testList.Id, testList))
                 .Returns(Task.FromResult(testList));
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.UpdateList(testList.Id, testList);
 
             Assert.IsType<OkObjectResult>(response.Result);
@@ -419,7 +419,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.DeleteByIdAsync(It.IsAny<string>()))
                 .Throws(new ItemNotFoundException());
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.DeleteList("123");
 
             Assert.IsType<NotFoundResult>(response.Result);
@@ -436,7 +436,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.DeleteByIdAsync(It.IsAny<string>()))
                 .Throws(new PersistencyException());
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.DeleteList("123");
 
             Assert.IsType<ConflictResult>(response.Result);
@@ -458,7 +458,7 @@ namespace Shopping.Server.UnitTests.Controllers
             listRepoMock.Setup(l => l.DeleteByIdAsync(testList.Id))
                 .Returns(Task.FromResult(true));
 
-            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null, null);
+            var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.DeleteList(testList.Id);
 
             Assert.IsType<OkResult>(response.Result);

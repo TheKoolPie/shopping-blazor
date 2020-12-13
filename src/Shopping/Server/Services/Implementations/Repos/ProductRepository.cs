@@ -70,18 +70,7 @@ namespace Shopping.Server.Services.Implementations
         public async Task<bool> DeleteByIdAsync(string id)
         {
             var existing = await GetAsync(id);
-            var shoppinglists = await GetShoppingListsWithProduct(id);
-            if (shoppinglists.Count > 0)
-            {
-                foreach (var list in shoppinglists)
-                {
-                    var deleteItem = list.Items.FirstOrDefault(i => i.ProductItemId == id);
-                    if (deleteItem != null)
-                    {
-                        list.Items.Remove(deleteItem);
-                    }
-                }
-            }
+
             _context.Products.Remove(existing);
 
             bool result = false;
@@ -117,21 +106,6 @@ namespace Shopping.Server.Services.Implementations
         private async Task<ProductCategory> GetCategoryAsync(string id)
         {
             return await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
-        }
-
-        private async Task<List<ShoppingList>> GetShoppingListsWithProduct(string productItemId)
-        {
-            var shoppinglist = await _context.ShoppingLists.ToListAsync();
-            foreach (var list in shoppinglist)
-            {
-                list.Items = (await _context.ShoppingListItems.ToListAsync())
-                    .Where(p => p.ProductItemId == productItemId)
-                    .ToList();
-            }
-            shoppinglist = shoppinglist
-                .Where(i => i.Items.Any(p => p.ProductItemId == productItemId))
-                .ToList();
-            return shoppinglist;
         }
     }
 }

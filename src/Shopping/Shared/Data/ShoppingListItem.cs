@@ -8,7 +8,6 @@ namespace Shopping.Shared.Data
         public ProductItem ProductItem { get; set; }
 
         public string ShoppingListId { get; set; }
-        public ShoppingList ShoppingList { get; set; }
 
         public float Amount { get; set; }
         public bool Done { get; set; }

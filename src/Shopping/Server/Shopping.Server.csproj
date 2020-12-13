@@ -45,5 +45,9 @@
     <ProjectReference Include="..\Shared\Shopping.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\Shopping\" />
+  </ItemGroup>
+
 
 </Project>

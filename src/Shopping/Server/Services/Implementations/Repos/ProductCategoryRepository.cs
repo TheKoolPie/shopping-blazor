@@ -41,27 +41,6 @@ namespace Shopping.Server.Services.Implementations
         {
             var existing = await GetAsync(id);
 
-            var products = await GetProductsWithCategory(id);
-            if (products.Count > 0)
-            {
-                foreach (var product in products)
-                {
-                    var shoppinglists = await GetShoppingListsWithProduct(product.Id);
-                    if (shoppinglists.Count > 0)
-                    {
-                        foreach (var list in shoppinglists)
-                        {
-                            var deleteItem = list.Items.FirstOrDefault(i => i.ProductItemId == product.Id);
-                            if (deleteItem != null)
-                            {
-                                list.Items.Remove(deleteItem);
-                            }
-                        }
-                    }
-                    _context.Products.Remove(product);
-                }
-            }
-
             _context.Categories.Remove(existing);
 
             bool result = false;
@@ -123,24 +102,7 @@ namespace Shopping.Server.Services.Implementations
             return !(restWithOutCurrentItem.Any(c => c.Name.Equals(item.Name, StringComparison.InvariantCultureIgnoreCase)));
         }
 
-        private async Task<List<ProductItem>> GetProductsWithCategory(string categoryId)
-        {
-            var products = await _context.Products.ToListAsync();
-            products = products
-                .Where(p => p.CategoryId == categoryId)
-                .ToList();
-
-            return products;
-        }
-        private async Task<List<ShoppingList>> GetShoppingListsWithProduct(string productItemId)
-        {
-            var shoppinglist = await _context.ShoppingLists.ToListAsync();
-            shoppinglist = shoppinglist
-                .Where(i => i.Items.Any(p => p.ProductItemId == productItemId))
-                .ToList();
-            return shoppinglist;
-        }
-
+       
         private async Task CreateStoreCatAssignmentsForCategory(ProductCategory category)
         {
             var assignments = await _context.StoreProductCategories.ToListAsync();
