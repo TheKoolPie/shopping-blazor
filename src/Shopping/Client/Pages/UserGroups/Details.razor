@@ -88,7 +88,6 @@ else
                                                 <tr>
                                                     <th>Name</th>
                                                     <th>Date</th>
-                                                    <th>Item Count</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
@@ -100,7 +99,6 @@ else
                                                         <tr class="selectable-row">
                                                             <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.Name</td>
                                                             <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.ListDate.ToString("dd.MM.yyyy")</td>
-                                                            <td @onclick="@(() => NavigateToListDetails(list.Id))">@list.Items.Count</td>
                                                             <td>
                                                                 @if (IsOwner)
                                                                 {
