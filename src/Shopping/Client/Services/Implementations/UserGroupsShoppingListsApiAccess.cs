@@ -4,50 +4,77 @@ using Shopping.Shared.Data;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Net.Http.Json;
-using Shopping.Shared.Services;
+using Shopping.Client.Services.Implementations.Base;
+using Shopping.Shared.Results;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class UserGroupsShoppingListsApiAccess : CRUDApiAccessBaseImpl<UserGroupShoppingList>, IUserGroupShoppingLists
+    public class UserGroupsShoppingListsApiAccess : BaseShoppingApiImpl<UserGroupShoppingList,UserGroupShoppingListResult>, IUserGroupShoppingLists
     {
-        public UserGroupsShoppingListsApiAccess(IAuthService authService, ILogger<UserGroupsShoppingListsApiAccess> logger) : base(authService, logger)
+        public UserGroupsShoppingListsApiAccess(IAuthService authService, ILogger<UserGroupsShoppingListsApiAccess> logger) 
+            : base("UserGroupShoppingLists", authService, logger)
         {
-            BaseAddress = "api/UserGroupShoppingLists";
         }
 
         public async Task<List<ShoppingList>> GetShoppingListsOfUserGroupAsync(string userGroupId)
         {
-            List<ShoppingList> lists = null;
-            var client = await _authService.GetHttpClientAsync();
-            var response = await client.GetAsync($"{BaseAddress}/ShoppingListsOfGroup/{userGroupId}");
+            var client = await GetApiClient();
+            var response = await client.GetAsync($"{_baseUri}/ShoppingListsOfGroup/{userGroupId}");
+
+            CheckForUnauthorized(response);
+
             if (response.IsSuccessStatusCode)
             {
-                lists = await response.Content.ReadFromJsonAsync<List<ShoppingList>>();
+                var result = await response.Content.ReadFromJsonAsync<ShoppingListResult>();
+                if (result.IsSuccessful)
+                {
+                    return result.ResultData;
+                }
+                else
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
             }
-            return lists;
+            else
+            {
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
+            }
+
+            return null;
         }
 
         public async Task<List<UserGroup>> GetUserGroupsOfShoppingListAsync(string shoppingListId)
         {
-            List<UserGroup> userGroups = null;
-            var client = await _authService.GetHttpClientAsync();
-            var response = await client.GetAsync($"{BaseAddress}/UserGroupsOfShoppingList/{shoppingListId}");
+            var client = await GetApiClient();
+            var response = await client.GetAsync($"{_baseUri}/UserGroupsOfShoppingList/{shoppingListId}");
+
+            CheckForUnauthorized(response);
+
             if (response.IsSuccessStatusCode)
             {
-                userGroups = await response.Content.ReadFromJsonAsync<List<UserGroup>>();
+                var result = await response.Content.ReadFromJsonAsync<UserGroupResult>();
+                if (result.IsSuccessful)
+                {
+                    return result.ResultData;
+                }
+                else
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
             }
-            return userGroups;
+            else
+            {
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
+            }
+
+            return null;
         }
 
         public async Task<bool> DeleteAsync(UserGroupShoppingList assignment)
         {
-            var client = await _authService.GetHttpClientAsync();
-            var response = await client.DeleteAsync($"{BaseAddress}/{assignment.UserGroupId}/{assignment.ShoppingListId}");
-            return response.IsSuccessStatusCode;
+            return await SendDelete($"{_baseUri}/{assignment.UserGroupId}/{assignment.ShoppingListId}");
         }
     }
 }

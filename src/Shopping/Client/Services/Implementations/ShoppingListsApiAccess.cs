@@ -5,6 +5,7 @@ using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -20,17 +21,27 @@ namespace Shopping.Client.Services.Implementations
         public async Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item)
         {
             var client = await GetApiClient();
-            ShoppingListItem createdItem = null;
             var response = await client.PostAsJsonAsync<ShoppingListItem>($"{_baseUri}/AddItem/{listId}", item);
+            CheckForUnauthorized(response);
+
             if (response.IsSuccessStatusCode)
             {
-                createdItem = await response.Content.ReadFromJsonAsync<ShoppingListItem>();
+                var result = await response.Content.ReadFromJsonAsync<ShoppingListItemResult>();
+                if (result.IsSuccessful)
+                {
+                    return result.ResultData.FirstOrDefault();
+                }
+                else
+                {
+                    _logger.LogError("Result is not set to successful", result.ErrorMessages);
+                }
             }
             else
             {
-                _logger.LogError($"Could not add item to list {listId}");
+                _logger.LogError($"Response has no success status code: {response.StatusCode}");
             }
-            return createdItem;
+
+            return null;
         }
 
         public Task<UserGroup> AddUserGroupAsync(string listId, string userGroupId)

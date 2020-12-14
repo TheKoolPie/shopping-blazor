@@ -104,27 +104,36 @@ namespace Shopping.Server.Controllers
             return Ok(result);
         }
         [HttpPost("AddItem/{id}")]
-        public async Task<ActionResult<ShoppingListItem>> AddItemToList(string id, [FromBody] ShoppingListItem item)
+        public async Task<ActionResult<ShoppingListItemResult>> AddItemToList(string id, [FromBody] ShoppingListItem item)
         {
-            ShoppingListItem createdItem;
+            var result = new ShoppingListItemResult();
             try
             {
                 if (!(await IsUserAuthorizedToAccessList(id)))
                 {
-                    return Unauthorized();
+                    result.IsSuccessful = false;
+                    result.ErrorMessages.Add("Not authorized");
+                    return Unauthorized(result);
                 }
-                createdItem = await _lists.AddOrUpdateItemAsync(id, item);
+                var createdItem = await _lists.AddOrUpdateItemAsync(id, item);
+                result.IsSuccessful = true;
+                result.ResultData.Add(createdItem);
+
             }
-            catch (ItemNotFoundException)
+            catch (ItemNotFoundException e)
             {
-                return NotFound();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
             }
-            catch (PersistencyException)
+            catch (PersistencyException e)
             {
-                return Conflict();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return Conflict(result);
             }
 
-            return Ok(createdItem);
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
@@ -146,6 +155,7 @@ namespace Shopping.Server.Controllers
                     return Unauthorized(result);
                 }
                 var updatedList = await _lists.UpdateAsync(id, list);
+                result.ResultData.Add(updatedList);
             }
             catch (ItemNotFoundException e)
             {
