@@ -6,6 +6,7 @@ using Shopping.Server.UnitTests.TestData;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
+using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -71,7 +72,7 @@ namespace Shopping.Server.UnitTests.Controllers
             var response = await controller.GetLists();
             var result = response.Result as OkObjectResult;
 
-            Assert.IsType<List<ShoppingList>>(result.Value);
+            Assert.IsType<ShoppingListResult>(result.Value);
         }
 
         [Fact]
@@ -99,9 +100,9 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var response = await controller.GetLists();
             var result = response.Result as OkObjectResult;
-            var resultValue = result.Value as List<ShoppingList>;
+            var resultValue = result.Value as ShoppingListResult;
 
-            Assert.Equal(2, resultValue.Count);
+            Assert.Equal(2, resultValue.ResultData.Count);
         }
 
         [Fact]
@@ -138,10 +139,10 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var response = await controller.GetLists();
             var result = response.Result as OkObjectResult;
-            var resultValue = result.Value as List<ShoppingList>;
+            var resultValue = result.Value as ShoppingListResult;
 
-            Assert.Single(resultValue);
-            Assert.Equal(userListName, resultValue.First().Name);
+            Assert.Single(resultValue.ResultData);
+            Assert.Equal(userListName, resultValue.ResultData.First().Name);
         }
 
         [Fact]
@@ -156,7 +157,7 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var response = await controller.GetList("");
 
-            Assert.IsType<UnauthorizedResult>(response.Result);
+            Assert.IsType<UnauthorizedObjectResult>(response.Result);
         }
 
         [Fact]
@@ -173,9 +174,9 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var response = await controller.GetList("");
             var resultObject = response.Result as OkObjectResult;
-            var list = resultObject.Value as ShoppingList;
+            var list = resultObject.Value as ShoppingListResult;
 
-            Assert.Equal(testListName, list.Name);
+            Assert.Equal(testListName, list.ResultData[0].Name);
         }
         [Fact]
         public async Task GetList_UserIsNotAdminInList_ReturnsList()
@@ -201,16 +202,16 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var response = await controller.GetList(testListId);
             var resultObject = response.Result as OkObjectResult;
-            var list = resultObject.Value as ShoppingList;
+            var list = resultObject.Value as ShoppingListResult;
 
-            Assert.Equal(testListName, list.Name);
+            Assert.Equal(testListName, list.ResultData[0].Name);
         }
 
         [Fact]
         public async Task GetList_SearchForNonExistingList_ReturnsNotFoundResult()
         {
             var testListId = "abc-def";
-            var userRepoMock = UserMocks.GetMockUserProvider(UserMocks.TestUser);
+            var userRepoMock = UserMocks.GetMockUserProvider(UserMocks.AdminUser);
 
             var listRepoMock = new Mock<IShoppingLists>();
             listRepoMock.Setup(l => l.GetAsync(testListId))
@@ -219,7 +220,7 @@ namespace Shopping.Server.UnitTests.Controllers
             var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.GetList(testListId);
 
-            Assert.IsType<NotFoundResult>(response.Result);
+            Assert.IsType<NotFoundObjectResult>(response.Result);
         }
 
         [Fact]
@@ -241,9 +242,9 @@ namespace Shopping.Server.UnitTests.Controllers
             var response = await controller.CreateList(testList);
 
             var result = response.Result as OkObjectResult;
-            var list = result.Value as ShoppingList;
+            var list = result.Value as ShoppingListResult;
 
-            Assert.Equal(UserMocks.AdminUser.Id, list.OwnerId);
+            Assert.Equal(UserMocks.AdminUser.Id, list.ResultData[0].OwnerId);
         }
 
         [Fact]
@@ -259,7 +260,7 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var response = await controller.CreateList(new ShoppingList());
 
-            Assert.IsType<ConflictResult>(response.Result);
+            Assert.IsType<ConflictObjectResult>(response.Result);
         }
 
         [Fact]
@@ -275,7 +276,7 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var response = await controller.AddItemToList("", new ShoppingListItem());
 
-            Assert.IsType<NotFoundResult>(response.Result);
+            Assert.IsType<NotFoundObjectResult>(response.Result);
         }
         [Fact]
         public async Task AddItemToList_WhileAddingListNotFound_ReturnsNotFoundResult()
@@ -290,7 +291,7 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var response = await controller.AddItemToList("", new ShoppingListItem());
 
-            Assert.IsType<NotFoundResult>(response.Result);
+            Assert.IsType<NotFoundObjectResult>(response.Result);
         }
 
         [Fact]
@@ -306,7 +307,7 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var response = await controller.AddItemToList("", new ShoppingListItem());
 
-            Assert.IsType<ConflictResult>(response.Result);
+            Assert.IsType<ConflictObjectResult>(response.Result);
         }
 
         [Fact]
@@ -334,9 +335,9 @@ namespace Shopping.Server.UnitTests.Controllers
 
             var result = response.Result as OkObjectResult;
 
-            var itemResult = result.Value as ShoppingListItem;
+            var itemResult = result.Value as ShoppingListItemResult;
 
-            Assert.Equal(item.Id, itemResult.Id);
+            Assert.Equal(item.Id, itemResult.ResultData[0].Id);
         }
 
         [Fact]
@@ -345,7 +346,7 @@ namespace Shopping.Server.UnitTests.Controllers
             var controller = new ShoppingListsController(null, null, null);
             var response = await controller.UpdateList("123", new ShoppingList() { Id = "abc" });
 
-            Assert.IsType<BadRequestResult>(response.Result);
+            Assert.IsType<BadRequestObjectResult>(response.Result);
         }
         [Fact]
         public async Task UpdateList_UpdateThrowsItemNotFoundException_ReturnsNotFoundResult()
@@ -361,7 +362,7 @@ namespace Shopping.Server.UnitTests.Controllers
             var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.UpdateList("123", new ShoppingList() { Id = "123" });
 
-            Assert.IsType<NotFoundResult>(response.Result);
+            Assert.IsType<NotFoundObjectResult>(response.Result);
         }
 
         [Fact]
@@ -378,7 +379,7 @@ namespace Shopping.Server.UnitTests.Controllers
             var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.UpdateList("123", new ShoppingList() { Id = "123" });
 
-            Assert.IsType<ConflictResult>(response.Result);
+            Assert.IsType<ConflictObjectResult>(response.Result);
         }
 
         [Fact]
@@ -403,9 +404,9 @@ namespace Shopping.Server.UnitTests.Controllers
             Assert.IsType<OkObjectResult>(response.Result);
 
             var result = response.Result as OkObjectResult;
-            var list = result.Value as ShoppingList;
+            var list = result.Value as ShoppingListResult;
 
-            Assert.Equal(testList.Id, list.Id);
+            Assert.Equal(testList.Id, list.ResultData[0].Id);
         }
 
         [Fact]
@@ -422,7 +423,7 @@ namespace Shopping.Server.UnitTests.Controllers
             var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.DeleteList("123");
 
-            Assert.IsType<NotFoundResult>(response.Result);
+            Assert.IsType<NotFoundObjectResult>(response.Result);
         }
 
         [Fact]
@@ -439,7 +440,7 @@ namespace Shopping.Server.UnitTests.Controllers
             var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.DeleteList("123");
 
-            Assert.IsType<ConflictResult>(response.Result);
+            Assert.IsType<ConflictObjectResult>(response.Result);
         }
 
         [Fact]
@@ -461,7 +462,7 @@ namespace Shopping.Server.UnitTests.Controllers
             var controller = new ShoppingListsController(listRepoMock.Object, userRepoMock, null);
             var response = await controller.DeleteList(testList.Id);
 
-            Assert.IsType<OkResult>(response.Result);
+            Assert.IsType<OkObjectResult>(response.Result);
         }
     }
 }
