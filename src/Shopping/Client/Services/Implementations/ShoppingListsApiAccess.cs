@@ -1,31 +1,27 @@
 ﻿using Microsoft.Extensions.Logging;
-using Shopping.Client.Services.Interfaces;
+using Shopping.Client.Services.Implementations.Base;
 using Shopping.Shared.Data;
-using Shopping.Shared.Services;
+using Shopping.Shared.Results;
 using Shopping.Shared.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Shopping.Client.Services.Implementations
 {
-    public class ShoppingListsApiAccess : CRUDApiAccessBaseImpl<ShoppingList>, IShoppingLists
+    public class ShoppingListsApiAccess : BaseShoppingApiImpl<ShoppingList, ShoppingListResult>, IShoppingLists
     {
-        public ShoppingListsApiAccess(IAuthService authService, ILogger<ShoppingListsApiAccess> logger) 
-            : base(authService, logger)
+        public ShoppingListsApiAccess(IAuthService authService, ILogger<ShoppingListsApiAccess> logger)
+            : base("ShoppingLists", authService, logger)
         {
-            BaseAddress = "api/ShoppingLists";
         }
 
         public async Task<ShoppingListItem> AddOrUpdateItemAsync(string listId, ShoppingListItem item)
         {
-            var client = await _authService.GetHttpClientAsync();
+            var client = await GetApiClient();
             ShoppingListItem createdItem = null;
-            var response = await client.PostAsJsonAsync<ShoppingListItem>($"{BaseAddress}/AddItem/{listId}", item);
+            var response = await client.PostAsJsonAsync<ShoppingListItem>($"{_baseUri}/AddItem/{listId}", item);
             if (response.IsSuccessStatusCode)
             {
                 createdItem = await response.Content.ReadFromJsonAsync<ShoppingListItem>();
