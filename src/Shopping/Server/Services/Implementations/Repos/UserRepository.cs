@@ -49,7 +49,13 @@ namespace Shopping.Server.Services.Implementations
                 {
                     Id = dbUser.Id,
                     UserName = dbUser.UserName,
-                    Email = dbUser.Email
+                    Email = dbUser.Email,
+                    Settings = new ShoppingUserSettingsModel()
+                    {
+                        FirstName = dbUser.FirstName,
+                        LastName = dbUser.LastName,
+                        StandardUserGroupId = dbUser.StandardUserGroupId
+                    }
                 };
             }
 
@@ -66,7 +72,13 @@ namespace Shopping.Server.Services.Implementations
                 {
                     Id = user.Id,
                     UserName = user.UserName,
-                    Email = user.Email
+                    Email = user.Email,
+                    Settings = new ShoppingUserSettingsModel()
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        StandardUserGroupId = user.StandardUserGroupId
+                    }
                 };
             }
             else
@@ -86,7 +98,13 @@ namespace Shopping.Server.Services.Implementations
                 {
                     Id = user.Id,
                     UserName = user.UserName,
-                    Email = user.Email
+                    Email = user.Email,
+                    Settings = new ShoppingUserSettingsModel()
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        StandardUserGroupId = user.StandardUserGroupId
+                    }
                 };
             }
             else
@@ -106,7 +124,13 @@ namespace Shopping.Server.Services.Implementations
                 {
                     Id = user.Id,
                     UserName = user.UserName,
-                    Email = user.Email
+                    Email = user.Email,
+                    Settings = new ShoppingUserSettingsModel()
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        StandardUserGroupId = user.StandardUserGroupId
+                    }
                 };
             }
             else
@@ -157,7 +181,22 @@ namespace Shopping.Server.Services.Implementations
             }
             return result;
         }
-
+        public async Task<bool> RemoveStandardUserGroupId(string userGroupId)
+        {
+            var usersWithGroup = _userManager.Users
+                .Where(u => u.StandardUserGroupId == userGroupId)
+                .ToList();
+            foreach (var user in usersWithGroup)
+            {
+                user.StandardUserGroupId = "";
+                var result = await _userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         private async Task<ShoppingUser> GetDbUserFromModelData(ShoppingUserModel userModel)
         {
             ShoppingUser dbUser = null;
@@ -179,5 +218,7 @@ namespace Shopping.Server.Services.Implementations
             }
             return dbUser;
         }
+
+
     }
 }

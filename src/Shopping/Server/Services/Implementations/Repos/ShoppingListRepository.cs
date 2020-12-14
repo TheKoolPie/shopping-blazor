@@ -205,10 +205,6 @@ namespace Shopping.Server.Services.Implementations
         public async Task<bool> DeleteByIdAsync(string id)
         {
             var existing = await GetAsync(id);
-
-            await RemoveAssignmentsOfShoppingListAsync(id);
-            await DeleteAllItemsOfList(id);
-
             _context.ShoppingLists.Remove(existing);
 
             bool result = false;
@@ -265,35 +261,6 @@ namespace Shopping.Server.Services.Implementations
 
             return product;
         }
-        private async Task DeleteAllItemsOfList(string shoppingListId)
-        {
-            var allItems = await _context.ShoppingListItems.ToListAsync();
-            var itemsOfList = allItems.Where(i => i.ShoppingListId == shoppingListId).ToList();
-            foreach (var item in itemsOfList)
-            {
-                _context.ShoppingListItems.Remove(item);
-            }
-        }
-        private async Task<bool> RemoveAssignmentsOfShoppingListAsync(string shoppingListId)
-        {
-            var allAssignmentsOfList = (await _groupListAssignments.GetAllAsync())
-                .Where(a => a.ShoppingListId == shoppingListId)
-                .ToList();
-
-            return await DeleteAssignments(allAssignmentsOfList);
-        }
-        private async Task<bool> DeleteAssignments(List<UserGroupShoppingList> assignments)
-        {
-            foreach (var assignment in assignments)
-            {
-                if (!(await _groupListAssignments.DeleteAsync(assignment)))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
         private async Task<List<ShoppingListItem>> GetItemsOfList(string id)
         {
             var items = await _context.ShoppingListItems.ToListAsync();

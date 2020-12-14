@@ -17,5 +17,6 @@ namespace Shopping.Shared.Services.Interfaces
         Task<ShoppingUserModel> GetUserAsync(ShoppingUserModel userModel);
         Task<ShoppingUserModel> UpdateUserData(string id, ShoppingUserModel updateData);
         Task<ShoppingUserSettingsModel> UpdateUserSettingsAsync(string userId, ShoppingUserSettingsModel settingsData);
+        Task<bool> RemoveStandardUserGroupId(string userGroupId);
     }
 }

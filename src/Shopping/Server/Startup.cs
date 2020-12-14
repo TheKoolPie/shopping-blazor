@@ -89,8 +89,6 @@ namespace Shopping.Server
             });
 
             services.AddTransient<IAuthService, AuthService>();
-
-            services.AddTransient<IShoppingRepoBackup, ShoppingRepoBackup>();
             services.AddTransient<IShoppingDataRepository, ShoppingDataRepoEf>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<ICurrentUserProvider, UserFromHttpContextProvider>();

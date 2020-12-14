@@ -9,8 +9,8 @@ using Shopping.Server.Data;
 namespace Shopping.Server.Migrations.Shopping
 {
     [DbContext(typeof(ShoppingDbContext))]
-    [Migration("20201125192204_Remove-Category-Color")]
-    partial class RemoveCategoryColor
+    [Migration("20201213205524_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -74,10 +74,10 @@ namespace Shopping.Server.Migrations.Shopping
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("OwnerId")
+                        .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
@@ -100,6 +100,7 @@ namespace Shopping.Server.Migrations.Shopping
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("ProductItemId")
+                        .IsRequired()
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
 
                     b.Property<string>("ShoppingListId")
@@ -224,6 +225,7 @@ namespace Shopping.Server.Migrations.Shopping
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("OwnerId")
+                        .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
@@ -240,14 +242,15 @@ namespace Shopping.Server.Migrations.Shopping
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("MemberId")
-                        .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("UserGroupId")
                         .IsRequired()
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserGroupId");
 
                     b.ToTable("UserGroupMembers");
                 });
@@ -288,11 +291,14 @@ namespace Shopping.Server.Migrations.Shopping
                 {
                     b.HasOne("Shopping.Shared.Data.ProductItem", "ProductItem")
                         .WithMany()
-                        .HasForeignKey("ProductItemId");
+                        .HasForeignKey("ProductItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Shopping.Shared.Data.ShoppingList", null)
                         .WithMany("Items")
-                        .HasForeignKey("ShoppingListId");
+                        .HasForeignKey("ShoppingListId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Shopping.Shared.Data.Store", b =>
@@ -316,15 +322,26 @@ namespace Shopping.Server.Migrations.Shopping
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("Shopping.Shared.Data.UserGroupMembers", b =>
+                {
+                    b.HasOne("Shopping.Shared.Data.UserGroup", "UserGroup")
+                        .WithMany()
+                        .HasForeignKey("UserGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Shopping.Shared.Data.UserGroupShoppingList", b =>
                 {
                     b.HasOne("Shopping.Shared.Data.ShoppingList", "ShoppingList")
                         .WithMany()
-                        .HasForeignKey("ShoppingListId");
+                        .HasForeignKey("ShoppingListId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Shopping.Shared.Data.UserGroup", "UserGroup")
                         .WithMany()
-                        .HasForeignKey("UserGroupId");
+                        .HasForeignKey("UserGroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
