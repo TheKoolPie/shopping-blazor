@@ -2,7 +2,7 @@
 
 namespace Shopping.Shared.Results
 {
-    public class UserGroupResult : BaseResult<UserGroup>
+    public class ShoppingListItemResult : BaseResult<ShoppingListItem>
     {
     }
 }

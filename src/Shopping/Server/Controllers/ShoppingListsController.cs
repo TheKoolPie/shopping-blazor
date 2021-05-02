@@ -8,6 +8,7 @@ using Shopping.Server.Services;
 using Shopping.Shared.Data;
 using Shopping.Shared.Exceptions;
 using Shopping.Shared.Model.Account;
+using Shopping.Shared.Results;
 using Shopping.Shared.Services;
 using Shopping.Shared.Services.Interfaces;
 
@@ -31,136 +32,181 @@ namespace Shopping.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ShoppingList>>> GetLists()
+        public async Task<ActionResult<ShoppingListResult>> GetLists()
         {
             var user = await _users.GetUserAsync();
 
-            List<ShoppingList> lists = new List<ShoppingList>();
-
+            var result = new ShoppingListResult();
+            result.IsSuccessful = true;
             if (await _users.IsUserAdminAsync())
             {
-                lists = await _lists.GetAllAsync();
+                result.ResultData = await _lists.GetAllAsync();
             }
             else
             {
-                lists = await _lists.GetAllOfUserAsync(user.Id);
+                result.ResultData = await _lists.GetAllOfUserAsync(user.Id);
             }
-            return Ok(lists);
+            return Ok(result);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<ShoppingList>> GetList(string id)
+        public async Task<ActionResult<ShoppingListResult>> GetList(string id)
         {
-            ShoppingList list;
+            var result = new ShoppingListResult();
             try
             {
-                list = await _lists.GetAsync(id);
-                if (!(await IsUserAuthorizedToAccessList(list.Id)))
+                if (!(await IsUserAuthorizedToAccessList(id)))
                 {
-                    return Unauthorized();
+                    result.IsSuccessful = true;
+                    result.ErrorMessages.Add("Not authorized");
+                    return Unauthorized(result);
                 }
+
+                var list = await _lists.GetAsync(id);
+                result.IsSuccessful = true;
+                result.ResultData.Add(list);
             }
-            catch (ItemNotFoundException)
+            catch (ItemNotFoundException e)
             {
-                return NotFound();
+                result.IsSuccessful = true;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
             }
 
-            return Ok(list);
+            return Ok(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult<ShoppingList>> CreateList(ShoppingList shoppingList)
+        public async Task<ActionResult<ShoppingListResult>> CreateList(ShoppingList shoppingList)
         {
             var user = await _users.GetUserAsync();
             shoppingList.OwnerId = user.Id;
 
-            ShoppingList item;
+            var result = new ShoppingListResult();
             try
             {
-                item = await _lists.CreateAsync(shoppingList);
+                result.IsSuccessful = true;
+                var item = await _lists.CreateAsync(shoppingList);
+                result.IsSuccessful = true;
+                result.ResultData.Add(item);
             }
-            catch (ItemAlreadyExistsException)
+            catch (ItemAlreadyExistsException e)
             {
-                return Conflict();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return Conflict(result);
             }
-            catch (PersistencyException)
+            catch (PersistencyException e)
             {
-                return Conflict();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return Conflict(result);
             }
-            return Ok(item);
+            return Ok(result);
         }
         [HttpPost("AddItem/{id}")]
-        public async Task<ActionResult<ShoppingListItem>> AddItemToList(string id, [FromBody] ShoppingListItem item)
+        public async Task<ActionResult<ShoppingListItemResult>> AddItemToList(string id, [FromBody] ShoppingListItem item)
         {
-            ShoppingListItem createdItem;
+            var result = new ShoppingListItemResult();
             try
             {
                 if (!(await IsUserAuthorizedToAccessList(id)))
                 {
-                    return Unauthorized();
+                    result.IsSuccessful = false;
+                    result.ErrorMessages.Add("Not authorized");
+                    return Unauthorized(result);
                 }
-                createdItem = await _lists.AddOrUpdateItemAsync(id, item);
+                var createdItem = await _lists.AddOrUpdateItemAsync(id, item);
+                result.IsSuccessful = true;
+                result.ResultData.Add(createdItem);
+
             }
-            catch (ItemNotFoundException)
+            catch (ItemNotFoundException e)
             {
-                return NotFound();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
             }
-            catch (PersistencyException)
+            catch (PersistencyException e)
             {
-                return Conflict();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return Conflict(result);
             }
 
-            return Ok(createdItem);
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ShoppingList>> UpdateList(string id, ShoppingList list)
+        public async Task<ActionResult<ShoppingListResult>> UpdateList(string id, ShoppingList list)
         {
+            var result = new ShoppingListResult();
             if (id != list.Id)
             {
-                return BadRequest();
+                result.IsSuccessful = true;
+                result.ErrorMessages.Add("Id does not match");
+                return BadRequest(result);
             }
-            ShoppingList updatedList;
             try
             {
                 if (!(await IsUserAuthorizedToAccessList(list.Id)))
                 {
-                    return Unauthorized();
+                    result.IsSuccessful = false;
+                    result.ErrorMessages.Add("Not authorized");
+                    return Unauthorized(result);
                 }
-                updatedList = await _lists.UpdateAsync(id, list);
+                var updatedList = await _lists.UpdateAsync(id, list);
+                result.ResultData.Add(updatedList);
             }
-            catch (ItemNotFoundException)
+            catch (ItemNotFoundException e)
             {
-                return NotFound();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
             }
-            catch (PersistencyException)
+            catch (PersistencyException e)
             {
-                return Conflict();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return Conflict(result);
             }
 
-            return Ok(updatedList);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<bool>> DeleteList(string id)
+        public async Task<ActionResult<ShoppingListResult>> DeleteList(string id)
         {
+            var result = new ShoppingListResult();
             try
             {
                 if (!(await IsUserAuthorizedToAccessList(id)))
                 {
-                    return Unauthorized();
+                    result.IsSuccessful = false;
+                    result.ErrorMessages.Add("Not authorized");
+                    return Unauthorized(result);
                 }
 
-                await _lists.DeleteByIdAsync(id);
+                var deleteResult = await _lists.DeleteByIdAsync(id);
+                if (!deleteResult)
+                {
+                    result.IsSuccessful = false;
+                    result.ErrorMessages.Add($"Could not delete list '{id}'");
+                    return UnprocessableEntity(result);
+                }
             }
-            catch (ItemNotFoundException)
+            catch (ItemNotFoundException e)
             {
-                return NotFound();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return NotFound(result);
             }
-            catch (PersistencyException)
+            catch (PersistencyException e)
             {
-                return Conflict();
+                result.IsSuccessful = false;
+                result.ErrorMessages.Add(e.Message);
+                return Conflict(result);
             }
-            return Ok();
+            return Ok(result);
         }
 
 
