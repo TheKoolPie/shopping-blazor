@@ -23,6 +23,7 @@ using Shopping.Shared.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
 using Shopping.Server.Filter;
 using Shopping.Server.Services.Implementations.Repos;
+using System;
 
 namespace Shopping.Server
 {
@@ -40,7 +41,16 @@ namespace Shopping.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(o =>
-                o.UseMySql(Configuration.GetConnectionString("IdentityMySQL")));
+            {
+                o.UseMySql(Configuration.GetConnectionString("IdentityMySQL"),
+                    sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 10,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null);
+                    });
+            });
 
             services.AddDefaultIdentity<ShoppingUser>()
                 .AddRoles<IdentityRole>()
