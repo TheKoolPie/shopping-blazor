@@ -133,10 +133,10 @@ namespace Shopping.Server
                 endpoints.MapFallbackToFile("index.html");
             });
 
-            AdminSettings admin = Configuration.GetSection("AdminSettings").Get<AdminSettings>();
-            List<string> userRoles = Configuration.GetSection("UserRoles").Get<List<string>>();
-            ApplicationDbInitializer.SeedRoles(roleManager, userRoles, logger);
-            ApplicationDbInitializer.SeedUsers(userManager, admin, userRoles, logger);
+            //AdminSettings admin = Configuration.GetSection("AdminSettings").Get<AdminSettings>();
+            //List<string> userRoles = Configuration.GetSection("UserRoles").Get<List<string>>();
+            //ApplicationDbInitializer.SeedRoles(roleManager, userRoles, logger);
+            //ApplicationDbInitializer.SeedUsers(userManager, admin, userRoles, logger);
         }
     }
 }
